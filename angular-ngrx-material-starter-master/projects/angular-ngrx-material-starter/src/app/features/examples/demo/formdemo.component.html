@@ -1,0 +1,62 @@
+<div class="container" rtl>
+    <div class="row">
+        <div class="col">
+            <h1 class="main-heading">form nhập dữ liệu</h1>
+        </div>
+    </div>
+    <ng-container *ngIf="formValueChanges$ | async as updatedForm">
+        {{update(updatedForm)}}
+    </ng-container>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <mat-card>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput placeholder="User name" formControlName="username">
+                            <mat-error *ngIf="form.get('username').invalid">
+                                User name {{ 'anms.examples.form.error1' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput type="password" placeholder="Password" formControlName="password">
+                            <mat-error *ngIf="form.get('password').invalid">
+                                Password {{ 'anms.examples.form.error1' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput placeholder="Email" formControlName="email">
+                            <mat-error *ngIf="form.get('username').invalid">
+                                Email {{ 'anms.examples.form.error1' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput placeholder="Password" formControlName="password">
+                            <mat-error *ngIf="form.get('password').invalid">
+                                Password {{ 'anms.examples.form.error1' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <textarea matInput placeholder="Trích yếu" formControlName="description" minlength="10" maxlength="1000" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="3" cdkAutosizeMaxRows="10"></textarea>
+                            <mat-hint align="end">{{form.get('description').value?.length}} / 1000
+                            </mat-hint>
+                            <mat-error *ngIf="form.get('description').hasError('required')">
+                                {{ 'anms.examples.form.placeholder4' | translate }} {{ 'anms.examples.form.error1' | translate }}
+                            </mat-error>
+                            <mat-error *ngIf="form.get('description').hasError('minlength')">
+                                {{ 'anms.examples.form.placeholder4' | translate }} {{ 'anms.examples.form.error3' | translate }} 10
+                            </mat-error>
+                            <mat-error *ngIf="form.get('description').hasError('maxlength')">
+                                {{ 'anms.examples.form.placeholder4' | translate }} {{ 'anms.examples.form.error4' | translate }} 1000
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </form>
+</div>
