@@ -35,10 +35,11 @@ export class AppComponent implements OnInit {
   logo = require('../../assets/logo.png');
   languages = ['en', 'de', 'sk', 'fr', 'es', 'pt-br', 'zh-cn', 'he'];
   navigation = [
-    { link: 'about', label: 'anms.menu.about' },
-    { link: 'feature-list', label: 'anms.menu.features' },
-    { link: 'examples', label: 'anms.menu.examples' },
-  //  { link: 'documents', label: 'documents' }
+    { link: 'examples', label: 'Văn bản đến' },
+    { link: 'feature-list', label: 'Văn bản đi' },
+    { link: 'examples', label: 'Hồ sơ' },
+    { link: 'about', label: 'Danh mục' },
+    { link: 'feature-list', label: 'Truyền thông nội bộ' }
   ];
   navigationSideMenu = [
     ...this.navigation,
