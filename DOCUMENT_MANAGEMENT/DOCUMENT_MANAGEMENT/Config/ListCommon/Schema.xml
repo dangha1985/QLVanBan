@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" Title="ListCommon" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/ListCommon" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <MetaData>
+    <ContentTypes>
+      
+      
+    <ContentType ID="0x01009853306d828442989da8087035b6f9de" Name="ListFieldsContentType"><FieldRefs><FieldRef ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Name="Title" /><FieldRef ID="{dd24318d-ffc0-4a91-8237-a4be7d94b8c7}" Name="Mail_OutOfDate_subject" /><FieldRef ID="{1bf98ea6-e7e3-4692-99df-e27e3b5112c3}" Name="Mail_OutOfDate_content" /><FieldRef ID="{e05adc78-0a0f-46f0-bdc4-49af24acdf21}" Name="Mail_OutOfDate_subject_field" /><FieldRef ID="{b6c539c3-979d-44b8-91a7-e2f94726365f}" Name="Mail_OutOfDate_content_field" /><FieldRef ID="{f70dd98f-3666-4cd1-89e8-ef4403c8e0ab}" Name="IndexId" /><FieldRef ID="{f7d77cc3-65d5-45da-ac06-fe3a07ecf8ae}" Name="Mail_Comment_Subject" /><FieldRef ID="{f4e11eb6-1691-4bb9-b387-a30e8dadd847}" Name="Mail_Comment_Field" /><FieldRef ID="{e1a2c29a-39f4-455e-8b54-a2e6347aa39b}" Name="Mail_Comment_Content" /><FieldRef ID="{b13c77cc-f01e-4bab-ba24-ec05403305c8}" Name="typeSidebarMenu" /><FieldRef ID="{e762c15b-0af7-4cee-813c-ca8d7f2920dc}" Name="AppAdmin" /><FieldRef ID="{f95532a0-fdce-4269-afe1-1ea05d92e94b}" Name="Mail_CommentGoal_Subject" /><FieldRef ID="{04bb529c-b640-4624-a9f5-006b5ea70f7d}" Name="Mail_CommentGoal_Field" /><FieldRef ID="{1c354079-e05d-414c-93ad-07ac5ee3d58d}" Name="Mail_CommentGoal_Content" /><FieldRef ID="{5b3a176a-f761-4eb6-97ae-d7929b8c1269}" Name="NumDateline" /><FieldRef ID="{764fef67-b269-46f9-8da7-f47641a6dc0d}" Name="NDayAlert" /><FieldRef ID="{b0e21b40-7d91-42f7-a288-ea7afcb59704}" Name="NDaySlowAlert" /><FieldRef ID="{85462f2e-4667-4745-a439-2f914605c891}" Name="HoursAlert" /><FieldRef ID="{eedcf053-843b-4f22-876c-53bfcbdd0283}" Name="HoursSlowAlert" /><FieldRef ID="{ac5479fe-0d06-402d-8340-9822ea1fc32f}" Name="Mail_OverdueB_Subject" /><FieldRef ID="{5ecba19e-a189-4020-a413-adb357514ec1}" Name="Mail_OverdueB_Field" /><FieldRef ID="{723a3c06-7461-49de-b3bb-7c09e924af87}" Name="Mail_OverdueB_Content" /><FieldRef ID="{fa98f2ed-06a7-4f7d-bc50-424639f3a4ef}" Name="Mail_Overdue_Subject" /><FieldRef ID="{4b41920b-5663-4122-9480-bd7d9ec982f0}" Name="Mail_Overdue_Field" /><FieldRef ID="{aed4be67-01c9-4636-ae30-e8b143d1be76}" Name="Mail_Overdue_Content" /></FieldRefs></ContentType><ContentTypeRef ID="0x01">
+        <Folder TargetName="Item" />
+      </ContentTypeRef><ContentTypeRef ID="0x0120" /></ContentTypes>
+    <Fields>
+      
+    <Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="$Resources:core,Title;" Required="TRUE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" MaxLength="255" /><Field Name="Mail_OutOfDate_subject" ID="{dd24318d-ffc0-4a91-8237-a4be7d94b8c7}" DisplayName="Mail_OutOfDate_subject" Type="Note" /><Field Name="Mail_OutOfDate_content" ID="{1bf98ea6-e7e3-4692-99df-e27e3b5112c3}" DisplayName="Mail_OutOfDate_content" Type="Note" /><Field Name="Mail_OutOfDate_subject_field" ID="{e05adc78-0a0f-46f0-bdc4-49af24acdf21}" DisplayName="Mail_OutOfDate_subject_field" Type="Text" /><Field Name="Mail_OutOfDate_content_field" ID="{b6c539c3-979d-44b8-91a7-e2f94726365f}" DisplayName="Mail_OutOfDate_content_field" Type="Text" /><Field Name="IndexId" ID="{f70dd98f-3666-4cd1-89e8-ef4403c8e0ab}" DisplayName="IndexId" Type="Number" /><Field Name="Mail_Comment_Subject" ID="{f7d77cc3-65d5-45da-ac06-fe3a07ecf8ae}" DisplayName="Mail_Comment_Subject" Type="Text" /><Field Name="Mail_Comment_Field" ID="{f4e11eb6-1691-4bb9-b387-a30e8dadd847}" DisplayName="Mail_Comment_Field" Type="Text" /><Field Name="Mail_Comment_Content" ID="{e1a2c29a-39f4-455e-8b54-a2e6347aa39b}" DisplayName="Mail_Comment_Content" Type="Note" /><Field Name="typeSidebarMenu" ID="{b13c77cc-f01e-4bab-ba24-ec05403305c8}" DisplayName="typeSidebarMenu" Type="Number" /><Field Name="AppAdmin" ID="{e762c15b-0af7-4cee-813c-ca8d7f2920dc}" DisplayName="AppAdmin" Type="UserMulti" Mult="TRUE" /><Field Name="Mail_CommentGoal_Subject" ID="{f95532a0-fdce-4269-afe1-1ea05d92e94b}" DisplayName="Mail_CommentGoal_Subject" Type="Text" /><Field Name="Mail_CommentGoal_Field" ID="{04bb529c-b640-4624-a9f5-006b5ea70f7d}" DisplayName="Mail_CommentGoal_Field" Type="Text" /><Field Name="Mail_CommentGoal_Content" ID="{1c354079-e05d-414c-93ad-07ac5ee3d58d}" DisplayName="Mail_CommentGoal_Content" Type="Note" /><Field Name="NumDateline" ID="{5b3a176a-f761-4eb6-97ae-d7929b8c1269}" DisplayName="NumDateline" Type="Number" /><Field Name="NDayAlert" ID="{764fef67-b269-46f9-8da7-f47641a6dc0d}" DisplayName="NDayAlert" Type="Number" /><Field Name="NDaySlowAlert" ID="{b0e21b40-7d91-42f7-a288-ea7afcb59704}" DisplayName="NDaySlowAlert" Type="Number" /><Field Name="HoursAlert" ID="{85462f2e-4667-4745-a439-2f914605c891}" DisplayName="HoursAlert" Type="Number" /><Field Name="HoursSlowAlert" ID="{eedcf053-843b-4f22-876c-53bfcbdd0283}" DisplayName="HoursSlowAlert" Type="Number" /><Field Name="Mail_OverdueB_Subject" ID="{ac5479fe-0d06-402d-8340-9822ea1fc32f}" DisplayName="Mail_OverdueB_Subject" Type="Note" /><Field Name="Mail_OverdueB_Field" ID="{5ecba19e-a189-4020-a413-adb357514ec1}" DisplayName="Mail_OverdueB_Field" Type="Note" /><Field Name="Mail_OverdueB_Content" ID="{723a3c06-7461-49de-b3bb-7c09e924af87}" DisplayName="Mail_OverdueB_Content" Type="Note" /><Field Name="Mail_Overdue_Subject" ID="{fa98f2ed-06a7-4f7d-bc50-424639f3a4ef}" DisplayName="Mail_Overdue_Subject" Type="Note" /><Field Name="Mail_Overdue_Field" ID="{4b41920b-5663-4122-9480-bd7d9ec982f0}" DisplayName="Mail_Overdue_Field" Type="Note" /><Field Name="Mail_Overdue_Content" ID="{aed4be67-01c9-4636-ae30-e8b143d1be76}" DisplayName="Mail_Overdue_Content" Type="Note" /></Fields>
+    <Views>
+      
+      
+    <View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+          
+        <FieldRef Name="LinkTitleNoMenu"></FieldRef></ViewFields>
+        <Query>
+          <OrderBy>
+            
+          <FieldRef Name="Modified" Ascending="FALSE"></FieldRef></OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" />
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" />
+        </ParameterBindings>
+      </View><View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/15/images/generic.png?rev=23" Url="AllItems.aspx">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <JSLink>clienttemplates.js</JSLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+          
+        <FieldRef Name="Title" /><FieldRef Name="Mail_OutOfDate_subject" /><FieldRef Name="Mail_OutOfDate_content" /><FieldRef Name="Mail_OutOfDate_subject_field" /><FieldRef Name="Mail_OutOfDate_content_field" /><FieldRef Name="IndexId" /><FieldRef Name="Mail_Comment_Subject" /><FieldRef Name="Mail_Comment_Field" /><FieldRef Name="Mail_Comment_Content" /><FieldRef Name="typeSidebarMenu" /><FieldRef Name="AppAdmin" /><FieldRef Name="Mail_CommentGoal_Subject" /><FieldRef Name="Mail_CommentGoal_Field" /><FieldRef Name="Mail_CommentGoal_Content" /><FieldRef Name="NumDateline" /><FieldRef Name="NDayAlert" /><FieldRef Name="NDaySlowAlert" /><FieldRef Name="HoursAlert" /><FieldRef Name="HoursSlowAlert" /><FieldRef Name="Mail_OverdueB_Subject" /><FieldRef Name="Mail_OverdueB_Field" /><FieldRef Name="Mail_OverdueB_Content" /><FieldRef Name="Mail_Overdue_Subject" /><FieldRef Name="Mail_Overdue_Field" /><FieldRef Name="Mail_Overdue_Content" /></ViewFields>
+        <Query>
+          <OrderBy>
+            
+          <FieldRef Name="ID"></FieldRef></OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" />
+        </ParameterBindings>
+      </View><View BaseViewID="2" Name="ad06ac2b-160d-4c0c-b883-b2fc6d4592fc" DisplayName="Item Detail" Type="HTML" WebPartZoneID="Main" SetupPath="pages\viewpage.aspx" Url="Item Detail.aspx"><ViewFields><FieldRef Name="Title" /><FieldRef Name="IndexId" /><FieldRef Name="Mail_OutOfDate_content" /><FieldRef Name="Mail_OutOfDate_content_field" /><FieldRef Name="Mail_OutOfDate_subject" /><FieldRef Name="Mail_OutOfDate_subject_field" /></ViewFields><Query /><Toolbar Type="Standard" /><XslLink Default="TRUE">main.xsl</XslLink><JSLink>clienttemplates.js</JSLink></View></Views>
+    <Forms>
+      <Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+    </Forms>
+  </MetaData>
+</List>

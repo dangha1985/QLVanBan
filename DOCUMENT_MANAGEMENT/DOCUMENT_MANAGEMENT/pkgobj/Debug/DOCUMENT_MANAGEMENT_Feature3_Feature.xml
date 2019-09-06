@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Id="b537fc7e-7976-4706-a28b-5fd91d5d8d05" Scope="Web" Title="DOCUMENT_MANAGEMENT Feature3" Version="1.0.0.6">
+  <ElementManifests>
+    <ElementManifest Location="ListCreateList\Elements.xml" />
+    <ElementFile Location="ListCreateList\Schema.xml" />
+    <ElementManifest Location="ListCreateListInstance\Elements.xml" />
+  </ElementManifests>
+  <UpgradeActions>
+    <VersionRange>
+      <ApplyElementManifests>
+        <ElementManifest Location="ListCreateList\Elements.xml" />
+        <ElementManifest Location="ListCreateListInstance\Elements.xml" />
+      </ApplyElementManifests>
+    </VersionRange>
+  </UpgradeActions>
+</Feature>

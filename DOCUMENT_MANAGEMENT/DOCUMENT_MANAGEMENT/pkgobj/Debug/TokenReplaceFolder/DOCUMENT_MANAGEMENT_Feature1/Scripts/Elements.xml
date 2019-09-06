@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <Module Name="Scripts">
+    <File Path="Scripts\App.js" Url="Scripts/App.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\jquery-1.9.1.min.map" Url="Scripts/jquery-1.9.1.min.map" ReplaceContent="TRUE" />
+    <File Path="Scripts\jquery-1.9.1.min.js" Url="Scripts/jquery-1.9.1.min.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\jquery-1.9.1.js" Url="Scripts/jquery-1.9.1.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\jquery-1.9.1.intellisense.js" Url="Scripts/jquery-1.9.1.intellisense.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\AppCommon.js" Url="Scripts/AppCommon.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\AppPermision.js" Url="Scripts/AppPermision.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\CreateList.js" Url="Scripts/CreateList.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\ListCommonFunction.js" Url="Scripts/ListCommonFunction.js" ReplaceContent="TRUE" />
+    <File Path="Scripts\ListFunction.js" Url="Scripts/ListFunction.js" ReplaceContent="TRUE" />
+  </Module>
+</Elements>

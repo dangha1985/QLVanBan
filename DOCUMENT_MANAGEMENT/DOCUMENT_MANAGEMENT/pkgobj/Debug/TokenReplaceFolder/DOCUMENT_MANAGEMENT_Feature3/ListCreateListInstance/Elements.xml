@@ -1,0 +1,310 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ListInstance Title="ListCreateList" OnQuickLaunch="TRUE" TemplateType="100" Url="Lists/ListCreateList" Description="My List Instance">
+    <Data>
+      <Rows>
+        <!--BEGIN NHÂN VIÊN-->
+        <Row>
+          <Field Name="ID">1</Field>
+          <Field Name="Title">EmployeeList</Field>
+          <Field Name="TitleName">FisrtName:, LastName:, EmailId:, NickName:, Mobile_Phone:, OtherEmail:, BirthDate: DateTime, MaritalStatus:, Address:, Tags:, DepartmentID: Number,DepartmentName:,EmpLevel:, IDParent: Number,ParentName:, SourceOfHireID: Number, SeatingLocation:, LocationID: Number, DesignationID: Number, DateOfJoining: DateTime, StatusID: Number,StatusCode:,StatusName:, EmpTypeID: Number, Work_Phone:, Extension:Note, RoleID: Number, Experience: Number, JobDescription:Note, Expertise:Note, AboutMe:Note, DateOfExit: DateTime, GenderId:, Photo:,Skyper:,AddToGroup:,Supply:,ParkingTicket:Number,InsuranceRegime:,BankAccount:,BankName:</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">2</Field>
+          <Field Name="Title">DependentList</Field>
+          <Field Name="TitleName">DependentName:,EmployeeID:Number,RelationshipID:Number,DateOfBirth:DateTime</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">3</Field>
+          <Field Name="Title">EducationList</Field>
+          <Field Name="TitleName">SchoolName:,EmployeeID:Number,Degree:,DateOfCompletion:DateTime,FieldOfStudy:,AdditionalNote:Note,Interests:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">4</Field>
+          <Field Name="Title">WorkExperienceList</Field>
+          <Field Name="TitleName">EmployeeID:Number,PreCompanyName:,Job_Title:,FromDate:DateTime,ToDate:DateTime,JobDescription:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">5</Field>
+          <Field Name="Title">ListImage</Field>
+          <Field Name="TitleName"></Field>
+          <Field Name="TemplateType">documentLibrary</Field>
+        </Row>
+        <Row>
+          <Field Name="ID">6</Field>
+          <Field Name="Title">DepartmentList</Field>
+          <Field Name="TitleName">DepartmentLeadID:Number,Code:,IDParent:Number,MailAlias:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">7</Field>
+          <Field Name="Title">DesignationList</Field>
+          <Field Name="TitleName">LevelCode:,LevelName:,MailAlias:,Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">8</Field>
+          <Field Name="Title">LocationList</Field>
+          <Field Name="TitleName">Code:,CountryID:Number,ProvinceID:Number,TimeZoneId:Number,MailAlias:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">9</Field>
+          <Field Name="Title">StatusList</Field>
+          <Field Name="TitleName">Code:,StatusTypeCode:,StatusTypeName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+
+        <Row>
+          <Field Name="ID">10</Field>
+          <Field Name="Title">CountryList</Field>
+          <Field Name="TitleName">Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">11</Field>
+          <Field Name="Title">SourceHireList</Field>
+          <Field Name="TitleName">Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">12</Field>
+          <Field Name="Title">EmployeeTypeList</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">13</Field>
+          <Field Name="Title">RelationshipList</Field>
+          <Field Name="TitleName">Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">14</Field>
+          <Field Name="Title">ProvinceList</Field>
+          <Field Name="TitleName">Code:</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <!--END NHÂN VIÊN-->
+        <!--BEGIN GIAO VIỆC-->
+        <!--<Row>
+          <Field Name="ID">15</Field>
+          <Field Name="Title">CompanyGoalList</Field>
+          <Field Name="TitleName">GTableID:Number,GTableName:,GTableCode:,PercentComplete:Number,StatusCode:,StatusName:,StartDate_:DateTime,DueDate_:DateTime,BusAreaID:Number,BusAreaName:Note,PriorityID:Number,PriorityName:,Note:Note,Weight:Number,KPIName:,FrequencyID:Number,FrequencyName:,CompFactorID:Number,CompFactorName:,UnitMeasureID:Number,UMName:,TargetValue:Number,ActualValue:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">16</Field>
+          <Field Name="Title">DepartmentGoalList</Field>
+          <Field Name="TitleName">DepartmentID:Number,DepartmentName:,EmployeeID:Number,EmployeeName:,CompGoalID:Number,CompGoalName:,PercentComplete:Number,StatusID:Number,StatusName:,StartDate_:DateTime,DueDate_:DateTime,ActStartDate:DateTime,ActDueDate:DateTime,ExtDeadline:DateTime,Deadline:DateTime,BusAreaID:Number,BusAreaName:Note,PriorityID:Number,PriorityName:,Note:Note,Weight:Number,Code:,FrequencyID:Number,FrequencyName:,CompFactorID:Number,CompFactorName:,UnitMeasureID:Number,UMName:,TargetValue:Number,ActualValue:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>-->
+        <Row>
+          <Field Name="ID">17</Field>
+          <Field Name="Title">EmployeeGoalList</Field>
+          <Field Name="TitleName">GTableID:Number,GTableName:,GTableCode:,DepLeadID:Number,UnitCode:,KeyResult:Number,Difficult:Note,IDParentGoal:Number,ParentGoalName:,BusAreaID:Number,BusAreaName:Note,PriorityID:Number,PriorityName:,EManagerID:Number,EManagerName:,PercentComplete:Number,StatusCode:,StatusName:,StartDate_:DateTime,DueDate_:DateTime,ActStartDate:DateTime,ActDueDate:DateTime,ExtDeadline:DateTime,Deadline:DateTime,ActHours:Number,AssignedByID: Number,AssignedByName:,EmployeeID: Number, EmployeeName:,Level:Number, AddedTime: DateTime, EditTime: DateTime, NDayComplete: Number, NDayAssigned: Number, NDayExtDeadline: Number, DepartmentID: Number,DepartmentName:,EmpLevel:, IDParent: Number, EditBy :,Note:Note,Weight:Number,KPIName:,FrequencyID:Number,FrequencyName:,CompFactorID:Number,CompFactorName:,UnitMeasureID:Number,UMName:,TargetValue:Number,ActualValue:Number,DeadlineBefore:DateTime,DeadlineAfter:DateTime,Result:Note,GoalLevel:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">18</Field>
+          <Field Name="Title">MyWorkList</Field>
+          <Field Name="TitleName">GTableID:Number,GTableName:,EmpGoalID:Number,EmpGoalName:,EManagerID:Number,EManagerName:,PercentComplete:Number,Difficult:Note,CalResult:Number,StatusCode:,StatusName:,StartDate_:DateTime,DueDate_:DateTime,ActStartDate:DateTime,ActDueDate:DateTime,ExtDeadline:DateTime,Deadline:DateTime,ActHours:Number, TypeWorkID: Number, TypeWorkName:,EmployeeID: Number, EmployeeName:,AssignedByID:Number,AssignedByName:,NDayComplete: Number, NDayAssigned: Number, NDayExtDeadline: Number, DepartmentID: Number,DepartmentName:, IDParent: Number,PriorityID:Number,PriorityName:, WorkFollowID: Number,WFollowName:,Note:Note,DeadlineBefore:DateTime,DeadlineAfter:DateTime,Result:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">19</Field>
+          <Field Name="Title">TypeWorkList</Field>
+          <Field Name="TitleName">DesignationID:Number,WorkInstructions:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">20</Field>
+          <Field Name="Title">BusinessAreaList</Field>
+          <Field Name="TitleName">Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+
+        <Row>
+          <Field Name="ID">21</Field>
+          <Field Name="Title">StatusTypeList</Field>
+          <Field Name="TitleName">Code:</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">22</Field>
+          <Field Name="Title">ListComments</Field>
+          <Field Name="TitleName">KeyList:, Chat_Comments:Note, AssignTo:UserMulti,SubjectMail:Note,BodyMail:Note,SendMailTo:Note,AlertType:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">38</Field>
+          <Field Name="Title">GTableTemplate</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <!--<Row>
+          <Field Name="ID">39</Field>
+          <Field Name="Title">UseList</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>-->
+        <Row>
+          <Field Name="ID">40</Field>
+          <Field Name="Title">GTableList</Field>
+          <Field Name="TitleName">Code:,StartDate_:DateTime,DueDate_:DateTime,StatusCode:,StatusName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">41</Field>
+          <Field Name="Title">GoalLibrary</Field>
+          <Field Name="TitleName">GGroupID:Number,GGroupName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">42</Field>
+          <Field Name="Title">WorkLibrary</Field>
+          <Field Name="TitleName">WGroupID:Number,WGroupName:,ParentWorkID:Number,CalResult:Number,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">43</Field>
+          <Field Name="Title">CheckList</Field>
+          <Field Name="TitleName">MyWorkID:Number,StatusCode:,StatusName:</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <!--list thong bao chậm dateline-->
+        <Row>
+          <Field Name="ID">44</Field>
+          <Field Name="Title">ListMailAlert</Field>
+          <Field Name="TitleName">KeyList:, SubjectMail:Note,BodyMail:Note,SendMailTo:Note,DateAlert:DateTime,IsFinishRequest:Number,AlertType:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <!--END GIAO VIỆC-->
+
+        <!--BEGIN PHÂN QUYỀN-->
+        <Row>
+          <Field Name="ID">23</Field>
+          <Field Name="Title">RoleList</Field>
+          <Field Name="TitleName">CloneRoleID:Number,IsAdmin:Boolean,LocationAdminID:Number,Note:Note,GroupUser:UserMulti</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">24</Field>
+          <Field Name="Title">PermissionList</Field>
+          <Field Name="TitleName">Order_:Number,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">25</Field>
+          <Field Name="Title">SiteList</Field>
+          <Field Name="TitleName">Path:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">26</Field>
+          <Field Name="Title">RoleInSitePermissionList</Field>
+          <Field Name="TitleName">PermissionID:Number,SiteID:Number,RoleID:Number,PermissionValue:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+
+        <!--END PHÂN QUYỀN-->
+
+        <!--Đánh giá-->
+
+        <Row>
+          <Field Name="ID">27</Field>
+          <Field Name="Title">CatalogList</Field>
+          <Field Name="TitleName">CatGroupCode:,CatGroupName:,Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">28</Field>
+          <Field Name="Title">CatGroupList</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">29</Field>
+          <Field Name="Title">CompFactorList</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+
+        <Row>
+          <Field Name="ID">30</Field>
+          <Field Name="Title">KPIList</Field>
+          <Field Name="TitleName">KPIGroupID:Number,KPIGroupName:,FrequencyID:Number,FrequencyName:,CompFactorID:Number,CompFactorName:,UnitMeasureID:Number,UnitMeasureName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">31</Field>
+          <Field Name="Title">CriteriaList</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">32</Field>
+          <Field Name="Title">ScoreList</Field>
+          <Field Name="TitleName">Score:Number,SLadderID:Number,SLadderName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">33</Field>
+          <Field Name="Title">AppCycleList</Field>
+          <Field Name="TitleName">StartDate_:DateTime,DueDate_:DateTime,Deadline:DateTime,LocationID:,LocationName:,DepartmentID:,DepartmentName:,DesignationID:,DesignationName:,SLadderID:Number,SLadderName:,StatusName:,StatusCode:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">34</Field>
+          <Field Name="Title">ACCriteriaList</Field>
+          <Field Name="TitleName">AppCycleID:Number,CriteriaCode:,CriteriaName:,Weight:Number,Value:Boolean</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">35</Field>
+          <Field Name="Title">EmpAppraisalList</Field>
+          <Field Name="TitleName">AppCycleID:Number,StartDate_:DateTime,DueDate_:DateTime,SLadderID:Number,SLadderName:,IDParent:Number,ParentName:,ParentEmail:,EmployeeID:Number,EmployeeName:,EmpEmail:,StatusCode:,StatusName,EmpScoreTotal:</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">36</Field>
+          <Field Name="Title">EmpAppraisalGoal</Field>
+          <Field Name="TitleName">EmployeeID:Number,EmployeeName:,EmpGoalID:Number,BusAreaID :Number,BusAreaName:,StartDate_:DateTime,DueDate_:DateTime,StatusID:Number,StatusName:,PercentComplete:Number,Weight:Number,Code:,TargetValue:Number,ActualValue:Number,ScoreDetail:,EmpAppraisalID:Number</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">37</Field>
+          <Field Name="Title">AppStatusList</Field>
+          <Field Name="TitleName">Code:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <!-- <Row>
+          <Field Name="ID">30</Field>
+          <Field Name="Title">CompetencyList</Field>
+          <Field Name="TitleName">ComGroupID:Number,ComGroupName:,ComTypeCode:,ComTypeName:,Weight:Number,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">31</Field>
+          <Field Name="Title">ComLevelList</Field>
+          <Field Name="TitleName">Level:,ComID:Number,ComName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>
+        <Row>
+          <Field Name="ID">30</Field>
+          <Field Name="Title">ComDesignationList</Field>
+          <Field Name="TitleName">CompetencyID:Number,DesignationID:Number,DesignationName:,ComGroupID:Number,ComGroupName:,ComTypeCode:,ComTypeName:,Weight:Number,ComLevelID:Number,LevelName:,Note:Note</Field>
+          <Field Name="TemplateType"></Field>
+        </Row>-->
+
+        <!--END đánh giá-->
+
+
+      </Rows>
+    </Data>
+  </ListInstance>
+</Elements>

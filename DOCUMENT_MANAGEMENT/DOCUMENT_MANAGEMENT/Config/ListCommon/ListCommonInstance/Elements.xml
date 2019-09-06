@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ListInstance Title="ListCommon" OnQuickLaunch="TRUE" TemplateType="100" Url="Lists/ListCommon" Description="My List Instance">
+    <Data>
+      <Rows>
+        <Row>
+          <Field Name="ID">1</Field>
+          <Field Name="IndexId">1</Field>
+          <Field Name="Title">App config</Field>
+          <Field Name="Mail_OutOfDate_subject">Request {Title}: Out Of Date</Field>
+          <Field Name="Mail_OutOfDate_content">
+            You have a out of date request ({Title},{TimeRequest}) {UrlTask}
+          </Field>
+          <Field Name="Mail_OutOfDate_subject_field">Title</Field>
+          <Field Name="Mail_OutOfDate_content_field">Title,TimeRequest,UrlTask</Field>
+          <Field Name="Mail_ITTech_Finish_subject">Request {Title}: Finish</Field>
+          <Field Name="Mail_ITTech_Finish_content">
+            Dear {Author}
+            You have a request finish ({Title},{TimeRequest}) {UrlItem}
+            Reason:{Reason}
+          </Field>
+          <Field Name="Mail_ITTech_Finish_subject_field">Title</Field>
+          <Field Name="Mail_ITTech_Finish_content_field">Title,TimeRequest,UrlItem,Reason,Author</Field>
+          <Field Name="Mail_ITTech_New_subject">New Request {Title} </Field>
+          <Field Name="Mail_ITTech_New_content">
+            You have a new request ({Title},{TimeRequest}) {UrlTask}
+          </Field>
+          <Field Name="Mail_ITTech_New_subject_field">Title</Field>
+          <Field Name="Mail_ITTech_New_content_field">Title,TimeRequest,UrlTask</Field>
+        </Row>
+      </Rows>
+    </Data>
+  </ListInstance>
+</Elements>
