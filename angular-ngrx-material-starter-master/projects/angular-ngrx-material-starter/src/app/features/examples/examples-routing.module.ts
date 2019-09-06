@@ -14,7 +14,7 @@ import { NotificationsComponent } from './notifications/components/notifications
 import { UserComponent } from './simple-state-management/components/user.component';
 import { ElementsComponent } from './elements/elements.component';
 import { FormdemoComponent } from './demo/formdemo.component';
-import {DocumentGoComponent }from './../documents/document-go/document-go.component';
+import {DocumentGoComponent }from './documents/document-go/document-go.component';
 const routes: Routes = [
   {
     path: '',

@@ -30,7 +30,7 @@ import { UserComponent } from './simple-state-management/components/user.compone
 import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
 import { FormdemoComponent } from './demo/formdemo.component';
-import {DocumentGoComponent }from './../documents/document-go/document-go.component';
+import {DocumentGoComponent }from './documents/document-go/document-go.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
