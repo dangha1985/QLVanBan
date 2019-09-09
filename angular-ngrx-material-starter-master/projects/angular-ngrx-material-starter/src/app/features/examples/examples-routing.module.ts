@@ -15,7 +15,7 @@ import { UserComponent } from './simple-state-management/components/user.compone
 import { ElementsComponent } from './elements/elements.component';
 import { FormdemoComponent } from './demo/formdemo.component';
 import {DocumentGoComponent }from './documents/document-go/document-go.component';
-import {DocumentAddComponent} from './documents/document-to/document-add.component'
+import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
 
 const routes: Routes = [
   {
@@ -67,11 +67,11 @@ const routes: Routes = [
         component: FormdemoComponent,
         data: { title: 'demo' }
       },
-      {
-        path: 'documentgo',
-        component: DocumentGoComponent,
-        data: { title: 'documentgo' }
-      },
+      // {
+      //   path: 'documentgo',
+      //   component: DocumentGoComponent,
+      //   data: { title: 'documentgo' }
+      // },
       {
         path: 'notifications',
         component: NotificationsComponent,

@@ -1,0 +1,208 @@
+<form [formGroup]="IncomingDocform" (ngSubmit)="submit()">
+    <div fxLayout="column" #formNew *ngIf="addNew">
+        <div class="actions">
+            <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+            <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
+        </div>
+        <div class="form-input" fxLayout="column">
+            <div class="caption" fxFlexFill>
+                <span class="d-flex justify-content-between align-items-baseline">
+                          <h3>Thông tin văn bản</h3>
+                        </span>
+            </div>
+            <div fxLayout="column">
+                <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
+                    <mat-form-field fxFlex="50">
+                        <mat-label>Sổ văn bản *</mat-label>
+                        <mat-select formControlName="bookType">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let item of ListBookType" value={{item.code}}>{{item.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="50">
+                        <input matInput placeholder="Số đến *" formControlName="numberTo">
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
+                    <mat-form-field fxFlex="50">
+                        <input matInput placeholder="Số phụ" formControlName="numberToSub">
+                    </mat-form-field>
+                    <mat-form-field fxFlex="50">
+                        <input matInput placeholder="Số / Ký hiệu" formControlName="numberOfSymbol">
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
+                    <mat-form-field fxFlex="50">
+                        <mat-label>Nơi gửi *</mat-label>
+                        <mat-select formControlName="source">
+                            <mat-option>None</mat-option>
+                            <mat-option>Công ty ABC</mat-option>
+                            <mat-option>Bưu điện Cầu Giấy</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="50">
+                        <mat-label>Loại văn bản *</mat-label>
+                        <mat-select formControlName="docType">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let item of ListDocType" value={{item.id}}>{{item.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="10px">
+                    <mat-form-field fxFlex="50">
+                        <mat-label>Ngày ban hành</mat-label>
+                        <input matInput [matDatepicker]="picker" placeholder="Start date" formControlName="promulgatedDate">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="50">
+                        <mat-label>Ngày đến</mat-label>
+                        <input matInput [matDatepicker]="picker2" placeholder="End date" [value]="date.value" formControlName="dateTo">
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker #picker2></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                <mat-form-field fxFlex="100">
+                    <textarea matInput placeholder="Trích yếu *" formControlName="compendium"></textarea>
+                </mat-form-field>
+            </div>
+            <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
+                <mat-form-field fxFlex="50">
+                    <mat-label>Độ mật</mat-label>
+                    <mat-select formControlName="secretLevel">
+                        <mat-option>None</mat-option>
+                        <mat-option *ngFor="let item of getListSecret" value={{item.id}}>{{item.title}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field fxFlex="50">
+                    <mat-label>Độ khẩn</mat-label>
+                    <mat-select formControlName="urgentLevel">
+                        <mat-option>None</mat-option>
+                        <mat-option *ngFor="let item of ListUrgent" value={{item.id}}>{{item.title}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
+                <!-- multiple -->
+                <mat-form-field fxFlex="50">
+                    <mat-label>Người xử lý</mat-label>
+                    <mat-select formControlName="userHandle">
+                        <mat-option>None</mat-option>
+                        <mat-option>Ha Thanh Loan</mat-option>
+                        <mat-option>Nguyen Thi La</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field fxFlex="50">
+                    <mat-label>Hạn xử lý</mat-label>
+                    <input matInput [matDatepicker]="picker3" placeholder="End date" formControlName="deadline">
+                    <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                    <mat-datepicker #picker3></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                <mat-form-field fxFlex="100">
+                    <textarea matInput placeholder="Nội dung xử lý" formControlName="note"></textarea>
+                </mat-form-field>
+            </div>
+            <div class="div-checkbox" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                <section class="example-section">
+                    <mat-checkbox class="example-margin" formControlName="isRespinse" [(ngModel)]="checked">Yêu cầu trả lời</mat-checkbox> &nbsp;
+                    <mat-checkbox class="example-margin" formControlName="isSendMail" [(ngModel)]="indeterminate">Gửi email</mat-checkbox>
+                </section>
+            </div>
+            <div class="div-checkbox" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                <div fxFlex="120px" fxFlex.xs="calc(100%-120px)">
+                    <button type="button" mat-raised-button color="primary"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-input" fxLayout="column">
+            <div class="caption" fxFlexFill>
+                <span class="d-flex justify-content-between align-items-baseline">
+                          <h3>Thông tin khác</h3>
+                        </span>
+            </div>
+            <div fxLayout="column">
+                <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
+                    <mat-form-field fxFlex="50">
+                        <input matInput placeholder="Người ký" formControlName="signer">
+                    </mat-form-field>
+                    <mat-form-field fxFlex="25">
+                        <input matInput placeholder="Số bản" formControlName="numberOfCopies">
+                    </mat-form-field>
+                    <mat-form-field fxFlex="25">
+                        <mat-label>Phương thức nhận</mat-label>
+                        <mat-select formControlName="methodReceipt">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let item of ListMethodReceipt" value={{item.id}}>{{item.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div fxLayout="row" class="actions">
+            <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+            <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
+        </div>
+    </div>
+</form>
+<div class="row" style="display:inline" *ngIf="showList">
+    <div fxFlexFill fxLayoutAlign="end">
+        <button mat-stroked-button color="primary" style="margin-right: 10px" (click)="addNew = !addNew; showList = !showList" ng-model="addNew">
+            <mat-icon>note_add</mat-icon>&nbsp; Vào sổ văn bản
+        </button>
+        <input class="docadd-filter" fxFlex="200px" fxLayout matInput (keyup)="applyFilter($event.target.value)" placeholder="Tìm kiếm">
+    </div>
+    <div fxFlexFill>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <!-- [dataSource]="dataSource" -->
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef> No. </th>
+                <td mat-cell *matCellDef="let element"> {{element.numberTo}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Type </th>
+                <td mat-cell *matCellDef="let element"> {{element.bookType}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="weight">
+                <th mat-header-cell *matHeaderCellDef> Note </th>
+                <td mat-cell *matCellDef="let element"> {{element.compendium}} </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="symbol">
+                <th mat-header-cell *matHeaderCellDef> Symbol </th>
+                <td mat-cell *matCellDef="let element"> {{element.numberOfSymbol}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+            </tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
+</div>
