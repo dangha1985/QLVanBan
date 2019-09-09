@@ -15,6 +15,8 @@ import { UserComponent } from './simple-state-management/components/user.compone
 import { ElementsComponent } from './elements/elements.component';
 import { FormdemoComponent } from './demo/formdemo.component';
 import {DocumentGoComponent }from './documents/document-go/document-go.component';
+import {DocumentAddComponent} from './documents/document-to/document-add.component'
+
 const routes: Routes = [
   {
     path: '',
@@ -26,9 +28,9 @@ const routes: Routes = [
         pathMatch: 'full'
       },
       {
-        path: 'todos',
-        component: TodosContainerComponent,
-        data: { title: 'anms.examples.menu.todos' }
+        path: 'doc-to',
+        component: DocumentAddComponent,
+        data: { title: 'Tiếp nhận văn bản' }
       },
       {
         path: 'stock-market',

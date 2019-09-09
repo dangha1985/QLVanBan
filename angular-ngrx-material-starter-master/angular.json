@@ -29,6 +29,7 @@
               "projects/angular-ngrx-material-starter/src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
               "projects/angular-ngrx-material-starter/src/styles-app-loading.scss",
               "projects/angular-ngrx-material-starter/src/styles.scss"
             ],
@@ -106,6 +107,7 @@
               "projects/angular-ngrx-material-starter/src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
               "projects/angular-ngrx-material-starter/src/styles-app-loading.scss",
               "projects/angular-ngrx-material-starter/src/styles.scss"
             ],
@@ -130,7 +132,9 @@
               "projects/angular-ngrx-material-starter/tsconfig.spec.json",
               "projects/angular-ngrx-material-starter/e2e/tsconfig.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         },
         "e2e": {

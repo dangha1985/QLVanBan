@@ -7,7 +7,7 @@ import { CoreModule } from './core/core.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app/app.component';
-import {DocumentsModule } from '././features/documents/documents.module';
+import {DocumentsModule } from './features/examples/documents/documents.module';
 import { from } from 'rxjs';
 
 

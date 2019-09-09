@@ -6,6 +6,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { FEATURE_NAME, reducers } from '.././../examples/examples.state';
+import {MatTableModule} from '@angular/material/table';
+
 //import { DocumentGoComponent }from './document-go/document-go.component';
 
 // export function HttpLoaderFactory(http: HttpClient) {
@@ -19,6 +21,7 @@ import { FEATURE_NAME, reducers } from '.././../examples/examples.state';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     LazyElementsModule,
+    MatTableModule,
 
     StoreModule.forFeature(FEATURE_NAME, reducers)
     //   TranslateModule.forChild({

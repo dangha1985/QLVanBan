@@ -5,7 +5,8 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
+import {MatTableModule} from '@angular/material/table';
+import {FlexLayoutModule} from '@angular/flex-layout'
 import { SharedModule } from '../../shared/shared.module';
 import { environment } from '../../../environments/environment';
 
@@ -31,6 +32,7 @@ import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
 import { FormdemoComponent } from './demo/formdemo.component';
 import {DocumentGoComponent }from './documents/document-go/document-go.component';
+import {DocumentAddComponent} from './documents/document-to/document-add.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -61,7 +63,9 @@ export function HttpLoaderFactory(http: HttpClient) {
       StockMarketEffects,
       BooksEffects,
       FormEffects
-    ])
+    ]),
+     MatTableModule,
+     FlexLayoutModule,
   ],
   declarations: [
     ExamplesComponent,
@@ -76,7 +80,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     UserComponent,
     ElementsComponent,
     FormdemoComponent,
-    DocumentGoComponent
+    DocumentGoComponent,
+    DocumentAddComponent,
   ],
   providers: [StockMarketService, UserService]
 })
