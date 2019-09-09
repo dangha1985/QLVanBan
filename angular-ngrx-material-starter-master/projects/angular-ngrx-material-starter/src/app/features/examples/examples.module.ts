@@ -80,7 +80,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     UserComponent,
     ElementsComponent,
     FormdemoComponent,
-    DocumentGoComponent,
+   // DocumentGoComponent,
     DocumentAddComponent,
   ],
   providers: [StockMarketService, UserService]

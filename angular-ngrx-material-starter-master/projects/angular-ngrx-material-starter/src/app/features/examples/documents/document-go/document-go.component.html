@@ -1,25 +1,35 @@
-<div class="container" rtl>
-    <div class="row">
+<div class="" rtl #formNew *ngIf="addNew">
+    <div class="actions">
+        <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Trình ký</span></button>
+        <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Nhập lại</span></button>
+    </div>
+    <div class="caption" fxFlexFill>
+        <span class="d-flex justify-content-between align-items-baseline uppercase portlet_title_tsg_2">
+                      <h3>Thêm mới dự thảo</h3>
+                    </span>
+    </div>
+    <!-- <div class="row">
         <div class="col">
             <h1 class="main-heading">THÊM MỚI VĂN BẢN ĐI</h1>
         </div>
-    </div>
+    </div> -->
+
     <!-- <ng-container *ngIf="formValueChanges$ | async as updatedForm">
         {{update(updatedForm)}}
     </ng-container> -->
     <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <mat-card>
+                    <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px"> -->
                     <div class="row">
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
                             <input matInput placeholder="Ký hiệu" formControlName="NumSymbol">
-                            <!-- <mat-error *ngIf="form.get('NumSymbol').invalid">
-                                {{ 'anms.examples.form.placeholder1' | translate }} {{ 'anms.examples.form.error1' | translate }}
-                            </mat-error> -->
                         </mat-form-field>
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
-                            <mat-select placeholder="Loại văn bản" [(ngModel)]="selectedDocType">
+                            <mat-select placeholder="Loại văn bản" [(ngModel)]="selectedDocType" formControlName="DocType">
                                 <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -29,7 +39,7 @@
                             <textarea matInput placeholder="Trích yếu" formControlName="Compendium" minlength="10" maxlength="1000" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="3" cdkAutosizeMaxRows="10"></textarea>
                             <mat-hint align="end">{{form.get('Compendium').value?.length}} / 1000
                             </mat-hint>
-                            <!-- <mat-error *ngIf="form.get('Compendium').hasError('required')">
+                            <mat-error *ngIf="form.get('Compendium').hasError('required')">
                                 {{ 'anms.examples.form.placeholder4' | translate }} {{ 'anms.examples.form.error1' | translate }}
                             </mat-error>
                             <mat-error *ngIf="form.get('Compendium').hasError('minlength')">
@@ -37,25 +47,165 @@
                             </mat-error>
                             <mat-error *ngIf="form.get('Compendium').hasError('maxlength')">
                                 {{ 'anms.examples.form.placeholder4' | translate }} {{ 'anms.examples.form.error4' | translate }} 1000
-                            </mat-error> -->
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Nơi nhận nội bộ" [(ngModel)]="selectedDocType" formControlName="RecipientsIn">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Nơi nhận ngoài hệ thống" [(ngModel)]="selectedDocType" formControlName="RecipientsOut">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Người xử lý chính" [(ngModel)]="selectedDocType" formControlName="UserOfHandle">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Người phối hợp" [(ngModel)]="selectedDocType" formControlName="UserOfCombinate">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Người nhận để biết" [(ngModel)]="selectedDocType" formControlName="UserOfKnow">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Người ký" [(ngModel)]="selectedDocType" formControlName="Signer">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
                         </mat-form-field>
                     </div>
                     <!-- <div class="row">
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
-                            <input matInput placeholder="Email" formControlName="email">
-                            <mat-error *ngIf="form.get('username').invalid">
-                                Email {{ 'anms.examples.form.error1' | translate }}
-                            </mat-error>
+                            <mat-select placeholder="Độ mật" [(ngModel)]="selectedDocType">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
                         </mat-form-field>
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
-                            <input matInput placeholder="Password" formControlName="password">
-                            <mat-error *ngIf="form.get('password').invalid">
-                                Password {{ 'anms.examples.form.error1' | translate }}
-                            </mat-error>
+                            <mat-select placeholder="Độ khẩn" [(ngModel)]="selectedDocType" formControlName="Signer">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput placeholder="Số bản" formControlName="NumOfPaper">
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <mat-select placeholder="Phương thức gửi" [(ngModel)]="selectedDocType" formControlName="Signer">
+                                <mat-option *ngFor="let item of ListDocType" value={{item.ID}}>{{item.Title}}</mat-option>
+                            </mat-select>
                         </mat-form-field>
                     </div> -->
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput [matDatepicker]="picker1" placeholder="Hạn xử lý" [value]="" formControlName="Deadline">
+                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                            <mat-datepicker #picker1></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <input matInput [matDatepicker]="picker2" placeholder="Ngày phát hành" [value]="" formControlName="DateIssued">
+                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                            <textarea matInput placeholder="Ghi chú" formControlName="Note" minlength="10" maxlength="1000" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="3" cdkAutosizeMaxRows="10"></textarea>
+                            <!-- <mat-hint align="end">{{form.get('Note').value?.length}} / 1000
+                            </mat-hint>
+                           
+                            <mat-error *ngIf="form.get('Note').hasError('maxlength')">
+                                {{ 'anms.examples.form.placeholder4' | translate }} {{ 'anms.examples.form.error4' | translate }} 1000
+                            </mat-error> -->
+                        </mat-form-field>
+                    </div>
+                    <!-- <mat-card-title>
+                        <div fxLayout="row" fxLayoutAlign="end stretch" fxFlexFill fxLayoutGap="5px">
+                            <div fxLayout="row" fxLayoutAlign="end stretch" fxLayoutGap="5px">
+                                <button mat-stroked-button color="primary" type="button"> <span class="Submit1">Submit</span></button>
+                                <button mat-stroked-button type="button"> <span class="Reset1">Reset</span></button>
+                            </div>
+                        </div>
+                    </mat-card-title> -->
+                    <!-- <div class="row  d-flex ">
+                        <button mat-raised-button color="primary"> Lưu</button>
+                        <button type="button" mat-raised-button color="accent" (click)="save()"> Trình ký</button>
+                        <button type="reset" mat-raised-button (click)="reset()">Hủy</button>
+                    </div> -->
+                    <div class="actions">
+                        <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+                        <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+                        <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Trình ký</span></button>
+                        <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Nhập lại</span></button>
+                    </div>
                 </mat-card>
             </div>
         </div>
     </form>
+</div>
+<div class="row" style="display:inline" *ngIf="showList">
+    <div fxFlexFill fxLayoutAlign="end">
+        <button mat-stroked-button color="primary" style="margin-right: 10px" (click)="addNew = !addNew; showList = !showList" ng-model="addNew">
+            <mat-icon>note_add</mat-icon>&nbsp; Thêm mới văn bản trình ký
+        </button>
+        <input class="docadd-filter" fxFlex="200px" fxLayout matInput (keyup)="applyFilter($event.target.value)" placeholder="Tìm kiếm">
+    </div>
+    <div fxFlexFill>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <!-- [dataSource]="dataSource" -->
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef> No. </th>
+                <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="weight">
+                <th mat-header-cell *matHeaderCellDef> Weight </th>
+                <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="symbol">
+                <th mat-header-cell *matHeaderCellDef> Symbol </th>
+                <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+            </tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
 </div>

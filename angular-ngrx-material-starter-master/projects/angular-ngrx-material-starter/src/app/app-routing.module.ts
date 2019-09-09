@@ -29,11 +29,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./features/examples/examples.module').then(m => m.ExamplesModule)
   },
-  // {
-  //   path: 'documents',
-  //   loadChildren: () =>
-  //     import('./features/documents/documents.module').then(m => m.DocumentsModule)
-  // },
+  {
+    path: 'documents',
+    loadChildren: () =>
+      import('./features/examples/documents/documents.module').then(m => m.DocumentsModule)
+  },
   {
     path: '**',
     redirectTo: 'about'
