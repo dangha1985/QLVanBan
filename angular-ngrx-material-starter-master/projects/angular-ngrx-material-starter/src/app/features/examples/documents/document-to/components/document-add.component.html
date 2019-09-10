@@ -2,8 +2,8 @@
     <div fxLayout="column" #formNew *ngIf="addNew">
         <div class="actions">
             <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem(-1)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem(0)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
             <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
         </div>
         <div class="form-input" fxLayout="column">
@@ -38,8 +38,8 @@
                         <mat-label>Nơi gửi *</mat-label>
                         <mat-select formControlName="source">
                             <mat-option>None</mat-option>
-                            <mat-option>Công ty ABC</mat-option>
-                            <mat-option>Bưu điện Cầu Giấy</mat-option>
+                            <mat-option value="1">Công ty ABC</mat-option>
+                            <mat-option value="2">Bưu điện Cầu Giấy</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field fxFlex="50">
@@ -75,7 +75,7 @@
                     <mat-label>Độ mật</mat-label>
                     <mat-select formControlName="secretLevel">
                         <mat-option>None</mat-option>
-                        <mat-option *ngFor="let item of getListSecret" value={{item.id}}>{{item.title}}</mat-option>
+                        <mat-option *ngFor="let item of ListSecret" value={{item.id}}>{{item.title}}</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field fxFlex="50">
@@ -92,8 +92,8 @@
                     <mat-label>Người xử lý</mat-label>
                     <mat-select formControlName="userHandle">
                         <mat-option>None</mat-option>
-                        <mat-option>Ha Thanh Loan</mat-option>
-                        <mat-option>Nguyen Thi La</mat-option>
+                        <mat-option value="12">Ha Thanh Loan</mat-option>
+                        <mat-option value="47">Nguyen Thi La</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field fxFlex="50">
@@ -147,8 +147,8 @@
         </div>
         <div fxLayout="row" class="actions">
             <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem(-1)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem(0)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
             <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
         </div>
     </div>

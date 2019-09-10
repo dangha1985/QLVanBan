@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class ResApiService {
   private restUrl = environment.proxyUrl;
+  private restAPI = 'https://tsgvietnam.sharepoint.com/sites/dev/Ha_Document';
   private currentUserAPI = "/_api/web/currentUser";
   private urlUserInfo = "/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v=";
 
@@ -78,6 +79,6 @@ export class ResApiService {
   }
 
   AddItemToList(listName, data){
-    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('`+ listName +`')/items`, data, this.httpOptions);
+    return this.http.post(`${this.restAPI}/_api/web/lists/getbytitle('`+ listName +`')/items`, data, this.httpOptions);
   }
 }

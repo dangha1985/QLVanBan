@@ -21,7 +21,7 @@
         "contributors:add": "all-contributors add",
         "contributors:generate": "all-contributors generate && node .all-contributors-html.js",
         "contributors:check": "all-contributors check",
-        "spProxy": "node ./projects/server/server.js"
+        "spProxy": "node ./server.js"
     },
     "husky": {
         "hooks": {

@@ -24,6 +24,14 @@ export class IncomingDocService {
     this.model = this.modelFactory.create([...ELEMENT_DATA]);
     this.inDocs$ = this.model.data$;
    }
+
+   FindItemById(array, id) {
+    return array.find(i => parseInt(i.id) === parseInt(id));
+  }
+
+  FindItemByCode(array, value) {
+    return array.find(i => i.code === value);
+  }
 }
 
 export interface IncomingDoc {

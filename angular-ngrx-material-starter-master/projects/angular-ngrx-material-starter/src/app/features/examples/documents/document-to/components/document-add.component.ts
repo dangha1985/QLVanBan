@@ -51,7 +51,7 @@ export class DocumentAddComponent implements OnInit {
     this.getMethodReceipt();
 
     this.IncomingDocform = this.fb.group({
-      bookType: '',
+      bookType: 'DT',
       numberTo: ['', [Validators.required]],
       numberToSub: '',
       numberOfSymbol: '',
@@ -110,7 +110,6 @@ export class DocumentAddComponent implements OnInit {
         })
       });
     })
-    console.warn(this.ListBookType);
   }
 
   getDocType() {
@@ -165,17 +164,51 @@ export class DocumentAddComponent implements OnInit {
     })
   }
 
-  AddNewItem() {
-    const data = {
-      __metadata: { type: 'SP.Data.ListDocumentTo' },
-
+  AddNewItem(sts) {
+    if (this.IncomingDocform.valid) {
+      const dataForm = this.IncomingDocform.getRawValue();
+      let bookT = this.docTo.FindItemByCode(this.ListBookType, dataForm.bookType);
+      let docT = this.docTo.FindItemById(this.ListDocType, dataForm.docType);
+      let secretL = this.docTo.FindItemById(this.ListSecret, dataForm.secretLevel);
+      let urgentL = this.docTo.FindItemById(this.ListUrgent, dataForm.urgentLevel);
+      let method = this.docTo.FindItemById(this.ListMethodReceipt, dataForm.methodReceipt);
+      const data = {
+        __metadata: { type: 'SP.Data.ListDocumentTo' },
+        BookTypeCode: dataForm.bookType,
+        BookTypeName: bookT === undefined ? '' : bookT.title,
+        NumberTo: dataForm.numberTo,
+        NumberToSub: dataForm.numberToSub,
+        NumberOfSymbol: dataForm.numberOfSymbol,
+        Source: dataForm.source,
+        DocTypeID: dataForm.docType,
+        DocTypeName: docT === undefined ? '' : docT.title,
+        PromulgatedDate: dataForm.promulgatedDate,
+        DateTo: dataForm.dateTo,
+        DateCreated: new Date(),
+        Compendium: dataForm.compendium,
+        SecretLevelID: dataForm.secretLevel,
+        SecretLevelName: secretL === undefined ? '' : secretL.title,
+        UrgentLevelID: dataForm.urgentLevel,
+        UrgentLevelName: urgentL === undefined ? '' : urgentL.title,
+        Deadline: dataForm.deadline,
+        NumOfCopies: dataForm.numberOfCopies,
+        MethodReceiptID: dataForm.methodReceipt,
+        MethodReceipt: method === undefined ? '' : method.title,
+        UserOfHandle: dataForm.userHandle,
+        Note: dataForm.note,
+        IsResponse: dataForm.IsResponse ? 1 : 0,
+        IsRetrieve: dataForm.IsRetrieve ? 1 : 0,
+        StatusID: sts,
+        StatusName: sts === 0 ? "Chờ xử lý" : "Lưu tạm",
+        Signer: dataForm.signer
+      }
+      this.services.AddItemToList('ListDocumentTo', data).subscribe(
+        item => {},
+        error => console.log("error when add item to list ListDocumentTo: "+ error),
+        () => {
+          console.log("Add item of approval user to list ListDocumentTo successfully!");
+        });
     }
-    this.services.AddItemToList('ListDocumentTo', data).subscribe(
-      item => {},
-      error => console.log("error when add item to list ListRequestSendMail: "+ error),
-      () => {
-        console.log("Add item of approval user to list ListRequestSendMail successfully!");
-      });
   }
 
 }
