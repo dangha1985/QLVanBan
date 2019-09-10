@@ -79,6 +79,6 @@ export class ResApiService {
   }
 
   AddItemToList(listName, data){
-    return this.http.post(`${this.restAPI}/_api/web/lists/getbytitle('`+ listName +`')/items`, data, this.httpOptions);
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('`+ listName +`')/items`, data, this.httpOptions);
   }
 }

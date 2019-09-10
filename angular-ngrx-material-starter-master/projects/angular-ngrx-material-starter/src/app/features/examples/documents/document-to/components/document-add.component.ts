@@ -173,7 +173,8 @@ export class DocumentAddComponent implements OnInit {
       let urgentL = this.docTo.FindItemById(this.ListUrgent, dataForm.urgentLevel);
       let method = this.docTo.FindItemById(this.ListMethodReceipt, dataForm.methodReceipt);
       const data = {
-        __metadata: { type: 'SP.Data.ListDocumentTo' },
+        __metadata: { type: 'SP.Data.ListDocumentToListItem' },
+        Title: dataForm.bookType,
         BookTypeCode: dataForm.bookType,
         BookTypeName: bookT === undefined ? '' : bookT.title,
         NumberTo: dataForm.numberTo,
