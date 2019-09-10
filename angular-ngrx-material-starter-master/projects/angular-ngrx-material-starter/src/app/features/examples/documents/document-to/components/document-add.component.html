@@ -1,16 +1,16 @@
-<form [formGroup]="IncomingDocform" (ngSubmit)="submit()">
+<form [formGroup]="IncomingDocform">
     <div fxLayout="column" #formNew *ngIf="addNew">
         <div class="actions">
             <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
             <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
         </div>
         <div class="form-input" fxLayout="column">
             <div class="caption" fxFlexFill>
                 <span class="d-flex justify-content-between align-items-baseline">
-                          <h3>Thông tin văn bản</h3>
-                        </span>
+                    <h3>Thông tin văn bản</h3>
+                </span>
             </div>
             <div fxLayout="column">
                 <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
@@ -53,13 +53,13 @@
                 <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="10px">
                     <mat-form-field fxFlex="50">
                         <mat-label>Ngày ban hành</mat-label>
-                        <input matInput [matDatepicker]="picker" placeholder="Start date" formControlName="promulgatedDate">
+                        <input matInput [matDatepicker]="picker" formControlName="promulgatedDate">
                         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
                     <mat-form-field fxFlex="50">
                         <mat-label>Ngày đến</mat-label>
-                        <input matInput [matDatepicker]="picker2" placeholder="End date" [value]="date.value" formControlName="dateTo">
+                        <input matInput [matDatepicker]="picker2" [value]="date.value" formControlName="dateTo">
                         <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
                         <mat-datepicker #picker2></mat-datepicker>
                     </mat-form-field>
@@ -98,7 +98,7 @@
                 </mat-form-field>
                 <mat-form-field fxFlex="50">
                     <mat-label>Hạn xử lý</mat-label>
-                    <input matInput [matDatepicker]="picker3" placeholder="End date" formControlName="deadline">
+                    <input matInput [matDatepicker]="picker3" formControlName="deadline">
                     <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
                     <mat-datepicker #picker3></mat-datepicker>
                 </mat-form-field>
@@ -147,8 +147,8 @@
         </div>
         <div fxLayout="row" class="actions">
             <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
-            <button mat-stroked-button color="primary" type="button" class="MR5"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewItem()"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
             <button mat-stroked-button color="warn" type="button" class="MR5"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
         </div>
     </div>

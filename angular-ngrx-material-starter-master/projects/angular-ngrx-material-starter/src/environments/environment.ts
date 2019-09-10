@@ -24,5 +24,5 @@ export const environment = {
     typescript: packageJson.devDependencies['typescript'],
     cypress: packageJson.devDependencies['cypress']
   },
-  proxyUrl: 'https://tsgvietnam.sharepoint.com/sites/dev/Ha_Document'
+  proxyUrl: 'http://localhost:8080'
 };

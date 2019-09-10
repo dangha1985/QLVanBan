@@ -36,40 +36,48 @@ export class ResApiService {
     // loginName = 'i:0%23.f|membership|tuyen.nguyen@tsg.net.vn';
     return this.http.get(`${this.restUrl}${this.urlUserInfo}` + `'` + loginName + `'`);
   }
-  getListDepartment(){
+  getListDepartment() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListDepartment')/items`);
   }
-  getListUrgent(){
+  getListUrgent() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListUrgent')/items`);
   }
-  getListSecret(){
+  getListSecret() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListSecret')/items`);
   }
-  getListBookType(){
-    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListBookType')/items`);
+  getListBookType() : Observable<any> {
+    let abc = this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListBookType')/items`);
+    abc.subscribe((res : any[])=>{
+      console.log(res);
+    })
+    return abc;
   }
-  getListDocType(){
+  getListDocType() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListDocType')/items`);
   }
-  getListRole(){
+  getListRole() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListRole')/items`);
   }
-  getListStatus(){
+  getListStatus() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListStatus')/items`);
   }
-  getListStatusType(){
+  getListStatusType() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListStatusType')/items`);
   }
-  getListMethodSend(){
+  getListMethodSend() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMethodSend')/items`);
   }
-  getListTaskType(){
+  getListTaskType() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListTaskType')/items`);
   }
-  getListMapEmployee(){
+  getListMapEmployee() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMapEmployee')/items`);
   }
-  getListTotalStep(){
+  getListTotalStep() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListTotalStep')/items`);
+  }
+
+  AddItemToList(listName, data){
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('`+ listName +`')/items`, data, this.httpOptions);
   }
 }

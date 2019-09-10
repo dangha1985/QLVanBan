@@ -43,6 +43,7 @@ export class DocumentAddComponent implements OnInit {
     });
     this.dataSource = new MatTableDataSource<IncomingDoc>(this.inDocs$);
     this.dataSource.paginator = this.paginator;
+    // this.services.getListBookType();
     this.getBookType();
     this.getDocType();
     this.getSecretLevel();
@@ -54,17 +55,17 @@ export class DocumentAddComponent implements OnInit {
       numberTo: ['', [Validators.required]],
       numberToSub: '',
       numberOfSymbol: '',
-      source: 0,
-      docType: 0,
+      source: '',
+      docType: '',
       promulgatedDate: null,
       dateTo: null,
-      compendium: '',
-      secretLevel: 0,
-      urgentLevel: 0,
+      compendium: ['', [Validators.required]],
+      secretLevel: '',
+      urgentLevel: '',
       deadline: null,
-      numberOfCopies: 0,
-      methodReceipt: 0,
-      userHandle: 0,
+      numberOfCopies: '',
+      methodReceipt: '',
+      userHandle: '',
       note: '',
       isRespinse: false,
       isSendMail: false,
@@ -99,8 +100,8 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getBookType() {
-    this.services.getListBookType().subscribe(itemValue => {
-      let item = itemValue["Value"] as Array<any>;
+    this.services.getListBookType().subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;
       item.forEach(element => {
         this.ListBookType.push({
           id: element.ID,
@@ -109,11 +110,12 @@ export class DocumentAddComponent implements OnInit {
         })
       });
     })
+    console.warn(this.ListBookType);
   }
 
   getDocType() {
-    this.services.getListDocType().subscribe(itemValue => {
-      let item = itemValue["Value"] as Array<any>;
+    this.services.getListDocType().subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;
       item.forEach(element => {
         this.ListDocType.push({
           id: element.ID,
@@ -125,8 +127,8 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getSecretLevel() {
-    this.services.getListSecret().subscribe(itemValue => {
-      let item = itemValue["Value"] as Array<any>;
+    this.services.getListSecret().subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;
       item.forEach(element => {
         this.ListSecret.push({
           id: element.ID,
@@ -138,8 +140,8 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getUrgentLevel() {
-    this.services.getListUrgent().subscribe(itemValue => {
-      let item = itemValue["Value"] as Array<any>;
+    this.services.getListUrgent().subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;
       item.forEach(element => {
         this.ListUrgent.push({
           id: element.ID,
@@ -151,8 +153,8 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getMethodReceipt() {
-    this.services.getListMethodSend().subscribe(itemValue => {
-      let item = itemValue["Value"] as Array<any>;
+    this.services.getListMethodSend().subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;
       item.forEach(element => {
         this.ListMethodReceipt.push({
           id: element.ID,
@@ -161,6 +163,19 @@ export class DocumentAddComponent implements OnInit {
         })
       });
     })
+  }
+
+  AddNewItem() {
+    const data = {
+      __metadata: { type: 'SP.Data.ListDocumentTo' },
+
+    }
+    this.services.AddItemToList('ListDocumentTo', data).subscribe(
+      item => {},
+      error => console.log("error when add item to list ListRequestSendMail: "+ error),
+      () => {
+        console.log("Add item of approval user to list ListRequestSendMail successfully!");
+      });
   }
 
 }

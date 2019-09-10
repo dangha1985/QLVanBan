@@ -13,7 +13,6 @@ import { FormComponent } from './form/components/form.component';
 import { NotificationsComponent } from './notifications/components/notifications.component';
 import { UserComponent } from './simple-state-management/components/user.component';
 import { ElementsComponent } from './elements/elements.component';
-import { FormdemoComponent } from './demo/formdemo.component';
 import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
 
@@ -61,11 +60,6 @@ const routes: Routes = [
         path: 'form',
         component: FormComponent,
         data: { title: 'anms.examples.menu.form' }
-      },
-      {
-        path: 'demo',
-        component: FormdemoComponent,
-        data: { title: 'demo' }
       },
       // {
       //   path: 'documentgo',

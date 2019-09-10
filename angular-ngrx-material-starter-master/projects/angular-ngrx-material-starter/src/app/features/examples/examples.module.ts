@@ -30,7 +30,6 @@ import { ExamplesEffects } from './examples.effects';
 import { UserComponent } from './simple-state-management/components/user.component';
 import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
-import { FormdemoComponent } from './demo/formdemo.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
 
@@ -79,7 +78,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     NotificationsComponent,
     UserComponent,
     ElementsComponent,
-    FormdemoComponent,
    // DocumentGoComponent,
     DocumentAddComponent,
   ],
