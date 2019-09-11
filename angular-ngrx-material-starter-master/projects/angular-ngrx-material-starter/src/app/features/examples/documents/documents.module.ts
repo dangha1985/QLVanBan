@@ -58,7 +58,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 ],
   declarations: [
     DocumentComponent,
-      DocumentGoComponent
+      DocumentGoComponent,
   ],
   providers: [StockMarketService, UserService]
 })

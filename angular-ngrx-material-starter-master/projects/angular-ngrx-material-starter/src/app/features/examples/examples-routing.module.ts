@@ -15,6 +15,7 @@ import { UserComponent } from './simple-state-management/components/user.compone
 import { ElementsComponent } from './elements/elements.component';
 import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
+import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
 
 const routes: Routes = [
   {
@@ -30,6 +31,11 @@ const routes: Routes = [
         path: 'doc-to',
         component: DocumentAddComponent,
         data: { title: 'Tiếp nhận văn bản' }
+      },
+      {
+        path: 'doc-detail/:id',
+        component: DocumentDetailComponent,
+        data: { title: 'Xem chi tiết' }
       },
       {
         path: 'stock-market',

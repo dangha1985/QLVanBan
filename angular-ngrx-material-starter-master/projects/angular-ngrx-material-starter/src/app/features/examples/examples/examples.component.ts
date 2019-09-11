@@ -21,6 +21,7 @@ export class ExamplesComponent implements OnInit {
 
   examples = [
     { link: 'doc-to', label: 'Tiếp nhận văn bản' },
+    { link: 'doc-detail/:id', label: 'Xem chi tiết' },
     { link: 'stock-market', label: 'anms.examples.menu.stocks' },
     { link: 'theming', label: 'anms.examples.menu.theming' },
     { link: 'crud', label: 'anms.examples.menu.crud' },

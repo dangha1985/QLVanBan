@@ -1,0 +1,142 @@
+<div fxLayout="column" fxFlexFill class="route-container">
+    <div fxFlexFil class="actions">
+        <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+        <button mat-stroked-button color="submit" type="button" class="MR5" (click)="AddNewItem(-1)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+        <button mat-stroked-button color="submit" type="button" class="MR5" (click)="AddNewItem(0)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+        <button mat-stroked-button color="warn" type="button" class="MR5" (click)="reset()"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Reset</span></button>
+    </div>
+    <div fxLayout="row" fxFlexFill fxLayoutGap="15px">
+        <div fxFlex="60" fxFlex.sm="100" fxLayout="column">
+            <div class="caption">
+                <span class="d-flex justify-content-between align-items-baseline">
+                    <h3 class="title">Thông tin văn bản</h3>
+                </span>
+            </div>
+            <mat-card fxFlexFill>
+                <mat-card-content>
+                    <form class="example-form">
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Tiêu đề:</p>
+                                <p fxFlex="auto"> LeaveItem.Title</p>
+                            </div>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Mục đích:</p>
+                                <p fxFlex="auto">LeaveItem.Purpose</p>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Người phê duyệt:</p>
+                                <p fxFlex="auto">LeaveItem.UserApproval</p>
+                            </div>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Loại xin nghỉ:</p>
+                                <p fxFlex="auto">LeaveItem.LeaveType</p>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Thời gian nghỉ:</p>
+                                <p fxFlex="auto">LeaveItem.LeaveTime</p>
+                            </div>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Thời gian bắt đâu:</p>
+                                <p fxFlex="auto">LeaveItem.StartTime</p>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Thời gian kết thúc:</p>
+                                <p fxFlex="auto">LeaveItem.EndTime</p>
+                            </div>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Người yêu cầu:</p>
+                                <p fxFlex="auto">LeaveItem.Author</p>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Trạng thái:</p>
+                                <p fxFlex="auto">LeaveItem.Status</p>
+                            </div>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Thời gian tạo:</p>
+                                <p fxFlex="auto">LeaveItem.Created</p>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Lý do:</p>
+                                <p fxFlex="auto">LeaveItem.Reason</p>
+                            </div>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Inform To:</p>
+                                <p fxFlex="auto">LeaveItem.InformTo</p>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                                <p fxFlex="25" class="form-label">Tài liệu đính kèm</p>
+                                <div fxFlex="auto">
+                                    <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                        <a *ngFor="let item of ItemAttachments" href="item.urlFile" target="_blank">item.name</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        <div fxFlex="auto" fxLayout="column">
+            <div class="caption">
+                <span class="d-flex justify-content-between align-items-baseline" style="display:inline-block !important">
+                    <h3 class="title">Ý kiến xử lý</h3>
+                </span>
+                <span class="span-icon">
+                    <i class="material-icons" style="font-size: 16px !important">receipt</i>
+                </span>
+            </div>
+            <mat-card fxFlexFill>
+                <mat-card-content>
+                    <div fxLayout="column" fxFlexFill fxLayoutGap="15px">
+                        <div fxLayout="column">
+                            <mat-form-field>
+                                <mat-label>Bình luận</mat-label>
+                                <textarea matInput [(ngModel)]="Comments" rows="3" required></textarea>
+                            </mat-form-field>
+                            <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
+                                <div fxFlex="120px" fxFlex.xs="auto">
+                                    <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
+                                    <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
+                                </div>
+                                <div fxFlex="auto">
+                                    <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                        <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> items.name</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div fxLayout="row" fxLayoutAlign="end start" fxLayout.xs="column" fxFlexFill fxLayoutGap="5px">
+                                <button mat-stroked-button color="primary" type="button" (click)="SendComment()"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
+                            </div>
+
+                        </div>
+                        <div class="cmt-item" *ngFor="let item of listComment">
+                            <div class="cmt-img">
+                                <img src="item.userPicture">
+                            </div>
+                            <div class="cmt-content">
+                                <h3 id="cmt-author">item.Author <span id="cmt-date">item.Created</span></h3>
+                                <p id="cmt-title">item.Chat_Comments</p>
+                                <div fxLayout="column">
+                                    <a *ngFor="let itemAtt of item.itemAttach" href="itemAtt.urlFile" target="_blank">itemAtt.name</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>
