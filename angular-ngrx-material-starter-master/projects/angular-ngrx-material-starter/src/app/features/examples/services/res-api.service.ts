@@ -47,11 +47,7 @@ export class ResApiService {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListSecret')/items`);
   }
   getListBookType() : Observable<any> {
-    let abc = this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListBookType')/items`);
-    abc.subscribe((res : any[])=>{
-      console.log(res);
-    })
-    return abc;
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListBookType')/items`);
   }
   getListDocType() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListDocType')/items`);
@@ -67,6 +63,9 @@ export class ResApiService {
   }
   getListMethodSend() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMethodSend')/items`);
+  }
+  getListSourceAddress() : Observable<any> {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListSourceAddress')/items`);
   }
   getListTaskType() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListTaskType')/items`);

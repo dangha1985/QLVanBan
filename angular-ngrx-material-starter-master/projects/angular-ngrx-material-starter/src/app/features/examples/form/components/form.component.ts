@@ -89,6 +89,6 @@ export class FormComponent implements OnInit {
     this.form.reset();
     this.form.clearValidators();
     this.form.clearAsyncValidators();
-    this.store.dispatch(actionFormReset());
+    //this.store.dispatch(actionFormReset());
   }
 }
