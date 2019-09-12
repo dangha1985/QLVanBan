@@ -16,6 +16,7 @@ import { ElementsComponent } from './elements/elements.component';
 import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
 import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
+import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
 
 const routes: Routes = [
   {
@@ -31,6 +32,11 @@ const routes: Routes = [
         path: 'doc-to',
         component: DocumentAddComponent,
         data: { title: 'Tiếp nhận văn bản' }
+      },
+      {
+        path: 'doc-list',
+        component: DocumentWaitingComponent,
+        data: { title: 'Chờ xử lý' }
       },
       {
         path: 'doc-detail/:id',

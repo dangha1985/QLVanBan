@@ -8,6 +8,11 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'examples',
+    loadChildren: () =>
+      import('./features/examples/examples.module').then(m => m.ExamplesModule)
+  },
+  {
     path: 'about',
     loadChildren: () =>
       import('./features/about/about.module').then(m => m.AboutModule)
@@ -23,12 +28,7 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () =>
       import('./features/settings/settings.module').then(m => m.SettingsModule)
-  },
-  {
-    path: 'examples',
-    loadChildren: () =>
-      import('./features/examples/examples.module').then(m => m.ExamplesModule)
-  },
+  },  
   {
     path: 'documents',
     loadChildren: () =>

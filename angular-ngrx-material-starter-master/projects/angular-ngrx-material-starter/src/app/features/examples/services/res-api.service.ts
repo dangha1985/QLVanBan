@@ -30,6 +30,14 @@ export class ResApiService {
       'Content-Type': 'application/json;odata=verbose'
     })
   }
+  httpOptionsFile = {
+    headers: new HttpHeaders({
+      'accept': 'application/json;odata=verbose',
+      // 'dataType': 'json',
+      'Content-Type': 'application/json;odata=verbose',
+    })
+  }
+  
   getCurrentUser(){
     return this. http.get(`${this.restUrl}${this.currentUserAPI}`);
   }
@@ -79,5 +87,10 @@ export class ResApiService {
 
   AddItemToList(listName, data){
     return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('`+ listName +`')/items`, data, this.httpOptions);
+  }
+
+  //attachment file
+  inserAttachmentFile(data, filename, listName, indexItem) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/GetByTitle('`+ listName +`')/items(`+ indexItem +`)/AttachmentFiles/add(FileName='` + filename + `')`,data, this.httpOptionsFile);
   }
 }

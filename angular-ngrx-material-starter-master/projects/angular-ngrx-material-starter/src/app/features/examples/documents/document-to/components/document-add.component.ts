@@ -28,6 +28,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentAddComponent implements OnInit {
+  listTitle = "ListDocumentTo";
   inDocs$: IncomingDoc[]= [];
   displayedColumns: string[] = ['select', 'numberTo', 'bookType', 'compendium', 'dateTo']; //'select'
   dataSource = new MatTableDataSource<IncomingDoc>();
@@ -38,6 +39,8 @@ export class DocumentAddComponent implements OnInit {
   addNew = false;
   showList = true;
   userApproverId = '';
+  currentUserName = '';
+  currentUserId = '';
   userApproverEmail = '';
   currentNumberTo = 0;
   IncomingDocform: FormGroup;
@@ -48,6 +51,10 @@ export class DocumentAddComponent implements OnInit {
   ListMethodReceipt : ItemSeleted[] = [];
   ListSource: ItemSeleted[] = [];
   ApproverStep: ApproverObject[] = [];
+  DocumentID = 0;
+  outputFile = []; 
+  displayFile = ''; 
+  buffer;
 
   constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
@@ -55,6 +62,7 @@ export class DocumentAddComponent implements OnInit {
 
   ngOnInit() {
     this.getAllListDocument();
+    this.getCurrentUser();
     this.getBookType();
     this.getDocType();
     this.getSecretLevel();
@@ -99,18 +107,19 @@ export class DocumentAddComponent implements OnInit {
           numberOfSymbol: element.NumberOfSymbol, 
           source: element.Source, 
           docType: element.DocTypeName, 
-          promulgatedDate: element.PromulgatedDate, 
-          dateTo: this.docTo.FormatDateShow(element.DateTo, undefined), 
+          promulgatedDate: this.docTo.CheckNull(element.PromulgatedDate) === '' ? '' : moment(element.PromulgatedDate).format('DD/MM/YYYY'), 
+          dateTo: this.docTo.CheckNull(element.DateTo) === '' ? '' : moment(element.DateTo).format('DD/MM/YYYY'), 
           compendium: element.Compendium, 
           secretLevel: element.SecretLevelName, 
           urgentLevel: element.UrgentLevelName, 
-          deadline: element.Deadline, 
+          deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'), 
           numberOfCopies: element.NumOfCopies, 
           methodReceipt: element.MethodReceipt, 
           userHandle: element.UserOfHandle !== undefined ? element.UserOfHandle.Title : '', 
           note: element.Note, 
-          isRespinse: element.IsResponse === 0 ? false : true, 
-          isSendMail: true, 
+          isResponse: element.IsResponse === 0 ? "Không" : "Có", 
+          isSendMail: "Có", 
+          isRetrieve: element.IsRetrieve=== 0 ? "Không" : "Có", 
           signer: element.signer
         })
       })
@@ -119,6 +128,7 @@ export class DocumentAddComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.currentNumberTo = this.docTo.getNumberToMax(this.inDocs$);
       this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(++this.currentNumberTo));
+      this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
     });   
   }
 
@@ -145,6 +155,17 @@ export class DocumentAddComponent implements OnInit {
 
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  getCurrentUser(){
+    this.services.getCurrentUser().subscribe(
+      itemValue => {
+          this.currentUserId = itemValue["Id"];
+          this.currentUserName = itemValue["Title"];
+        },
+      error => console.log("error: " + error),
+      () => console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName )
+      );
   }
 
   getBookType() {
@@ -285,26 +306,137 @@ export class DocumentAddComponent implements OnInit {
         StatusName: sts === 0 ? "Chờ xử lý" : "Lưu tạm",
         Signer: dataForm.signer
       }
-      this.services.AddItemToList('ListDocumentTo', data).subscribe(
-        item => {},
+      this.services.AddItemToList(this.listTitle, data).subscribe(
+        item => {
+          this.DocumentID = item['d'].Id;
+        },
         error => {
-          console.log("error when add item to list ListDocumentTo: "+ error.error.error.message.value),
+          console.log("error when add item to list " + this.listTitle + ": "+ error.error.error.message.value),
           this.notificationService.error('Thêm văn bản đến thất bại');
           },
         () => {
-          console.log("Add item of approval user to list ListDocumentTo successfully!");
-          this.notificationService.success('Thêm văn bản đến thành công');
-          this.getAllListDocument();
-          this.addNew = !this.addNew;
-          this.showList = !this.showList;
+          console.log("Add item of approval user to list " + this.listTitle + " successfully!");
+          if(sts === 0) {
+            this.AddListTicket();
+          } else {
+            this.saveItemAttachment(0, this.DocumentID)
+          }
         });
     }
+  }
+
+  AddListTicket() {
+    const dataForm = this.IncomingDocform.getRawValue();
+    let sourceT = this.docTo.FindItemById(this.ListSource, dataForm.source);
+    const data = {
+      __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+      Title: dataForm.numberTo,
+      DateCreated: new Date(),
+      NoteBookID: this.DocumentID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.userApproverId,
+      Deadline: dataForm.deadline,
+      StatusID: 0,
+      StatusName: "Đang xử lý",
+      Source: sourceT === undefined ? '' : sourceT.title,
+      Destination: '',
+      TaskTypeCode: 'XLC',
+      TaskTypeName: 'Xử lý chính',
+      TypeCode: 'CXL',
+      TypeName: 'Chuyển xử lý',
+      Content: dataForm.note,
+      IndexStep: 1,
+      Compendium: dataForm.compendium,
+    }
+    this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
+      item => {},
+      error => {
+        console.log("error when add item to list ListProcessRequestTo: "+ error.error.error.message.value),
+        this.notificationService.error('Thêm phiếu xử lý thất bại');
+      },
+      () => {
+        console.log("Add item of approval user to list ListProcessRequestTo successfully!");
+        this.saveItemAttachment(0, this.DocumentID);
+      });
   }
 
   reset() {
     this.IncomingDocform.reset();
     this.IncomingDocform.clearValidators();
     this.IncomingDocform.clearAsyncValidators();
+  }
+
+  addAttachmentFile() {
+    try {
+      const inputNode: any = document.querySelector('#fileAttachment');
+      if (this.isNotNull(inputNode.files[0])) {
+        console.log(inputNode.files[0]);
+        if (this.outputFile.length > 0) {
+          if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
+            this.outputFile.push(inputNode.files[0]);
+          }
+        }
+        else {
+          this.outputFile.push(inputNode.files[0]);
+        }
+      }
+    } catch (error) {
+      console.log("addAttachmentFile error: " + error);
+    }
+  }
+  removeAttachmentFile(index) {
+    try {
+      console.log(this.outputFile.indexOf(index))
+      this.outputFile.splice(this.outputFile.indexOf(index), 1);
+    } catch (error) {
+      console.log("removeAttachmentFile error: " + error);
+    }
+  }
+
+  isNotNull(str) {
+    return (str !== null && str !== "" && str !== undefined);
+  }
+
+  saveItemAttachment(index, idItem){
+    try {
+      this.buffer = this.getFileBuffer(this.outputFile[index]);
+      this.buffer.onload = (e: any) => {
+        console.log(e.target.result);
+        const dataFile = e.target.result;
+        this.services.inserAttachmentFile(dataFile, this.outputFile[index].name, this.listTitle, idItem).subscribe(
+          itemAttach => {
+            console.log('inserAttachmentFile success');
+          },
+          error => console.log(error),
+          () => {
+            console.log('inserAttachmentFile successfully');
+            if(Number(index) < (this.outputFile.length-1)){
+              this.saveItemAttachment((Number(index)+ 1), idItem);
+            }
+            else{
+              //alert("Save request successfully");
+              this.callbackfunc();
+            }
+          }
+        )
+      }
+    } catch (error) {
+      console.log("saveItemAttachment error: "+error);
+    }
+  }
+
+  getFileBuffer(file) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    return reader;
+  }
+
+  callbackfunc(){
+    // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
+    this.notificationService.success('Thêm văn bản đến thành công');
+    this.getAllListDocument();
+    this.addNew = !this.addNew;
+    this.showList = !this.showList;
   }
 
 }

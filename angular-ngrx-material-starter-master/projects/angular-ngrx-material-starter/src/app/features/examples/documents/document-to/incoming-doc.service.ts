@@ -10,10 +10,10 @@ export const actionFormReset = createAction('[Form] Reset');
 const ELEMENT_DATA: IncomingDoc[] = [
   { bookType: 'DT', numberTo: '1', numberToSub: 0, numberOfSymbol: '', source: 0, docType: 1, promulgatedDate: null, dateTo: null, 
     compendium: '123', secretLevel: 1, urgentLevel: 2, deadline: null, numberOfCopies: 2, methodReceipt: 1, userHandle: 12, note: '', 
-    isRespinse: false, isSendMail: false, signer: '' },
+    isResponse: "Không", isSendMail: "Có", isRetrieve: 'Không', signer: '' },
   { bookType: 'DT', numberTo: '2', numberToSub: 0, numberOfSymbol: '', source: 0, docType: 1, promulgatedDate: null, dateTo: null, 
     compendium: '456', secretLevel: 1, urgentLevel: 2, deadline: null, numberOfCopies: 2, methodReceipt: 1, userHandle: 12, note: '', 
-    isRespinse: false, isSendMail: false, signer: ''},
+    isResponse: "Có", isSendMail: "Không", isRetrieve: 'Không', signer: ''},
 ];
 
 @Injectable({
@@ -93,6 +93,11 @@ export class IncomingDocService {
     return this.http.get(`${this.restUrl}${this.urlDocumentTo}`);
   }
 
+  urlRequestTo = "/_api/web/lists/getbytitle('ListProcessRequestTo')/items?$select=*, UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserApprover,UserRequest"
+  getListRequestTo(strFilter) : Observable<any> {
+    return this.http.get(`${this.restUrl}${this.urlRequestTo}` + strFilter);
+  }
+
   urlGroupApprover = "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=User/Name,User/Title,User/Id&$expand=User&$filter=RoleCode eq "
   getUserApprover(role) {
     return this.http.get(`${this.restUrl}${this.urlGroupApprover}` + `'` + role + `'`);
@@ -105,6 +110,12 @@ export class IncomingDocService {
     return result;
   }
 
+  //get item by id in list document incoming  
+  getListDocByID(id) {
+    let urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,"
+    + "AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$filter=ID eq ";
+    return this.http.get(`${this.restUrl}${urlDetailLeave}` + `'` + id + `'`);
+  }
 }
 
 export interface IncomingDoc {
@@ -114,19 +125,37 @@ export interface IncomingDoc {
   numberOfSymbol: string;
   source: number;
   docType: number;
-  promulgatedDate: Date;
-  dateTo: Date;
+  promulgatedDate: string;
+  dateTo: string;
   compendium: string;
   secretLevel: number;
   urgentLevel: number;
-  deadline: Date;
+  deadline: string;
   numberOfCopies: number;
   methodReceipt: number;
   userHandle: number;
   note: string;
-  isRespinse: boolean;
-  isSendMail: boolean;
+  isResponse: string;
+  isSendMail: string;
+  isRetrieve: string;
   signer: string;
+}
+
+export interface IncomingTicket {
+  compendium: string;
+  documentID: number;
+  userRequest: number;
+  userApprover: string;
+  deadline: string;
+  status: string;
+  source: string;
+  destination: string;
+  taskType: string;
+  typeCode: string;
+  content: string;
+  indexStep: number;
+  created: string;
+  numberTo: string;
 }
 
 export interface ItemSeleted {
@@ -139,4 +168,9 @@ export class ApproverObject {
   UserId: Number;
   UserName: string;
   UserEmail: string;
+}
+
+export class AttachmentsObject {
+  name: string;
+  urlFile: string;
 }

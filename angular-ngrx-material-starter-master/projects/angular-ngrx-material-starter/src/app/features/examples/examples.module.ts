@@ -33,6 +33,7 @@ import { ElementsComponent } from './elements/elements.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
 import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
+import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -82,6 +83,7 @@ export function HttpLoaderFactory(http: HttpClient) {
    // DocumentGoComponent,
     DocumentAddComponent,
     DocumentDetailComponent,
+    DocumentWaitingComponent,
   ],
   providers: [StockMarketService, UserService]
 })
