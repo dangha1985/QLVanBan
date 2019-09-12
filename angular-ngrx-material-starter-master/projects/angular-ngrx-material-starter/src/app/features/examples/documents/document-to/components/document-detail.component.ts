@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { IncomingDoc, AttachmentsObject, IncomingDocService} from '../incoming-doc.service';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild} from '@angular/core';
+import { IncomingDoc, AttachmentsObject, IncomingDocService, IncomingTicket} from '../incoming-doc.service';
 import { environment } from '../../../../../../environments/environment';
 import {ResApiService} from '../../../services/res-api.service';
 import { ActivatedRoute } from '@angular/router';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material';
 import * as moment from 'moment';
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
@@ -25,12 +27,18 @@ export class DocumentDetailComponent implements OnInit {
   outputFile = []; 
   displayFile = '';
   buffer;
+  displayedColumns: string[] = ['stt','created' , 'userRequest', 'userApprover', 'deadline','status', 'taskType']; //'select'
+  ListItem: IncomingTicket[] = [];
+  dataSource = new MatTableDataSource<IncomingTicket>();
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(private docTo: IncomingDocService, private services: ResApiService, 
-              private route: ActivatedRoute, private readonly notificationService: NotificationService) { }
+              private route: ActivatedRoute, private readonly notificationService: NotificationService,
+              private ref: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.GetItemDetail();
+    this.GetHistory();
   }
 
   GetItemDetail() {
@@ -70,9 +78,42 @@ export class DocumentDetailComponent implements OnInit {
           isSendMail: "Có", 
           isRetrieve: itemList[0].IsRetrieve === 0 ? "Không" : "Có", 
           signer: itemList[0].signer
+        };
+        if(this.isDisplay) {
+          return true;
+        } else {
+          return false;
         }
       })
     })
+  }
+
+  GetHistory() {
+    this.docTo.getListRequestByDocID(this.ItemId).subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;     
+      this.ListItem = []; 
+      item.forEach(element => {
+        this.ListItem.push({
+          documentID: element.NoteBookID, 
+          compendium: element.Compendium, 
+          userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+          userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
+          deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
+          status: 'Chờ xử lý',
+          source: '',
+          destination: '',
+          taskType: '',
+          typeCode: '',
+          content: this.docTo.CheckNull(element.Content),
+          indexStep: element.IndexStep,
+          created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
+          numberTo: element.Title
+        })
+      })
+      this.dataSource = new MatTableDataSource<IncomingTicket>(this.ListItem);
+      this.ref.detectChanges();
+      this.dataSource.paginator = this.paginator;
+    });   
   }
 
 }

@@ -61,7 +61,6 @@ export class DocumentAddComponent implements OnInit {
               private readonly notificationService: NotificationService) {}
 
   ngOnInit() {
-    this.getAllListDocument();
     this.getCurrentUser();
     this.getBookType();
     this.getDocType();
@@ -96,7 +95,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getAllListDocument() {
-    this.docTo.getListDocumentTo().subscribe((itemValue: any[]) => {
+    this.docTo.getListDocumentTo(this.currentUserId).subscribe((itemValue: any[]) => {
       let item = itemValue["value"] as Array<any>;     
       this.inDocs$ = []; 
       item.forEach(element => {
@@ -164,7 +163,10 @@ export class DocumentAddComponent implements OnInit {
           this.currentUserName = itemValue["Title"];
         },
       error => console.log("error: " + error),
-      () => console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName )
+      () => {
+        console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
+        this.getAllListDocument();
+      }
       );
   }
 

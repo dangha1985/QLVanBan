@@ -88,14 +88,18 @@ export class IncomingDocService {
     }
   }
 
-  urlDocumentTo = "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*, UserOfHandle/Title,UserOfHandle/Id&$expand=UserOfHandle"
-  getListDocumentTo() : Observable<any> {
-    return this.http.get(`${this.restUrl}${this.urlDocumentTo}`);
+  urlDocumentTo = "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$filter=Author/Id eq "
+  getListDocumentTo(userId) : Observable<any> {
+    return this.http.get(`${this.restUrl}${this.urlDocumentTo}` + `'` + userId + `'`);
   }
 
   urlRequestTo = "/_api/web/lists/getbytitle('ListProcessRequestTo')/items?$select=*, UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserApprover,UserRequest"
   getListRequestTo(strFilter) : Observable<any> {
     return this.http.get(`${this.restUrl}${this.urlRequestTo}` + strFilter);
+  }
+
+  getListRequestByDocID(docId) : Observable<any> {
+    return this.http.get(`${this.restUrl}${this.urlRequestTo}` + `&$filter=NoteBookID eq '` + docId + `'`);
   }
 
   urlGroupApprover = "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=User/Name,User/Title,User/Id&$expand=User&$filter=RoleCode eq "

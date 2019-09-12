@@ -1,3 +1,7 @@
+table {
+    width: 100%;
+}
+
 .actions {
     // margin: 10px 0;
     padding: 0 10px;
@@ -8,6 +12,14 @@
     margin-right: 10px;
 }
 
+.actions-bottom {
+    margin-top: 10px;
+    background-color: white;
+    button {
+        margin-right: 10px;
+    }
+}
+
 .caption {
     background: #00000008;
 }
@@ -15,6 +27,13 @@
 .caption .title {
     padding-left: 5px;
     margin-top: 7px;
+}
+
+.content-side {
+    background: white;
+    color: rgba(0, 0, 0, 0.87);
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12);
+    padding: 5px 10px;
 }
 
 .span-icon {
