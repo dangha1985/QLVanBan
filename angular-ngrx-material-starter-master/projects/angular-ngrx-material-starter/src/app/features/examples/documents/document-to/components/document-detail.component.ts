@@ -38,16 +38,41 @@ export class DocumentDetailComponent implements OnInit {
 
   ngOnInit() {
     this.GetItemDetail();
-    this.GetHistory();
   }
 
   GetItemDetail() {
     this.route.paramMap.subscribe(parames => {
       this.ItemId = parames.get('id');
+      //get ticket
+      // this.docTo.getListRequestByDocID(this.ItemId).subscribe((itemValue: any[]) => {
+      //   let item = itemValue["value"] as Array<any>;     
+      //   this.ListItem = []; 
+      //   item.forEach(element => {
+      //     this.ListItem.push({
+      //       documentID: element.NoteBookID, 
+      //       compendium: element.Compendium, 
+      //       userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+      //       userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
+      //       deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
+      //       status: 'Chờ xử lý',
+      //       source: '',
+      //       destination: '',
+      //       taskType: '',
+      //       typeCode: '',
+      //       content: this.docTo.CheckNull(element.Content),
+      //       indexStep: element.IndexStep,
+      //       created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
+      //       numberTo: element.Title
+      //     })
+      //   })
+      //   this.dataSource = new MatTableDataSource<IncomingTicket>(this.ListItem);
+      //   this.ref.detectChanges();
+      //   this.dataSource.paginator = this.paginator;
+      // });   
+
       this.docTo.getListDocByID(this.ItemId).subscribe(items => {
         console.log('items: ' + items);
         let itemList = items["value"] as Array<any>;
-        this.isDisplay = true;
         if (itemList[0].AttachmentFiles.length > 0) {
           itemList[0].AttachmentFiles.forEach(element => {
             this.ItemAttachments.push({
@@ -80,12 +105,8 @@ export class DocumentDetailComponent implements OnInit {
           isRetrieve: itemList[0].IsRetrieve === 0 ? "Không" : "Có", 
           signer: itemList[0].signer
         };
-        if(this.isDisplay) {
-          return true;
-        } else {
-          return false;
-        }
-      })
+        this.ref.detectChanges();
+      });      
     })
   }
 

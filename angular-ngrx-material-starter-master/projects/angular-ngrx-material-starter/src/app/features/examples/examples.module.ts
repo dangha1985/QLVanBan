@@ -31,7 +31,7 @@ import { UserComponent } from './simple-state-management/components/user.compone
 import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
-import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
+import {DocumentAddComponent, RotiniPanel} from './documents/document-to/components/document-add.component'
 import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
 import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
 
@@ -84,8 +84,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentAddComponent,
     DocumentDetailComponent,
     DocumentWaitingComponent,
+    RotiniPanel,
   ],
-  providers: [StockMarketService, UserService]
+  entryComponents: [
+    RotiniPanel,
+    ]
 })
 export class ExamplesModule {
   constructor() {}

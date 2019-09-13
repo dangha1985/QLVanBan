@@ -14,6 +14,7 @@
             </div>
             <div fxFlexFill>
                 <form class="example-form" *ngIf="itemDoc">
+                    <!-- *ngIf="itemDoc" -->
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Sổ văn bản:</p>
@@ -211,7 +212,7 @@
             </div>
         </div>
     </div>
-    <div fxFlexFil class="actions-bottom ">
+    <div fxFlexFil class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval()"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>

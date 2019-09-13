@@ -89,6 +89,11 @@ export class IncomingDocService {
     }
   }
 
+  urlDocumentToMax = "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$top=1&$orderby=ID desc&$filter=Author/Id eq "
+  getDocumentToMax(userId) : Observable<any> {
+    return this.http.get(`${this.restUrl}${this.urlDocumentToMax}` + `'` + userId + `'`);
+  }
+
   urlDocumentTo = "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$filter=Author/Id eq "
   getListDocumentTo(userId) : Observable<any> {
     return this.http.get(`${this.restUrl}${this.urlDocumentTo}` + `'` + userId + `' and StatusID eq '-1'`);
@@ -179,8 +184,4 @@ export class ApproverObject {
 export class AttachmentsObject {
   name: string;
   urlFile: string;
-}
-
-export class RotiniPanel {
-
 }

@@ -5,7 +5,7 @@ import {FormControl, FormBuilder, FormGroup, FormGroupDirective, Validators, NgF
 import {SelectionModel} from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
 import * as moment from 'moment';
-import {IncomingDoc, ItemSeleted, IncomingDocService, ApproverObject, RotiniPanel} from '../incoming-doc.service'
+import {IncomingDoc, ItemSeleted, IncomingDocService, ApproverObject} from '../incoming-doc.service'
 import {ResApiService} from '../../../services/res-api.service'
 import {ErrorStateMatcher} from '@angular/material/core';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
@@ -30,6 +30,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['./document-add.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class DocumentAddComponent implements OnInit {
   listTitle = "ListDocumentTo";
   inDocs$: IncomingDoc[]= [];
@@ -100,6 +101,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getAllListDocument() {
+    this.OpenRotiniPanel();
     this.docTo.getListDocumentTo(this.currentUserId).subscribe((itemValue: any[]) => {
       let item = itemValue["value"] as Array<any>;     
       this.inDocs$ = []; 
@@ -131,10 +133,31 @@ export class DocumentAddComponent implements OnInit {
       this.dataSource = new MatTableDataSource<IncomingDoc>(this.inDocs$);
       this.ref.detectChanges();
       this.dataSource.paginator = this.paginator;
-      this.currentNumberTo = this.docTo.getNumberToMax(this.inDocs$);
+      this.CloseRotiniPanel();
+      // this.currentNumberTo = this.docTo.getNumberToMax(this.inDocs$);
+      // this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(++this.currentNumberTo));
+      // this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
+    },
+    error => { 
+      console.log("error: " + error);
+      this.CloseRotiniPanel();
+    });
+
+    this.docTo.getDocumentToMax(this.currentUserId).subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;
+      if(item.length === 0) {
+        this.currentNumberTo = 0;
+      } else {
+        item.forEach(element => {
+          this.currentNumberTo = element.NumberTo;
+        }); 
+      }
+    },
+    error => {console.log("Load numberTo max error");},
+    () => {      
       this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(++this.currentNumberTo));
       this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
-    });   
+    })
   }
 
   OpenRotiniPanel() {
@@ -180,11 +203,14 @@ export class DocumentAddComponent implements OnInit {
           this.currentUserId = itemValue["Id"];
           this.currentUserName = itemValue["Title"];
         },
-      error => console.log("error: " + error),
-      () => {
-        console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
-        this.getAllListDocument();
-      }
+        error => { 
+          console.log("error: " + error);
+          this.CloseRotiniPanel();
+        },
+        () => {
+          console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
+          this.getAllListDocument();
+        }
       );
   }
 
@@ -286,6 +312,7 @@ export class DocumentAddComponent implements OnInit {
 
   AddNewItem(sts) {
     if (this.IncomingDocform.valid) {
+      this.OpenRotiniPanel();
       const dataForm = this.IncomingDocform.getRawValue();
       let bookT = this.docTo.FindItemByCode(this.ListBookType, dataForm.bookType);
       let docT = this.docTo.FindItemById(this.ListDocType, dataForm.docType);
@@ -331,6 +358,7 @@ export class DocumentAddComponent implements OnInit {
           this.DocumentID = item['d'].Id;
         },
         error => {
+          this.CloseRotiniPanel();
           console.log("error when add item to list " + this.listTitle + ": "+ error.error.error.message.value),
           this.notificationService.error('Thêm văn bản đến thất bại');
           },
@@ -371,6 +399,7 @@ export class DocumentAddComponent implements OnInit {
     this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
       item => {},
       error => {
+        this.CloseRotiniPanel();
         console.log("error when add item to list ListProcessRequestTo: "+ error.error.error.message.value),
         this.notificationService.error('Thêm phiếu xử lý thất bại');
       },
@@ -384,6 +413,9 @@ export class DocumentAddComponent implements OnInit {
     this.IncomingDocform.reset();
     this.IncomingDocform.clearValidators();
     this.IncomingDocform.clearAsyncValidators();
+    this.IncomingDocform.controls['bookType'].setValue('DT');
+    this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(this.currentNumberTo));
+    this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
   }
 
   addAttachmentFile() {
@@ -427,7 +459,10 @@ export class DocumentAddComponent implements OnInit {
           itemAttach => {
             console.log('inserAttachmentFile success');
           },
-          error => console.log(error),
+          error => { 
+            console.log("error: " + error);
+            this.CloseRotiniPanel();
+          },
           () => {
             console.log('inserAttachmentFile successfully');
             if(Number(index) < (this.outputFile.length-1)){
@@ -453,6 +488,7 @@ export class DocumentAddComponent implements OnInit {
 
   callbackfunc(){
     // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
+    this.CloseRotiniPanel();
     this.notificationService.success('Thêm văn bản đến thành công');
     this.getAllListDocument();
     this.addNew = !this.addNew;
@@ -461,7 +497,11 @@ export class DocumentAddComponent implements OnInit {
 
 }
 
-// @Component({
-//   selector: 'rotini-panel',
-//   template: '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Saving data....</p>'
-// })
+
+@Component({
+  selector: 'rotini-panel',
+  template: '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Waiting....</p>'
+})
+
+export class RotiniPanel {
+}

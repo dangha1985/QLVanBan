@@ -1,11 +1,14 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material';
 import {FormControl, FormBuilder} from '@angular/forms';
 import {SelectionModel} from '@angular/cdk/collections';
 import * as moment from 'moment';
-import {IncomingDoc, ItemSeleted, IncomingDocService, IncomingTicket} from '../incoming-doc.service'
+import {IncomingDoc, ItemSeleted, IncomingDocService, IncomingTicket} from '../incoming-doc.service';
+import {RotiniPanel} from './document-add.component';
 import {ResApiService} from '../../../services/res-api.service';
+import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
@@ -31,10 +34,12 @@ export class DocumentWaitingComponent implements OnInit {
   currentUserId;
   currentUserName;
   strFilter = '';
+  overlayRef;
 
   constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
-              private readonly notificationService: NotificationService) {}
+              private readonly notificationService: NotificationService,
+              public overlay: Overlay, public viewContainerRef: ViewContainerRef) {}
 
   ngOnInit() {
     this.getCurrentUser();
@@ -66,20 +71,38 @@ export class DocumentWaitingComponent implements OnInit {
       this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
       this.ref.detectChanges();
       this.dataSource.paginator = this.paginator;
+      this.CloseRotiniPanel();
     });   
   }
 
   getCurrentUser(){
+    this.OpenRotiniPanel();
     this.services.getCurrentUser().subscribe(
       itemValue => {
           this.currentUserId = itemValue["Id"];
           this.currentUserName = itemValue["Title"];
         },
-      error => console.log("error: " + error),
+      error => { 
+        console.log("error: " + error);
+        this.CloseRotiniPanel();
+      },
       () => {
         console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
         this.getAllListRequest();
       }
       );
+  }
+
+  OpenRotiniPanel() {
+    let config = new OverlayConfig();
+    config.positionStrategy = this.overlay.position()
+      .global().centerVertically().centerHorizontally();
+    config.hasBackdrop = true;
+    this.overlayRef = this.overlay.create(config);
+    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+  }
+
+  CloseRotiniPanel() {
+    this.overlayRef.dispose();
   }
 }
