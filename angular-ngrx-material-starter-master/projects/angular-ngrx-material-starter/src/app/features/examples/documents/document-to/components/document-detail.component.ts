@@ -38,6 +38,7 @@ export class DocumentDetailComponent implements OnInit {
 
   ngOnInit() {
     this.GetItemDetail();
+    this.GetHistory();
   }
 
   GetItemDetail() {
