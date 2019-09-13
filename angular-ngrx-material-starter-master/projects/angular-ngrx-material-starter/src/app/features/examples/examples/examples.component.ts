@@ -22,20 +22,20 @@ export class ExamplesComponent implements OnInit {
   examples = [
     { link: 'doc-to', label: 'Tiếp nhận văn bản' },
     { link: 'doc-list', label: 'Chờ xử lý' },
-    { link: 'doc-detail/:id', label: 'Xem chi tiết' },
-    { link: 'stock-market', label: 'anms.examples.menu.stocks' },
-    { link: 'theming', label: 'anms.examples.menu.theming' },
-    { link: 'crud', label: 'anms.examples.menu.crud' },
-    {
-      link: 'simple-state-management',
-      label: 'anms.examples.menu.simple-state-management'
-    },
-    { link: 'form', label: 'anms.examples.menu.form' },
-    { link: 'demo', label: 'demo' },
-   // { link: 'documentgo', label: 'Document Go' },
-    { link: 'notifications', label: 'anms.examples.menu.notifications' },
-    { link: 'elements', label: 'anms.examples.menu.elements' },
-    { link: 'authenticated', label: 'anms.examples.menu.auth', auth: true }
+    // { link: 'doc-detail/:id', label: 'Xem chi tiết' },
+  //   { link: 'stock-market', label: 'anms.examples.menu.stocks' },
+  //   { link: 'theming', label: 'anms.examples.menu.theming' },
+  //   { link: 'crud', label: 'anms.examples.menu.crud' },
+  //   {
+  //     link: 'simple-state-management',
+  //     label: 'anms.examples.menu.simple-state-management'
+  //   },
+  //   { link: 'form', label: 'anms.examples.menu.form' },
+  //   { link: 'demo', label: 'demo' },
+  //  // { link: 'documentgo', label: 'Document Go' },
+  //   { link: 'notifications', label: 'anms.examples.menu.notifications' },
+  //   { link: 'elements', label: 'anms.examples.menu.elements' },
+  //   { link: 'authenticated', label: 'anms.examples.menu.auth', auth: true }
   ];
 
   constructor(private store: Store<State>) {}

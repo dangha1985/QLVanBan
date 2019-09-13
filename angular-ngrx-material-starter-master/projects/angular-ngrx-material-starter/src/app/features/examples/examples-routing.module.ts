@@ -25,7 +25,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'todos',
+        redirectTo: 'doc-to',
         pathMatch: 'full'
       },
       {

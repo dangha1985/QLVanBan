@@ -23,7 +23,7 @@ export class DocumentComponent implements OnInit {
    // { link: 'demo', label: 'demo' },
     { link: 'documentgo', label: 'văn bản trình' },
     { link: 'documentgo-waiting', label: 'Chờ xử lý' },
-  { link: 'documentgo-detail/6', label: 'Xem chi tiết' },
+  // { link: 'documentgo-detail/6', label: 'Xem chi tiết' },
   ];
 
   constructor(private store: Store<State>) {}
