@@ -10,12 +10,14 @@ import { ExamplesComponent } from './../examples/examples.component';
 // import { StockMarketContainerComponent } from './stock-market/components/stock-market-container.component';
 // import { CrudComponent } from './crud/components/crud.component';
 // import { FormComponent } from './form/components/form.component';
-// import { NotificationsComponent } from './notifications/components/notifications.component';
+import { NotificationsComponent } from './../notifications/components/notifications.component';
 // import { UserComponent } from './simple-state-management/components/user.component';
-// import { ElementsComponent } from './elements/elements.component';
+import { ElementsComponent } from './../elements/elements.component';
 // import { FormdemoComponent } from './demo/formdemo.component';
-import {DocumentComponent} from '../../../features/examples/documents/document-go/document.component'
-import {DocumentGoComponent }from './document-go/document-go.component';
+import { DocumentComponent } from '../../../features/examples/documents/document-go/document.component'
+import { DocumentGoComponent } from './document-go/document-go.component';
+import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
+import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
 import { from } from 'rxjs';
 const routes: Routes = [
   {
@@ -27,19 +29,37 @@ const routes: Routes = [
       //   redirectTo: 'todos',
       //   pathMatch: 'full'
       // },
-     
+
       {
         path: 'documentgo',
         component: DocumentGoComponent,
-        data: { title: 'Trình văn bản' }
+        data: { title: 'Văn bản trình ký' }
       },
-     
+      {
+        path: 'documentgo-waiting',
+        component: DocumentGoWaitingComponent,
+        data: { title: 'Chờ xử lý' }
+      },
+      {
+        path: 'documentgo-detail/:id',
+        component: DocumentGoDetailComponent,
+        data: { title: 'Xem chi tiết' }
+      },
+      {
+        path: 'detail/:id',
+        component: DocumentGoDetailComponent,
+        data: { title: 'Xem chi tiết' }
+      },
     ]
-  }
+  },
+  // {
+  //   path: 'documentgo/detail/:id',
+  //   component: DocumentGoDetailComponent,
+  // },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class DocumentRoutingModule {}
+export class DocumentRoutingModule { }

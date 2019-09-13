@@ -1,0 +1,70 @@
+<div class="row" style="display:inline" *ngIf="showList">
+    <div fxFlexFill fxLayoutAlign="end" class="PB10">
+
+        <input class="docadd-filter" fxFlex="200px" fxLayout matInput (keyup)="applyFilter($event.target.value)" placeholder="Tìm kiếm">
+    </div>
+    <div fxFlexFill>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <!-- [dataSource]="dataSource" -->
+            <!-- Checkbox Column -->
+            <!-- <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container> -->
+
+            <!-- ID Column -->
+            <ng-container matColumnDef="ID">
+                <th mat-header-cell *matHeaderCellDef> No. </th>
+                <td mat-cell *matCellDef="let element"><a routerLink="detail/{{element.ID}}">{{element.ID}}</a> </td>
+            </ng-container>
+            <!-- DocTypeName Column -->
+            <ng-container matColumnDef="DocTypeName">
+                <th mat-header-cell *matHeaderCellDef> Loại văn bản </th>
+                <td mat-cell *matCellDef="let element"> {{element.DocTypeName}} </td>
+            </ng-container>
+
+            <!-- Compendium Column -->
+            <ng-container matColumnDef="Compendium">
+                <th mat-header-cell *matHeaderCellDef> Trích yếu </th>
+                <td mat-cell *matCellDef="let element"> {{element.Compendium}} </td>
+            </ng-container>
+
+            <!-- UserCreateName Column -->
+            <ng-container matColumnDef="UserCreateName">
+                <th mat-header-cell *matHeaderCellDef> Người tạo </th>
+                <td mat-cell *matCellDef="let element"> {{element.UserCreateName}} </td>
+            </ng-container>
+            <!-- DateCreated Column -->
+            <ng-container matColumnDef="DateCreated">
+                <th mat-header-cell *matHeaderCellDef> Ngày tạo </th>
+                <td mat-cell *matCellDef="let element"> {{element.DateCreated}} </td>
+            </ng-container>
+            <!-- UserOfHandle Column -->
+            <ng-container matColumnDef="UserOfHandle">
+                <th mat-header-cell *matHeaderCellDef> Người xử lý </th>
+                <td mat-cell *matCellDef="let element"> {{element.UserOfHandle}} </td>
+            </ng-container>
+            <!-- Deadline Column -->
+            <ng-container matColumnDef="Deadline">
+                <th mat-header-cell *matHeaderCellDef> Hạn xử lý </th>
+                <td mat-cell *matCellDef="let element"> {{element.Deadline}} </td>
+            </ng-container>
+            <!-- StatusName Column -->
+            <ng-container matColumnDef="StatusName">
+                <th mat-header-cell *matHeaderCellDef> Trạng thái </th>
+                <td mat-cell *matCellDef="let element"> {{element.StatusName}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                <!-- (click)="selection.toggle(row)" -->
+            </tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
+</div>

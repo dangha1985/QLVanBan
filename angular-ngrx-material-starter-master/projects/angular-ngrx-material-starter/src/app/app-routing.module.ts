@@ -30,7 +30,7 @@ const routes: Routes = [
       import('./features/settings/settings.module').then(m => m.SettingsModule)
   },  
   {
-    path: 'documents',
+    path: 'OutGoingDocs',
     loadChildren: () =>
       import('./features/examples/documents/documents.module').then(m => m.DocumentsModule)
   },

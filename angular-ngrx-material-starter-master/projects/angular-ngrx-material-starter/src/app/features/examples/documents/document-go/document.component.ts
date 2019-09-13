@@ -21,8 +21,9 @@ export class DocumentComponent implements OnInit {
   documents = [
     
    // { link: 'demo', label: 'demo' },
-    { link: 'documentgo', label: 'Trình văn bản' },
-   
+    { link: 'documentgo', label: 'văn bản trình' },
+    { link: 'documentgo-waiting', label: 'Chờ xử lý' },
+  { link: 'documentgo-detail/6', label: 'Xem chi tiết' },
   ];
 
   constructor(private store: Store<State>) {}

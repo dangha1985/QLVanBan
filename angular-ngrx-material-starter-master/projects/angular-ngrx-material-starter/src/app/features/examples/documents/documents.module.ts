@@ -10,6 +10,10 @@ import {FlexLayoutModule} from '@angular/flex-layout'
 import { SharedModule } from '../../../shared/shared.module';
 import { environment } from '../../../../environments/environment';
 import {MatTableModule} from '@angular/material/table';
+import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CoreModule } from './../../../core/core.module';
 
 import { FormEffects } from './../form/form.effects';
 import { ExamplesEffects } from './../examples.effects';
@@ -22,6 +26,8 @@ import { UserService } from './../simple-state-management/user.service';
 import {DocumentRoutingModule} from './document-routing.module';
 import { DocumentGoComponent }from './document-go/document-go.component';
 import { DocumentComponent } from './document-go/document.component';
+import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
+import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(
@@ -37,6 +43,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatTableModule,
     SharedModule,
     DocumentRoutingModule,
+  // CommonModule,
+  //  BrowserModule,
+   // CoreModule,
+  //  EffectsModule,
+  //  BrowserAnimationsModule,
     StoreModule.forFeature(FEATURE_NAME, reducers),
       TranslateModule.forChild({
         loader: {
@@ -46,21 +57,23 @@ export function HttpLoaderFactory(http: HttpClient) {
         },
         isolate: true
       }),
- EffectsModule.forFeature([
-    ExamplesEffects,
-    TodosEffects,
-    StockMarketEffects,
-    BooksEffects,
-    FormEffects
-  ]),
+//  EffectsModule.forFeature([
+//     ExamplesEffects,
+//     TodosEffects,
+//     StockMarketEffects,
+//     BooksEffects,
+//     FormEffects
+//   ]),
   MatTableModule,
   FlexLayoutModule,
 ],
   declarations: [
     DocumentComponent,
       DocumentGoComponent,
+      DocumentGoDetailComponent,
+      DocumentGoWaitingComponent
   ],
-  providers: [StockMarketService, UserService]
+  providers: []
 })
 export class DocumentsModule {
   constructor() {}
