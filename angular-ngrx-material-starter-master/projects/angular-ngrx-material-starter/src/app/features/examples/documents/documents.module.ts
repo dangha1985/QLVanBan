@@ -10,19 +10,8 @@ import {FlexLayoutModule} from '@angular/flex-layout'
 import { SharedModule } from '../../../shared/shared.module';
 import { environment } from '../../../../environments/environment';
 import {MatTableModule} from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CoreModule } from './../../../core/core.module';
-
-import { FormEffects } from './../form/form.effects';
-import { ExamplesEffects } from './../examples.effects';
-import { TodosEffects } from './../todos/todos.effects';
-import { BooksEffects } from './../crud/books.effects';
-import { StockMarketEffects } from './../stock-market/stock-market.effects';
-import { StockMarketService } from './../stock-market/stock-market.service';
-import { UserService } from './../simple-state-management/user.service';
-
 import {DocumentRoutingModule} from './document-routing.module';
 import { DocumentGoComponent }from './document-go/document-go.component';
 import { DocumentComponent } from './document-go/document.component';
@@ -44,10 +33,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     SharedModule,
     DocumentRoutingModule,
   // CommonModule,
-  //  BrowserModule,
+    //BrowserModule,
    // CoreModule,
   //  EffectsModule,
-  //  BrowserAnimationsModule,
+    //BrowserAnimationsModule,
     StoreModule.forFeature(FEATURE_NAME, reducers),
       TranslateModule.forChild({
         loader: {
