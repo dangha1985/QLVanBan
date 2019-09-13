@@ -86,6 +86,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentWaitingComponent,
     RotiniPanel,
   ],
+  providers: [StockMarketService, UserService],
   entryComponents: [
     RotiniPanel,
     ]
