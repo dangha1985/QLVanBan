@@ -58,6 +58,7 @@ export class DocumentDetailComponent implements OnInit {
         }
 
         this.itemDoc = {
+          ID: itemList[0].ID,
           bookType: itemList[0].BookTypeName, 
           numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo), 
           numberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 

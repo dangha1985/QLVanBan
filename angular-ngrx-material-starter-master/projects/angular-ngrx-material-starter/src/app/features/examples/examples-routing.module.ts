@@ -44,6 +44,11 @@ const routes: Routes = [
         data: { title: 'Xem chi tiết' }
       },
       {
+        path: 'todos',
+        component: TodosContainerComponent,
+        data: { title: 'Todos' }
+      },
+      {
         path: 'stock-market',
         component: StockMarketContainerComponent,
         data: { title: 'anms.examples.menu.stocks' }

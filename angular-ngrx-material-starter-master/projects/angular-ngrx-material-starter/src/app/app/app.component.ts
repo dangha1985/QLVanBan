@@ -35,9 +35,9 @@ export class AppComponent implements OnInit {
   logo = require('../../assets/logo.png');
   languages = ['en', 'de', 'sk', 'fr', 'es', 'pt-br', 'zh-cn', 'he'];
   navigation = [
-    { link: 'examples', label: 'Văn bản đến' },
+    // { link: 'examples', label: 'Văn bản đến' },
     { link: 'documents', label: 'Văn bản đi' },
-    { link: 'examples', label: 'Hồ sơ' },
+    { link: 'settings', label: 'Hồ sơ' },
     { link: 'about', label: 'Danh mục' },
     { link: 'feature-list', label: 'Truyền thông nội bộ' }
   ];

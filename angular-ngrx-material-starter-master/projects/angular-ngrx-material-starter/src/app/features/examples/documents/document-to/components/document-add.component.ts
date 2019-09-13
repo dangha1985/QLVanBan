@@ -1,13 +1,16 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material';
 import {FormControl, FormBuilder, FormGroup, FormGroupDirective, Validators, NgForm} from '@angular/forms';
 import {SelectionModel} from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
 import * as moment from 'moment';
-import {IncomingDoc, ItemSeleted, IncomingDocService, ApproverObject} from '../incoming-doc.service'
+import {IncomingDoc, ItemSeleted, IncomingDocService, ApproverObject, RotiniPanel} from '../incoming-doc.service'
 import {ResApiService} from '../../../services/res-api.service'
 import {ErrorStateMatcher} from '@angular/material/core';
+import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
@@ -55,10 +58,12 @@ export class DocumentAddComponent implements OnInit {
   outputFile = []; 
   displayFile = ''; 
   buffer;
+  overlayRef;
 
   constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
-              private readonly notificationService: NotificationService) {}
+              private readonly notificationService: NotificationService, public overlay: Overlay,
+              public viewContainerRef: ViewContainerRef) {}
 
   ngOnInit() {
     this.getCurrentUser();
@@ -100,6 +105,7 @@ export class DocumentAddComponent implements OnInit {
       this.inDocs$ = []; 
       item.forEach(element => {
         this.inDocs$.push({
+          ID: element.ID,
           bookType: element.BookTypeName, 
           numberTo: this.docTo.formatNumberTo(element.NumberTo), 
           numberToSub: element.NumberToSub, 
@@ -131,6 +137,18 @@ export class DocumentAddComponent implements OnInit {
     });   
   }
 
+  OpenRotiniPanel() {
+    let config = new OverlayConfig();
+    config.positionStrategy = this.overlay.position()
+      .global().centerVertically().centerHorizontally();
+    config.hasBackdrop = true;
+    this.overlayRef = this.overlay.create(config);
+    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+  }
+
+  CloseRotiniPanel() {
+    this.overlayRef.dispose();
+  }
    /** Whether the number of selected elements matches the total number of rows. */
    isAllSelected() {
     const numSelected = this.selection.selected.length;
@@ -442,3 +460,8 @@ export class DocumentAddComponent implements OnInit {
   }
 
 }
+
+// @Component({
+//   selector: 'rotini-panel',
+//   template: '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Saving data....</p>'
+// })

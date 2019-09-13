@@ -6,12 +6,13 @@ import { environment } from '../../../../../environments/environment';
 import { MatListItem } from '@angular/material';
 import { createAction, props } from '@ngrx/store';
 
+
 export const actionFormReset = createAction('[Form] Reset');
 const ELEMENT_DATA: IncomingDoc[] = [
-  { bookType: 'DT', numberTo: '1', numberToSub: 0, numberOfSymbol: '', source: 0, docType: 1, promulgatedDate: null, dateTo: null, 
+  { ID: -1, bookType: 'DT', numberTo: '1', numberToSub: 0, numberOfSymbol: '', source: 0, docType: 1, promulgatedDate: null, dateTo: null, 
     compendium: '123', secretLevel: 1, urgentLevel: 2, deadline: null, numberOfCopies: 2, methodReceipt: 1, userHandle: 12, note: '', 
     isResponse: "Không", isSendMail: "Có", isRetrieve: 'Không', signer: '' },
-  { bookType: 'DT', numberTo: '2', numberToSub: 0, numberOfSymbol: '', source: 0, docType: 1, promulgatedDate: null, dateTo: null, 
+  { ID: -1, bookType: 'DT', numberTo: '2', numberToSub: 0, numberOfSymbol: '', source: 0, docType: 1, promulgatedDate: null, dateTo: null, 
     compendium: '456', secretLevel: 1, urgentLevel: 2, deadline: null, numberOfCopies: 2, methodReceipt: 1, userHandle: 12, note: '', 
     isResponse: "Có", isSendMail: "Không", isRetrieve: 'Không', signer: ''},
 ];
@@ -90,7 +91,7 @@ export class IncomingDocService {
 
   urlDocumentTo = "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$filter=Author/Id eq "
   getListDocumentTo(userId) : Observable<any> {
-    return this.http.get(`${this.restUrl}${this.urlDocumentTo}` + `'` + userId + `'`);
+    return this.http.get(`${this.restUrl}${this.urlDocumentTo}` + `'` + userId + `' and StatusID eq '-1'`);
   }
 
   urlRequestTo = "/_api/web/lists/getbytitle('ListProcessRequestTo')/items?$select=*, UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserApprover,UserRequest"
@@ -123,6 +124,7 @@ export class IncomingDocService {
 }
 
 export interface IncomingDoc {
+  ID: number,
   bookType: string;
   numberTo: string;
   numberToSub: number;
@@ -177,4 +179,8 @@ export class ApproverObject {
 export class AttachmentsObject {
   name: string;
   urlFile: string;
+}
+
+export class RotiniPanel {
+
 }

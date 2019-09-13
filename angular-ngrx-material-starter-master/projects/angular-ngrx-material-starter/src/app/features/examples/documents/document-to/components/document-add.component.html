@@ -188,19 +188,19 @@
             </ng-container>
             <ng-container matColumnDef="numberTo">
                 <th mat-header-cell *matHeaderCellDef> Số đến </th>
-                <td mat-cell *matCellDef="let element"> {{element.numberTo}} </td>
+                <td mat-cell *matCellDef="let element"><a routerLink="/examples/doc-detail/{{element.ID}}">{{element.numberTo}}</a></td>
             </ng-container>
             <ng-container matColumnDef="bookType">
                 <th mat-header-cell *matHeaderCellDef> Loại văn bản </th>
-                <td mat-cell *matCellDef="let element"> {{element.bookType}} </td>
+                <td mat-cell *matCellDef="let element"><a routerLink="/examples/doc-detail/{{element.ID}}">{{element.bookType}}</a></td>
             </ng-container>
             <ng-container matColumnDef="compendium">
                 <th mat-header-cell *matHeaderCellDef> Trích yếu </th>
-                <td mat-cell *matCellDef="let element"> {{element.compendium}} </td>
+                <td mat-cell *matCellDef="let element"><a routerLink="/examples/doc-detail/{{element.ID}}">{{element.compendium}}</a></td>
             </ng-container>
             <ng-container matColumnDef="dateTo">
                 <th mat-header-cell *matHeaderCellDef> Ngày nhận </th>
-                <td mat-cell *matCellDef="let element"> {{element.dateTo}} </td>
+                <td mat-cell *matCellDef="let element"><a routerLink="/examples/doc-detail/{{element.ID}}">{{element.dateTo}}</a></td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
