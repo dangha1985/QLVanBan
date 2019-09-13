@@ -116,4 +116,19 @@ export class DocumentDetailComponent implements OnInit {
     });   
   }
 
+  gotoBack() {
+    window.history.back()
+  }
+ 
+  AddNewComment() {
+    this.notificationService.info('Chờ xin ý kiến');
+  }
+
+  NextApprval() {
+    this.notificationService.warn('Chọn người xử lý tiếp theo');
+  }
+
+  ReturnRequest() {
+    this.notificationService.warn('Chọn phòng ban để trả lại');
+  }
 }
