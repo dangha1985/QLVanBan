@@ -21,44 +21,45 @@
             <!-- ID Column -->
             <ng-container matColumnDef="ID">
                 <th mat-header-cell *matHeaderCellDef> No. </th>
-                <td mat-cell *matCellDef="let element"><a routerLink="detail/{{element.ID}}">{{element.ID}}</a> </td>
+                <td mat-cell *matCellDef="let element"><a routerLink="../documentgo-detail/{{element.ID}}">{{element.ID}}</a> </td>
             </ng-container>
             <!-- DocTypeName Column -->
             <ng-container matColumnDef="DocTypeName">
                 <th mat-header-cell *matHeaderCellDef> Loại văn bản </th>
-                <td mat-cell *matCellDef="let element"> {{element.DocTypeName}} </td>
+                <td mat-cell *matCellDef="let element">
+                    <a routerLink="../documentgo-detail/{{element.ID}}"></a> {{element.DocTypeName}} </td>
             </ng-container>
 
             <!-- Compendium Column -->
             <ng-container matColumnDef="Compendium">
                 <th mat-header-cell *matHeaderCellDef> Trích yếu </th>
-                <td mat-cell *matCellDef="let element"> {{element.Compendium}} </td>
+                <td mat-cell *matCellDef="let element"> <a routerLink="../documentgo-detail/{{element.ID}}">{{element.Compendium}} </a></td>
             </ng-container>
 
             <!-- UserCreateName Column -->
             <ng-container matColumnDef="UserCreateName">
                 <th mat-header-cell *matHeaderCellDef> Người tạo </th>
-                <td mat-cell *matCellDef="let element"> {{element.UserCreateName}} </td>
+                <td mat-cell *matCellDef="let element"><a routerLink="../documentgo-detail/{{element.ID}}">{{element.UserCreateName}} </a> </td>
             </ng-container>
             <!-- DateCreated Column -->
             <ng-container matColumnDef="DateCreated">
                 <th mat-header-cell *matHeaderCellDef> Ngày tạo </th>
-                <td mat-cell *matCellDef="let element"> {{element.DateCreated}} </td>
+                <td mat-cell *matCellDef="let element"> <a routerLink="../documentgo-detail/{{element.ID}}">{{element.DateCreated}}</a> </td>
             </ng-container>
             <!-- UserOfHandle Column -->
             <ng-container matColumnDef="UserOfHandle">
                 <th mat-header-cell *matHeaderCellDef> Người xử lý </th>
-                <td mat-cell *matCellDef="let element"> {{element.UserOfHandle}} </td>
+                <td mat-cell *matCellDef="let element"> <a routerLink="../documentgo-detail/{{element.ID}}">{{element.UserOfHandle}}</a> </td>
             </ng-container>
             <!-- Deadline Column -->
             <ng-container matColumnDef="Deadline">
                 <th mat-header-cell *matHeaderCellDef> Hạn xử lý </th>
-                <td mat-cell *matCellDef="let element"> {{element.Deadline}} </td>
+                <td mat-cell *matCellDef="let element"> <a routerLink="../documentgo-detail/{{element.ID}}">{{element.Deadline}} </a></td>
             </ng-container>
             <!-- StatusName Column -->
             <ng-container matColumnDef="StatusName">
                 <th mat-header-cell *matHeaderCellDef> Trạng thái </th>
-                <td mat-cell *matCellDef="let element"> {{element.StatusName}} </td>
+                <td mat-cell *matCellDef="let element"> <a routerLink="../documentgo-detail/{{element.ID}}">{{element.StatusName}}</a> </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;">

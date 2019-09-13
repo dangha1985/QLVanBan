@@ -105,11 +105,7 @@ export class DocumentGoDetailComponent implements OnInit {
           // isRetrieve: itemList[0].IsRetrieve === 0 ? "Không" : "Có", 
           // signer: itemList[0].signer
         };
-        if(this.isDisplay) {
-          return true;
-        } else {
-          return false;
-        }
+        this.ref.detectChanges();
       })
     })
   }

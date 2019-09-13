@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
   languages = ['en', 'de', 'sk', 'fr', 'es', 'pt-br', 'zh-cn', 'he'];
   navigation = [
     // { link: 'examples', label: 'Văn bản đến' },
-    { link: 'OutGoingDocs', label: 'Văn bản đi' },
+    // { link: 'OutGoingDocs', label: 'Văn bản đi' },
     { link: 'settings', label: 'Hồ sơ' },
     { link: 'about', label: 'Danh mục' },
     { link: 'feature-list', label: 'Truyền thông nội bộ' }
