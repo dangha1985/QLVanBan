@@ -15,7 +15,7 @@
             <div fxLayout="column">
                 <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
                     <mat-form-field fxFlex="50">
-                        <mat-label>Sổ văn bản *</mat-label>
+                        <mat-label>Sổ văn bản <span class="required-field">*</span></mat-label>
                         <mat-select formControlName="bookType">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let item of ListBookType" value={{item.code}}>{{item.title}}</mat-option>
@@ -23,7 +23,8 @@
                         <mat-error *ngIf="IncomingDocform.get('bookType').hasError('required')">Chọn loại văn bản</mat-error>
                     </mat-form-field>
                     <mat-form-field fxFlex="50">
-                        <input matInput placeholder="Số đến *" formControlName="numberTo">
+                        <mat-label>Số đến <span class="required-field">*</span></mat-label>
+                        <input matInput formControlName="numberTo" [disabled]="true">
                         <mat-error *ngIf="IncomingDocform.get('numberTo').hasError('required')">Nhập số đến của văn bản</mat-error>
                     </mat-form-field>
                 </div>
@@ -37,14 +38,14 @@
                 </div>
                 <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
                     <mat-form-field fxFlex="50">
-                        <mat-label>Nơi gửi *</mat-label>
+                        <mat-label>Nơi gửi</mat-label>
                         <mat-select formControlName="source">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let item of ListSource" value={{item.id}}>{{item.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field fxFlex="50">
-                        <mat-label>Loại văn bản *</mat-label>
+                        <mat-label>Loại văn bản</mat-label>
                         <mat-select formControlName="docType">
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let item of ListDocType" value={{item.id}}>{{item.title}}</mat-option>
@@ -68,7 +69,8 @@
             </div>
             <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                 <mat-form-field fxFlex="100">
-                    <textarea matInput placeholder="Trích yếu *" formControlName="compendium"></textarea>
+                    <mat-label>Trích yếu <span class="required-field">*</span></mat-label>
+                    <textarea matInput formControlName="compendium"></textarea>
                     <mat-error *ngIf="IncomingDocform.get('compendium').hasError('required')">Nhập nội dung trích yếu</mat-error>
                 </mat-form-field>
             </div>
@@ -91,7 +93,7 @@
             <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
                 <!-- multiple -->
                 <mat-form-field fxFlex="50">
-                    <mat-label>Người xử lý</mat-label>
+                    <mat-label>Người xử lý <span class="required-field">*</span></mat-label>
                     <mat-select formControlName="userHandle">
                         <mat-option>None</mat-option>
                         <mat-option *ngFor="let item of ApproverStep" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
@@ -128,10 +130,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div fxFlex="120px" fxFlex.xs="calc(100%-120px)">
-                    <button type="button" mat-raised-button color="primary"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
-                    <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
-                </div> -->
             </div>
         </div>
 

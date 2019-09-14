@@ -1,13 +1,32 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatTableDataSource} from '@angular/material';
-import {FormControl, FormBuilder, FormGroup, FormGroupDirective, Validators, NgForm} from '@angular/forms';
-import {SelectionModel} from '@angular/cdk/collections';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  ViewChild,
+  ChangeDetectorRef,
+  ViewContainerRef
+} from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material';
+import {
+  FormControl,
+  FormBuilder,
+  FormGroup,
+  FormGroupDirective,
+  Validators,
+  NgForm
+} from '@angular/forms';
+import { SelectionModel } from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
 import * as moment from 'moment';
-import {IncomingDoc, ItemSeleted, IncomingDocService, ApproverObject} from '../incoming-doc.service'
-import {ResApiService} from '../../../services/res-api.service'
-import {ErrorStateMatcher} from '@angular/material/core';
+import {
+  IncomingDoc,
+  ItemSeleted,
+  IncomingDocService,
+  ApproverObject
+} from '../incoming-doc.service';
+import { ResApiService } from '../../../services/res-api.service';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 
@@ -18,9 +37,16 @@ import {
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+  isErrorState(
+    control: FormControl | null,
+    form: FormGroupDirective | NgForm | null
+  ): boolean {
     const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+    return !!(
+      control &&
+      control.invalid &&
+      (control.dirty || control.touched || isSubmitted)
+    );
   }
 }
 
@@ -30,11 +56,16 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['./document-add.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class DocumentAddComponent implements OnInit {
-  listTitle = "ListDocumentTo";
-  inDocs$: IncomingDoc[]= [];
-  displayedColumns: string[] = ['select', 'numberTo', 'bookType', 'compendium', 'dateTo']; //'select'
+  listTitle = 'ListDocumentTo';
+  inDocs$: IncomingDoc[] = [];
+  displayedColumns: string[] = [
+    'select',
+    'numberTo',
+    'bookType',
+    'compendium',
+    'dateTo'
+  ]; //'select'
   dataSource = new MatTableDataSource<IncomingDoc>();
   selection = new SelectionModel<IncomingDoc>(true, []);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -49,22 +80,27 @@ export class DocumentAddComponent implements OnInit {
   currentNumberTo = 0;
   IncomingDocform: FormGroup;
   ListBookType: ItemSeleted[] = [];
-  ListDocType: ItemSeleted[]= [];
+  ListDocType: ItemSeleted[] = [];
   ListSecret: ItemSeleted[] = [];
-  ListUrgent: ItemSeleted[]= [];
-  ListMethodReceipt : ItemSeleted[] = [];
+  ListUrgent: ItemSeleted[] = [];
+  ListMethodReceipt: ItemSeleted[] = [];
   ListSource: ItemSeleted[] = [];
   ApproverStep: ApproverObject[] = [];
   DocumentID = 0;
-  outputFile = []; 
-  displayFile = ''; 
+  outputFile = [];
+  displayFile = '';
   buffer;
   overlayRef;
 
-  constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
-              private services: ResApiService, private ref: ChangeDetectorRef,
-              private readonly notificationService: NotificationService, public overlay: Overlay,
-              public viewContainerRef: ViewContainerRef) {}
+  constructor(
+    private fb: FormBuilder,
+    private docTo: IncomingDocService,
+    private services: ResApiService,
+    private ref: ChangeDetectorRef,
+    private readonly notificationService: NotificationService,
+    public overlay: Overlay,
+    public viewContainerRef: ViewContainerRef
+  ) {}
 
   ngOnInit() {
     this.getCurrentUser();
@@ -74,7 +110,7 @@ export class DocumentAddComponent implements OnInit {
     this.getUrgentLevel();
     this.getMethodReceipt();
     this.getSourceAddress();
-    this.getUserApprovalList("GĐ");
+    this.getUserApprovalList('GĐ');
 
     this.IncomingDocform = this.fb.group({
       bookType: ['DT', [Validators.required]],
@@ -95,85 +131,112 @@ export class DocumentAddComponent implements OnInit {
       note: '',
       isResponse: false,
       isRetrieve: false,
-      signer: '',
+      signer: ''
       //surname: ['', [Validators.required, Validators.minLength(5)]]
     });
   }
 
   getAllListDocument() {
     this.OpenRotiniPanel();
-    this.docTo.getListDocumentTo(this.currentUserId).subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;     
-      this.inDocs$ = []; 
-      item.forEach(element => {
-        this.inDocs$.push({
-          ID: element.ID,
-          bookType: element.BookTypeName, 
-          numberTo: this.docTo.formatNumberTo(element.NumberTo), 
-          numberToSub: element.NumberToSub, 
-          numberOfSymbol: element.NumberOfSymbol, 
-          source: element.Source, 
-          docType: element.DocTypeName, 
-          promulgatedDate: this.docTo.CheckNull(element.PromulgatedDate) === '' ? '' : moment(element.PromulgatedDate).format('DD/MM/YYYY'), 
-          dateTo: this.docTo.CheckNull(element.DateTo) === '' ? '' : moment(element.DateTo).format('DD/MM/YYYY'), 
-          compendium: element.Compendium, 
-          secretLevel: element.SecretLevelName, 
-          urgentLevel: element.UrgentLevelName, 
-          deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'), 
-          numberOfCopies: element.NumOfCopies, 
-          methodReceipt: element.MethodReceipt, 
-          userHandle: element.UserOfHandle !== undefined ? element.UserOfHandle.Title : '', 
-          note: element.Note, 
-          isResponse: element.IsResponse === 0 ? "Không" : "Có", 
-          isSendMail: "Có", 
-          isRetrieve: element.IsRetrieve=== 0 ? "Không" : "Có", 
-          signer: element.signer
-        })
-      })
-      this.dataSource = new MatTableDataSource<IncomingDoc>(this.inDocs$);
-      this.ref.detectChanges();
-      this.dataSource.paginator = this.paginator;
-      this.CloseRotiniPanel();
-      // this.currentNumberTo = this.docTo.getNumberToMax(this.inDocs$);
-      // this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(++this.currentNumberTo));
-      // this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
-    },
-    error => { 
-      console.log("error: " + error);
-      this.CloseRotiniPanel();
-    });
-
-    this.docTo.getDocumentToMax(this.currentUserId).subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
-      if(item.length === 0) {
-        this.currentNumberTo = 0;
-      } else {
+    this.docTo.getListDocumentTo(this.currentUserId).subscribe(
+      (itemValue: any[]) => {
+        let item = itemValue['value'] as Array<any>;
+        this.inDocs$ = [];
         item.forEach(element => {
-          this.currentNumberTo = element.NumberTo;
-        }); 
+          this.inDocs$.push({
+            ID: element.ID,
+            bookType: element.BookTypeName,
+            numberTo: this.docTo.formatNumberTo(element.NumberTo),
+            numberToSub: element.NumberToSub,
+            numberOfSymbol: element.NumberOfSymbol,
+            source: element.Source,
+            docType: element.DocTypeName,
+            promulgatedDate:
+              this.docTo.CheckNull(element.PromulgatedDate) === ''
+                ? ''
+                : moment(element.PromulgatedDate).format('DD/MM/YYYY'),
+            dateTo:
+              this.docTo.CheckNull(element.DateTo) === ''
+                ? ''
+                : moment(element.DateTo).format('DD/MM/YYYY'),
+            compendium: element.Compendium,
+            secretLevel: element.SecretLevelName,
+            urgentLevel: element.UrgentLevelName,
+            deadline:
+              this.docTo.CheckNull(element.Deadline) === ''
+                ? ''
+                : moment(element.Deadline).format('DD/MM/YYYY'),
+            numberOfCopies: element.NumOfCopies,
+            methodReceipt: element.MethodReceipt,
+            userHandle:
+              element.UserOfHandle !== undefined
+                ? element.UserOfHandle.Title
+                : '',
+            note: element.Note,
+            isResponse: element.IsResponse === 0 ? 'Không' : 'Có',
+            isSendMail: 'Có',
+            isRetrieve: element.IsRetrieve === 0 ? 'Không' : 'Có',
+            signer: element.signer
+          });
+        });
+        this.dataSource = new MatTableDataSource<IncomingDoc>(this.inDocs$);
+        this.ref.detectChanges();
+        this.dataSource.paginator = this.paginator;
+        this.CloseRotiniPanel();
+        // this.currentNumberTo = this.docTo.getNumberToMax(this.inDocs$);
+        // this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(++this.currentNumberTo));
+        // this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
+      },
+      error => {
+        console.log('error: ' + error);
+        this.CloseRotiniPanel();
       }
-    },
-    error => {console.log("Load numberTo max error");},
-    () => {      
-      this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(++this.currentNumberTo));
-      this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
-    })
+    );
+
+    this.docTo.getDocumentToMax(this.currentUserId).subscribe(
+      (itemValue: any[]) => {
+        let item = itemValue['value'] as Array<any>;
+        if (item.length === 0) {
+          this.currentNumberTo = 0;
+        } else {
+          item.forEach(element => {
+            this.currentNumberTo = element.NumberTo;
+          });
+        }
+      },
+      error => {
+        console.log('Load numberTo max error');
+      },
+      () => {
+        this.IncomingDocform.controls['numberTo'].setValue(
+          this.docTo.formatNumberTo(++this.currentNumberTo)
+        );
+        this.IncomingDocform.controls['numberOfSymbol'].setValue(
+          this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ'
+        );
+      }
+    );
   }
 
   OpenRotiniPanel() {
     let config = new OverlayConfig();
-    config.positionStrategy = this.overlay.position()
-      .global().centerVertically().centerHorizontally();
+    config.positionStrategy = this.overlay
+      .position()
+      .global()
+      .centerVertically()
+      .centerHorizontally();
     config.hasBackdrop = true;
     this.overlayRef = this.overlay.create(config);
-    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+    this.overlayRef.attach(
+      new ComponentPortal(RotiniPanel, this.viewContainerRef)
+    );
   }
 
   CloseRotiniPanel() {
     this.overlayRef.dispose();
   }
-   /** Whether the number of selected elements matches the total number of rows. */
-   isAllSelected() {
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
     return numSelected === numRows;
@@ -181,144 +244,165 @@ export class DocumentAddComponent implements OnInit {
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
-    this.isAllSelected() ?
-        this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
   checkboxLabel(row?: IncomingDoc): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.numberTo}`;
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${
+      row.numberTo
+    }`;
   }
 
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  getCurrentUser(){
+  getCurrentUser() {
     this.services.getCurrentUser().subscribe(
       itemValue => {
-          this.currentUserId = itemValue["Id"];
-          this.currentUserName = itemValue["Title"];
-        },
-        error => { 
-          console.log("error: " + error);
-          this.CloseRotiniPanel();
-        },
-        () => {
-          console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
-          this.getAllListDocument();
-        }
-      );
+        this.currentUserId = itemValue['Id'];
+        this.currentUserName = itemValue['Title'];
+      },
+      error => {
+        console.log('error: ' + error);
+        this.CloseRotiniPanel();
+      },
+      () => {
+        console.log(
+          'Current user email is: \n' +
+            'Current user Id is: ' +
+            this.currentUserId +
+            '\n' +
+            'Current user name is: ' +
+            this.currentUserName
+        );
+        this.getAllListDocument();
+      }
+    );
   }
 
   getBookType() {
     this.services.getListBookType().subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
+      let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListBookType.push({
           id: element.ID,
           title: element.Title,
           code: element.Code
-        })
+        });
       });
-    })
+    });
   }
 
   getDocType() {
     this.services.getListDocType().subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
+      let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListDocType.push({
           id: element.ID,
           title: element.Title,
           code: ''
-        })
+        });
       });
-    })
+    });
   }
 
   getSecretLevel() {
     this.services.getListSecret().subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
+      let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListSecret.push({
           id: element.ID,
           title: element.Title,
           code: ''
-        })
+        });
       });
-    })
+    });
   }
 
   getUrgentLevel() {
     this.services.getListUrgent().subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
+      let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListUrgent.push({
           id: element.ID,
           title: element.Title,
           code: ''
-        })
+        });
       });
-    })
+    });
   }
 
   getMethodReceipt() {
     this.services.getListMethodSend().subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
+      let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListMethodReceipt.push({
           id: element.ID,
           title: element.Title,
           code: ''
-        })
+        });
       });
-    })
+    });
   }
 
   getSourceAddress() {
     this.services.getListSourceAddress().subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
+      let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListSource.push({
           id: element.ID,
           title: element.Title,
           code: element.Address
-        })
+        });
       });
-    })
+    });
   }
 
-  getUserApprovalList(role){
-    this.docTo.getUserApprover(role).subscribe(items =>{
-      let itemUserMember = items["value"] as Array<any>;
-      itemUserMember.forEach(element =>{
+  getUserApprovalList(role) {
+    this.docTo.getUserApprover(role).subscribe(items => {
+      let itemUserMember = items['value'] as Array<any>;
+      itemUserMember.forEach(element => {
         this.ApproverStep.push({
           UserId: element.User.Id,
           UserName: element.User.Title,
-          UserEmail: element.User.Name.split("|")[2]
-        })
-      })
-    })
+          UserEmail: element.User.Name.split('|')[2]
+        });
+      });
+    });
   }
 
-  splitDataUserApprover(value){
-    this.userApproverId = value.split("|")[0];
-    this.userApproverEmail = value.split("|")[1];
+  splitDataUserApprover(value) {
+    this.userApproverId = value.split('|')[0];
+    this.userApproverEmail = value.split('|')[1];
   }
 
   AddNewItem(sts) {
     if (this.IncomingDocform.valid) {
       this.OpenRotiniPanel();
       const dataForm = this.IncomingDocform.getRawValue();
-      let bookT = this.docTo.FindItemByCode(this.ListBookType, dataForm.bookType);
+      let bookT = this.docTo.FindItemByCode(
+        this.ListBookType,
+        dataForm.bookType
+      );
       let docT = this.docTo.FindItemById(this.ListDocType, dataForm.docType);
-      let secretL = this.docTo.FindItemById(this.ListSecret, dataForm.secretLevel);
-      let urgentL = this.docTo.FindItemById(this.ListUrgent, dataForm.urgentLevel);
-      let method = this.docTo.FindItemById(this.ListMethodReceipt, dataForm.methodReceipt);
+      let secretL = this.docTo.FindItemById(
+        this.ListSecret,
+        dataForm.secretLevel
+      );
+      let urgentL = this.docTo.FindItemById(
+        this.ListUrgent,
+        dataForm.urgentLevel
+      );
+      let method = this.docTo.FindItemById(
+        this.ListMethodReceipt,
+        dataForm.methodReceipt
+      );
       let sourceT = this.docTo.FindItemById(this.ListSource, dataForm.source);
       this.splitDataUserApprover(dataForm.userHandle);
       const data = {
@@ -350,26 +434,40 @@ export class DocumentAddComponent implements OnInit {
         IsResponse: dataForm.isResponse ? 1 : 0,
         IsRetrieve: dataForm.isRetrieve ? 1 : 0,
         StatusID: sts,
-        StatusName: sts === 0 ? "Chờ xử lý" : "Lưu tạm",
+        StatusName: sts === 0 ? 'Chờ xử lý' : 'Lưu tạm',
         Signer: dataForm.signer
-      }
+      };
       this.services.AddItemToList(this.listTitle, data).subscribe(
         item => {
           this.DocumentID = item['d'].Id;
         },
         error => {
           this.CloseRotiniPanel();
-          console.log("error when add item to list " + this.listTitle + ": "+ error.error.error.message.value),
-          this.notificationService.error('Thêm văn bản đến thất bại');
-          },
+          console.log(
+            'error when add item to list ' +
+              this.listTitle +
+              ': ' +
+              error.error.error.message.value
+          ),
+            this.notificationService.error('Thêm văn bản đến thất bại');
+        },
         () => {
-          console.log("Add item of approval user to list " + this.listTitle + " successfully!");
-          if(sts === 0) {
+          console.log(
+            'Add item of approval user to list ' +
+              this.listTitle +
+              ' successfully!'
+          );
+          if (sts === 0) {
             this.AddListTicket();
           } else {
-            this.saveItemAttachment(0, this.DocumentID)
+            if (this.outputFile.length > 0) {
+              this.saveItemAttachment(0, this.DocumentID);
+            } else {
+              this.callbackfunc();
+            }
           }
-        });
+        }
+      );
     }
   }
 
@@ -385,7 +483,7 @@ export class DocumentAddComponent implements OnInit {
       UserApproverId: this.userApproverId,
       Deadline: dataForm.deadline,
       StatusID: 0,
-      StatusName: "Đang xử lý",
+      StatusName: 'Đang xử lý',
       Source: sourceT === undefined ? '' : sourceT.title,
       Destination: '',
       TaskTypeCode: 'XLC',
@@ -394,19 +492,25 @@ export class DocumentAddComponent implements OnInit {
       TypeName: 'Chuyển xử lý',
       Content: dataForm.note,
       IndexStep: 1,
-      Compendium: dataForm.compendium,
-    }
+      Compendium: dataForm.compendium
+    };
     this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
       item => {},
       error => {
         this.CloseRotiniPanel();
-        console.log("error when add item to list ListProcessRequestTo: "+ error.error.error.message.value),
-        this.notificationService.error('Thêm phiếu xử lý thất bại');
+        console.log(
+          'error when add item to list ListProcessRequestTo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Thêm phiếu xử lý thất bại');
       },
       () => {
-        console.log("Add item of approval user to list ListProcessRequestTo successfully!");
+        console.log(
+          'Add item of approval user to list ListProcessRequestTo successfully!'
+        );
         this.saveItemAttachment(0, this.DocumentID);
-      });
+      }
+    );
   }
 
   reset() {
@@ -414,8 +518,12 @@ export class DocumentAddComponent implements OnInit {
     this.IncomingDocform.clearValidators();
     this.IncomingDocform.clearAsyncValidators();
     this.IncomingDocform.controls['bookType'].setValue('DT');
-    this.IncomingDocform.controls['numberTo'].setValue(this.docTo.formatNumberTo(this.currentNumberTo));
-    this.IncomingDocform.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
+    this.IncomingDocform.controls['numberTo'].setValue(
+      this.docTo.formatNumberTo(this.currentNumberTo)
+    );
+    this.IncomingDocform.controls['numberOfSymbol'].setValue(
+      this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ'
+    );
   }
 
   addAttachmentFile() {
@@ -424,59 +532,72 @@ export class DocumentAddComponent implements OnInit {
       if (this.isNotNull(inputNode.files[0])) {
         console.log(inputNode.files[0]);
         if (this.outputFile.length > 0) {
-          if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
+          if (
+            this.outputFile.findIndex(
+              index => index.name === inputNode.files[0].name
+            ) === -1
+          ) {
             this.outputFile.push(inputNode.files[0]);
           }
-        }
-        else {
+        } else {
           this.outputFile.push(inputNode.files[0]);
         }
       }
     } catch (error) {
-      console.log("addAttachmentFile error: " + error);
+      console.log('addAttachmentFile error: ' + error);
     }
   }
+
   removeAttachmentFile(index) {
     try {
-      console.log(this.outputFile.indexOf(index))
+      console.log(this.outputFile.indexOf(index));
       this.outputFile.splice(this.outputFile.indexOf(index), 1);
     } catch (error) {
-      console.log("removeAttachmentFile error: " + error);
+      console.log('removeAttachmentFile error: ' + error);
+      this.CloseRotiniPanel();
     }
   }
 
   isNotNull(str) {
-    return (str !== null && str !== "" && str !== undefined);
+    return str !== null && str !== '' && str !== undefined;
   }
 
-  saveItemAttachment(index, idItem){
+  saveItemAttachment(index, idItem) {
     try {
       this.buffer = this.getFileBuffer(this.outputFile[index]);
       this.buffer.onload = (e: any) => {
         console.log(e.target.result);
         const dataFile = e.target.result;
-        this.services.inserAttachmentFile(dataFile, this.outputFile[index].name, this.listTitle, idItem).subscribe(
-          itemAttach => {
-            console.log('inserAttachmentFile success');
-          },
-          error => { 
-            console.log("error: " + error);
-            this.CloseRotiniPanel();
-          },
-          () => {
-            console.log('inserAttachmentFile successfully');
-            if(Number(index) < (this.outputFile.length-1)){
-              this.saveItemAttachment((Number(index)+ 1), idItem);
+        this.services
+          .inserAttachmentFile(
+            dataFile,
+            this.outputFile[index].name,
+            this.listTitle,
+            idItem
+          )
+          .subscribe(
+            itemAttach => {
+              console.log('inserAttachmentFile success');
+            },
+            error => {
+              console.log('error: ' + error);
+              this.CloseRotiniPanel();
+            },
+            () => {
+              console.log('inserAttachmentFile successfully');
+              if (Number(index) < this.outputFile.length - 1) {
+                this.saveItemAttachment(Number(index) + 1, idItem);
+              } else {
+                //alert("Save request successfully");
+                this.callbackfunc();
+              }
             }
-            else{
-              //alert("Save request successfully");
-              this.callbackfunc();
-            }
-          }
-        )
-      }
+          );
+      };
     } catch (error) {
-      console.log("saveItemAttachment error: "+error);
+      this.notificationService.error('Thêm tệp đính kèm thất bại');
+      console.log('saveItemAttachment error: ' + error);
+      this.CloseRotiniPanel();
     }
   }
 
@@ -486,7 +607,7 @@ export class DocumentAddComponent implements OnInit {
     return reader;
   }
 
-  callbackfunc(){
+  callbackfunc() {
     // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
     this.CloseRotiniPanel();
     this.notificationService.success('Thêm văn bản đến thành công');
@@ -494,14 +615,11 @@ export class DocumentAddComponent implements OnInit {
     this.addNew = !this.addNew;
     this.showList = !this.showList;
   }
-
 }
-
 
 @Component({
   selector: 'rotini-panel',
-  template: '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Waiting....</p>'
+  template:
+    '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Waiting....</p>'
 })
-
-export class RotiniPanel {
-}
+export class RotiniPanel {}
