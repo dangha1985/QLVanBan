@@ -218,4 +218,26 @@
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval()"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest()"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
     </div>
+
+    <ng-template #content let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">Profile update</h4>
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="form-group">
+                    <mat-form-field fxFlex="50">
+                        <mat-label>Số đến <span class="required-field">*</span></mat-label>
+                        <input matInput>
+                    </mat-form-field>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
+        </div>
+    </ng-template>
 </div>

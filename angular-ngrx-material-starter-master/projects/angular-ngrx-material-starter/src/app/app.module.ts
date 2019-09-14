@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app/app.component';
 import {DocumentsModule } from './features/examples/documents/documents.module';
 import { from } from 'rxjs';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 
 
@@ -25,7 +26,8 @@ import { from } from 'rxjs';
     // app
     AppRoutingModule,
     //
-    DocumentsModule
+    DocumentsModule,
+    ModalModule.forRoot()
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent]

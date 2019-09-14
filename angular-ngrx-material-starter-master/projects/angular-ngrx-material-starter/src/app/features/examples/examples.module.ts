@@ -6,7 +6,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import {MatTableModule} from '@angular/material/table';
-import {FlexLayoutModule} from '@angular/flex-layout'
+import {FlexLayoutModule} from '@angular/flex-layout';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../../shared/shared.module';
 import { environment } from '../../../environments/environment';
 
@@ -32,7 +33,7 @@ import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent, RotiniPanel} from './documents/document-to/components/document-add.component'
-import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
+import {DocumentDetailComponent, ModalContentComponent} from './documents/document-to/components/document-detail.component'
 import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -67,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ]),
      MatTableModule,
      FlexLayoutModule,
+     ModalModule.forRoot(),
   ],
   declarations: [
     ExamplesComponent,
@@ -85,11 +87,13 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentDetailComponent,
     DocumentWaitingComponent,
     RotiniPanel,
+    ModalContentComponent,
   ],
   providers: [StockMarketService, UserService],
   entryComponents: [
     RotiniPanel,
-    ]
+    ModalContentComponent,
+    ],
 })
 export class ExamplesModule {
   constructor() {}

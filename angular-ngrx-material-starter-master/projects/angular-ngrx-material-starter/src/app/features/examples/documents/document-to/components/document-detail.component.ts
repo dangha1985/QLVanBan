@@ -3,7 +3,10 @@ import {
   OnInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  ViewChild
+  ViewChild,
+  Inject,
+  PLATFORM_ID,
+  Injector
 } from '@angular/core';
 import {
   IncomingDoc,
@@ -17,10 +20,12 @@ import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material';
 import * as moment from 'moment';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
 } from '../../../../../core/core.module';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'anms-document-detail',
@@ -29,6 +34,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentDetailComponent implements OnInit {
+  bsModalRef: BsModalRef;
   itemDoc: IncomingDoc;
   isDisplay: boolean = false;
   ItemId;
@@ -37,6 +43,7 @@ export class DocumentDetailComponent implements OnInit {
   listName = 'ListDocumentTo';
   outputFile = [];
   displayFile = '';
+  closeResult = '';
   buffer;
   displayedColumns: string[] = [
     'stt',
@@ -56,7 +63,8 @@ export class DocumentDetailComponent implements OnInit {
     private services: ResApiService,
     private route: ActivatedRoute,
     private readonly notificationService: NotificationService,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private modalService: BsModalService
   ) {}
 
   ngOnInit() {
@@ -173,9 +181,51 @@ export class DocumentDetailComponent implements OnInit {
 
   NextApprval() {
     this.notificationService.warn('Chọn người xử lý tiếp theo');
+    const initialState = {
+      list: [
+        'Open a modal with component',
+        'Pass your data',
+        'Do something else',
+        '...'
+      ],
+      title: 'Modal with component'
+    };
+    this.bsModalRef = this.modalService.show(ModalContentComponent, {initialState});
+    this.bsModalRef.content.closeBtnName = 'Close';
   }
 
   ReturnRequest() {
     this.notificationService.warn('Chọn phòng ban để trả lại');
   }
 }
+
+
+/* This is a component which we pass in modal*/
+@Component({
+  selector: 'modal-content',
+  template: `
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">{{title}}</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ul *ngIf="list.length">
+        <li *ngFor="let item of list">{{item}}</li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">{{closeBtnName}}</button>
+    </div>
+  `
+})
+
+export class ModalContentComponent {
+  title: string;
+  closeBtnName: string;
+  list: any[] = [];
+
+  constructor(public bsModalRef: BsModalRef) {}
+}
+

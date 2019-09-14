@@ -458,13 +458,9 @@ export class DocumentAddComponent implements OnInit {
               ' successfully!'
           );
           if (sts === 0) {
-            this.AddListTicket();
+            this.AddHistoryStep();
           } else {
-            if (this.outputFile.length > 0) {
-              this.saveItemAttachment(0, this.DocumentID);
-            } else {
-              this.callbackfunc();
-            }
+            this.saveItemAttachment(0, this.DocumentID);
           }
         }
       );
@@ -509,6 +505,43 @@ export class DocumentAddComponent implements OnInit {
           'Add item of approval user to list ListProcessRequestTo successfully!'
         );
         this.saveItemAttachment(0, this.DocumentID);
+      }
+    );
+  }
+
+  AddHistoryStep() {
+    const dataForm = this.IncomingDocform.getRawValue();
+    let sourceT = this.docTo.FindItemById(this.ListSource, dataForm.source);
+    const data = {
+      __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+      Title: dataForm.numberTo,
+      DateCreated: new Date(),
+      NoteBookID: this.DocumentID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.userApproverId,
+      Deadline: dataForm.deadline,
+      StatusID: 0,
+      StatusName: 'Chờ xử lý',
+      Content: dataForm.note,
+      IndexStep: 1,
+      Compendium: dataForm.compendium,
+      StatusApproval: "1_0"
+    };
+    this.services.AddItemToList('ListHistoryRequestTo', data).subscribe(
+      item => {},
+      error => {
+        this.CloseRotiniPanel();
+        console.log(
+          'error when add item to list ListHistoryRequestTo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Thêm phiếu xử lý thất bại');
+      },
+      () => {
+        console.log(
+          'Add item of approval user to list ListHistoryRequestTo successfully!'
+        );
+        this.AddListTicket();
       }
     );
   }
@@ -563,42 +596,46 @@ export class DocumentAddComponent implements OnInit {
   }
 
   saveItemAttachment(index, idItem) {
-    try {
-      this.buffer = this.getFileBuffer(this.outputFile[index]);
-      this.buffer.onload = (e: any) => {
-        console.log(e.target.result);
-        const dataFile = e.target.result;
-        this.services
-          .inserAttachmentFile(
-            dataFile,
-            this.outputFile[index].name,
-            this.listTitle,
-            idItem
-          )
-          .subscribe(
-            itemAttach => {
-              console.log('inserAttachmentFile success');
-            },
-            error => {
-              console.log('error: ' + error);
-              this.CloseRotiniPanel();
-            },
-            () => {
-              console.log('inserAttachmentFile successfully');
-              if (Number(index) < this.outputFile.length - 1) {
-                this.saveItemAttachment(Number(index) + 1, idItem);
-              } else {
-                //alert("Save request successfully");
-                this.callbackfunc();
+    if (this.outputFile.length > 0) {
+      try {
+        this.buffer = this.getFileBuffer(this.outputFile[index]);
+        this.buffer.onload = (e: any) => {
+          console.log(e.target.result);
+          const dataFile = e.target.result;
+          this.services
+            .inserAttachmentFile(
+              dataFile,
+              this.outputFile[index].name,
+              this.listTitle,
+              idItem
+            )
+            .subscribe(
+              itemAttach => {
+                console.log('inserAttachmentFile success');
+              },
+              error => {
+                console.log('error: ' + error);
+                this.CloseRotiniPanel();
+              },
+              () => {
+                console.log('inserAttachmentFile successfully');
+                if (Number(index) < this.outputFile.length - 1) {
+                  this.saveItemAttachment(Number(index) + 1, idItem);
+                } else {
+                  //alert("Save request successfully");
+                  this.callbackfunc();
+                }
               }
-            }
-          );
-      };
-    } catch (error) {
-      this.notificationService.error('Thêm tệp đính kèm thất bại');
-      console.log('saveItemAttachment error: ' + error);
-      this.CloseRotiniPanel();
-    }
+            );
+        };
+      } catch (error) {
+        this.notificationService.error('Thêm tệp đính kèm thất bại');
+        console.log('saveItemAttachment error: ' + error);
+        this.CloseRotiniPanel();
+      }
+  } else {
+    this.callbackfunc();
+  }
   }
 
   getFileBuffer(file) {
