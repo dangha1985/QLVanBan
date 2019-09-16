@@ -10,6 +10,7 @@ import {FlexLayoutModule} from '@angular/flex-layout'
 import { SharedModule } from '../../../shared/shared.module';
 import { environment } from '../../../../environments/environment';
 import {MatTableModule} from '@angular/material/table';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
 import { BrowserModule } from '@angular/platform-browser';
 import {DocumentRoutingModule} from './document-routing.module';
@@ -32,6 +33,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatTableModule,
     SharedModule,
     DocumentRoutingModule,
+    ModalModule,
   // CommonModule,
     //BrowserModule,
    // CoreModule,
