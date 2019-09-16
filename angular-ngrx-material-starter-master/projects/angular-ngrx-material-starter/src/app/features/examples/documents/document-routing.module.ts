@@ -24,11 +24,11 @@ const routes: Routes = [
     path: '',
     component: DocumentComponent,
     children: [
-      // {
-      //   path: '',
-      //   redirectTo: 'todos',
-      //   pathMatch: 'full'
-      // },
+      {
+        path: '',
+        redirectTo: 'documentgo',
+        pathMatch: 'full'
+      },
 
       {
         path: 'documentgo',
@@ -45,11 +45,11 @@ const routes: Routes = [
         component: DocumentGoDetailComponent,
         data: { title: 'Xem chi tiết' }
       },
-      {
-        path: 'detail/:id',
-        component: DocumentGoDetailComponent,
-        data: { title: 'Xem chi tiết' }
-      },
+      // {
+      //   path: 'detail/:id',
+      //   component: DocumentGoDetailComponent,
+      //   data: { title: 'Xem chi tiết' }
+      // },
     ]
   },
   // {

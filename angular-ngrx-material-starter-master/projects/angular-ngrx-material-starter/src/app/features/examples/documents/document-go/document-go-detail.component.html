@@ -14,25 +14,6 @@
             </div>
             <div fxFlexFill>
                 <form class="example-form" *ngIf="itemDoc">
-                    <!-- *ngIf="itemDoc" 
-                    BookTypeName: string;
-  UnitCreateName: string,
-  RecipientsInName: string,
-  RecipientsOutName: string,
- // UserOfHandle:number,
- // UserOfCombinate: number,
- // UserOfKnow: number,
-  SecretLevelName: string,
-  UrgentLevelName: string,
-  MethodSendName: string,NumberSymbol: string;
-  DocTypeName: string;
-  Compendium: string;
-  Deadline: string;
-  DateCreated: string;
-  UserCreateName: string;
-  UserOfHandleName: string;
-  StatusName:string;
-                    -->
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Đơn vị tạo:</p>
@@ -73,22 +54,46 @@
                             <p fxFlex="auto">{{itemDoc.DocTypeName}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Ngày xử lý:</p>
-                            <p fxFlex="auto">{{itemDoc.Deadline}}</p>
-                        </div>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Ngày tạo:</p>
-                            <p fxFlex="auto">{{itemDoc.DateCreated}}</p>
-                        </div>
-                    </div>
+
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="100">
                             <p fxFlex="12.5" class="form-label">Trích yếu:</p>
                             <p fxFlex="auto">{{itemDoc.Compendium}}</p>
                         </div>
                     </div>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Nơi nhận nội bộ:</p>
+                            <p fxFlex="auto">{{itemDoc.RecipientsInName}}</p>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Nơi nhận ngoài:</p>
+                            <p fxFlex="auto">{{itemDoc.RecipientsOutName}}</p>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Người xử lý:</p>
+                            <p fxFlex="auto">{{itemDoc.UserHandleName}}</p>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Hạn xử lý:</p>
+                            <p fxFlex="auto">{{itemDoc.deadline}}</p>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Người Phối hợp:</p>
+                            <!-- <p fxFlex="auto">{{itemDoc.UserHandleName}}</p> -->
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Người nhận để biết:</p>
+                            <!-- <p fxFlex="auto">{{itemDoc.deadline}}</p> -->
+                        </div>
+                    </div>
+
+
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Độ mật:</p>
@@ -101,38 +106,40 @@
                     </div>
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Người xử lý:</p>
-                            <p fxFlex="auto">{{itemDoc.UserHandleName}}</p>
+                            <p fxFlex="25" class="form-label">Số bản:</p>
+                            <p fxFlex="auto">{{itemDoc.NumOfPaper}}</p>
                         </div>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Hạn xử lý:</p>
-                            <p fxFlex="auto">{{itemDoc.deadline}}</p>
-                        </div>
-                    </div>
-                    <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlex="100">
-                            <p fxFlex="12.5" class="form-label">Nội dung xử lý:</p>
-                            <p fxFlex="auto">{{itemDoc.note}}</p>
-                        </div>
-                    </div> -->
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Là văn bản trả lời:</p>
-                            <p fxFlex="auto">{{itemDoc.isResponse}}</p>
-                        </div>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Người ký:</p>
-                            <p fxFlex="auto">{{itemDoc.SignerName}}</p>
-                        </div>
-                    </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Phương thức nhận:</p>
                             <p fxFlex="auto">{{itemDoc.MethodReceiptName}}</p>
                         </div>
+                    </div>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
-                            <p fxFlex="25" class="form-label">Số bản:</p>
-                            <p fxFlex="auto">{{itemDoc.NumberOfCopies}}</p>
+                            <p fxFlex="25" class="form-label">Người ký:</p>
+                            <p fxFlex="auto">{{itemDoc.SignerName}}</p>
+                        </div>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Ngày phát hành:</p>
+                            <p fxFlex="auto">{{itemDoc.DateIssued}}</p>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="100">
+                            <p fxFlex="12.5" class="form-label">Nội dung xử lý:</p>
+                            <p fxFlex="auto">{{itemDoc.note}}</p>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                        <!-- <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Hạn xử lý:</p>
+                            <p fxFlex="auto">{{itemDoc.Deadline}}</p>
+                        </div> -->
+
+                        <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
+                            <p fxFlex="25" class="form-label">Là văn bản trả lời:</p>
+                            <!-- <p fxFlex="auto">{{itemDoc.isResponse}}</p> -->
                         </div>
                     </div>
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>

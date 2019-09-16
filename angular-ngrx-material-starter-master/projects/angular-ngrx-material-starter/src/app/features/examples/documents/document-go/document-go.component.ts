@@ -1,5 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { Validators, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild,ViewContainerRef } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { filter, debounceTime, take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
@@ -7,7 +6,7 @@ import { Observable, from } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material';
-import { FormControl } from '@angular/forms';
+import { FormControl , FormBuilder, FormGroup, FormGroupDirective, Validators, NgForm} from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as moment from 'moment';
 
@@ -26,13 +25,16 @@ import { selectFormState } from '../../../examples/form/form.selectors';
 import { ResApiService } from '../../services/res-api.service'
 import { DocumentGoService } from './document-go.service';
 import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser } from './../models/document-go';
-
+import {ErrorStateMatcher} from '@angular/material/core';
+import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
 @Component({
   selector: 'anms-document-go',
   templateUrl: './document-go.component.html',
   styleUrls: ['./document-go.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class DocumentGoComponent implements OnInit {
   form = this.fb.group({
     // NumSymbol: ['', [Validators.required]],
@@ -42,8 +44,8 @@ export class DocumentGoComponent implements OnInit {
       '',
       [
         Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(1000)
+        // Validators.minLength(2),
+        // Validators.maxLength(1000)
       ]
     ],
     UnitCreate: null,
@@ -78,9 +80,12 @@ export class DocumentGoComponent implements OnInit {
     private services: ResApiService,
     private route: ActivatedRoute,
     private ref: ChangeDetectorRef,
+    public overlay: Overlay,
+    public viewContainerRef: ViewContainerRef
   ) { }
 
   displayedColumns: string[] = ['ID', 'DocTypeName', 'Compendium', 'UserCreateName', 'DateCreated', 'UserOfHandle', 'Deadline', 'StatusName'];
+  listTitle = "ListDocumentGo";
   dataSource = new MatTableDataSource<ItemDocumentGo>();
   // selection = new SelectionModel<PeriodicElement>(true, []);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -104,6 +109,14 @@ export class DocumentGoComponent implements OnInit {
   strFilterUser = '';
   userApproverId = '';
   userApproverEmail = '';
+  currentUserId = '';
+  currentUserName='';
+  currentNumberGo = 0;
+  DocumentID = 0;
+  outputFile = []; 
+  displayFile = ''; 
+  buffer;
+  overlayRef;
   ngOnInit() {
 
     //lấy tham số truyền vào qua url
@@ -127,14 +140,45 @@ export class DocumentGoComponent implements OnInit {
         this.getUserApproverStep();
         this.getUserSigner();
         this.getUserCreate();
+        
     //  }
       //Load ds văn bản
-      this.getListDocumentGo();
+      this.getCurrentUser();
+   //   this.getListDocumentGo();
    // });
+  }
+  //Lấy người dùng hiện tại
+  getCurrentUser(){
+    this.services.getCurrentUser().subscribe(
+      itemValue => {
+          this.currentUserId = itemValue["Id"];
+          this.currentUserName = itemValue["Title"];
+        },
+        error => { 
+          console.log("error: " + error);
+          this.CloseRotiniPanel();
+        },
+        () => {
+          console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
+          this.getListDocumentGo();
+        }
+      );
+  }
+  OpenRotiniPanel() {
+    let config = new OverlayConfig();
+    config.positionStrategy = this.overlay.position()
+      .global().centerVertically().centerHorizontally();
+    config.hasBackdrop = true;
+    this.overlayRef = this.overlay.create(config);
+    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+  }
+
+  CloseRotiniPanel() {
+    this.overlayRef.dispose();
   }
   //lấy ds văn bản
   getListDocumentGo() {
-    this.strFilter = `&$filter=ID ne ''`;
+    this.strFilter = `&$filter=Author/Id eq '`+ this.currentUserId+`'`;
   //  if (this.idStatus == '1') {//chờ xử lý
       this.strFilter += `and StatusCode eq 'VBDT'`;
   //  }
@@ -163,9 +207,12 @@ export class DocumentGoComponent implements OnInit {
             SecretLevelName: '',
             UrgentLevelName: '',
             MethodSendName: '',
+            DateIssued:'',
+            SignerName: '',
+            Note:'',
+           NumOfPaper :'',
           })
         })
-
       },
         error => console.log(error),
         () => {
@@ -314,7 +361,6 @@ export class DocumentGoComponent implements OnInit {
   //Thêm mới văn bản đi
   save(isChuyenXL) {
     try {
-     
       const dataForm = this.form.getRawValue();
       if (this.form.valid) {
         let itemBookType = this.docServices.FindItemByCode(this.ListBookType, this.form.get('BookType').value);
@@ -331,6 +377,7 @@ export class DocumentGoComponent implements OnInit {
         // console.log('UserOfHandle:'+ dataForm.UserOfHandle);
         let UserCreate = (dataForm.UserCreate == null || dataForm.UserCreate == 0) ? null : dataForm.UserCreate.split("|")[0];
         let UserOfHandle = (dataForm.UserOfHandle == null || dataForm.UserOfHandle == 0) ? null : dataForm.UserOfHandle.split("|")[0];
+        this.userApproverId=UserOfHandle;
         let UserOfCombinate = (dataForm.UserOfCombinate == null || dataForm.UserOfCombinate == 0) ? null : dataForm.UserOfCombinate.split("|")[0];
         let UserOfKnow = (dataForm.UserOfKnow == null || dataForm.UserOfKnow == 0) ? null : dataForm.UserOfKnow.split("|")[0];
         let Signer = (dataForm.Signer == null || dataForm.Signer == 0) ? null : dataForm.Signer.split("|")[0];
@@ -381,21 +428,38 @@ export class DocumentGoComponent implements OnInit {
         // console.log('DocTypeID:'+this.form.get('DocType').value);
         // console.log('DocTypeID:'+this.form.get('DocType'));
         // console.log('NumberGo:'+ this.form.get('NumberGo').value),
-        this.docServices.createDocumentGo(data).subscribe(
+        this.services.AddItemToList(this.listTitle, data).subscribe(
           item => {
-            console.log("add success !");
-            this.notificationService.success('Thêm mới thành công!');
+            this.DocumentID = item['d'].Id;
           },
           error => {
-            console.log("error add:" + error);
-            this.notificationService.error("Thêm mới thất bại.");
-          },
+            this.CloseRotiniPanel();
+            console.log("error when add item to list " + this.listTitle + ": "+ error.error.error.message.value),
+            this.notificationService.error('Thêm văn bản trình thất bại');
+            },
           () => {
-            //load lại ds văn bản
-            this.getListDocumentGo();
-            this.reset();
-          }
-        );
+            console.log("Add item of approval user to list " + this.listTitle + " successfully!");
+            if(isChuyenXL === 1) {//chuyển xử lý
+              this.AddListTicket();
+            } else {
+              this.saveItemAttachment(0, this.DocumentID)
+            }
+          });
+        // this.docServices.createDocumentGo(data).subscribe(
+        //   item => {
+        //     console.log("add success !");
+        //     this.notificationService.success('Thêm mới thành công!');
+        //   },
+        //   error => {
+        //     console.log("error add:" + error);
+        //     this.notificationService.error("Thêm mới thất bại.");
+        //   },
+        //   () => {
+        //     //load lại ds văn bản
+        //     this.getListDocumentGo();
+        //     this.reset();
+        //   }
+        // );
       }
     }
     catch (error) {
@@ -406,12 +470,7 @@ export class DocumentGoComponent implements OnInit {
     this.save(isChuyenXL);
     this.notificationService.info('Chuyển xử lý');
   }
-  reset() {
-    this.form.reset();
-    this.form.clearValidators();
-    this.form.clearAsyncValidators();
-    this.store.dispatch(actionFormReset());
-  }
+ 
   //  /** Whether the number of selected elements matches the total number of rows. */
   //  isAllSelected() {
   //   const numSelected = this.selection.selected.length;
@@ -435,4 +494,144 @@ export class DocumentGoComponent implements OnInit {
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+  AddListTicket() {
+    const dataForm = this.form.getRawValue();
+    let DocTypeName = this.docServices.FindItemById(this.ListDocType, dataForm.DocType);
+  // DocumentGoID:Number,DateCreated:DateTime,UserRequest:User,UserApprover:User,TaskTypeID:Number,TaskTypeName:
+  // ,Deadline:DateTime,Content:Note,TypeCode:,TypeName:,StatusID:Number,StatusName:,Compendium:Note
+    const data = {
+      __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+      Title:'Văn bản đi',
+      DocTypeName: DocTypeName==undefined?'':DocTypeName.Title,
+      DateCreated: new Date(),
+      DocumentGoID: this.DocumentID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.userApproverId,
+      Deadline: dataForm.Deadline,
+      StatusID: 0,
+      StatusName: "Chờ xử lý",
+     // Source: sourceT === undefined ? '' : sourceT.Title,
+     //Destination: '',
+      TaskTypeCode: 'XLC',
+      TaskTypeName: 'Xử lý chính',
+      TypeCode: 'CXL',
+      TypeName: 'Chuyển xử lý',
+      Content: dataForm.Note,
+      IndexStep: 1,
+      Compendium: dataForm.Compendium,
+    }
+    this.services.AddItemToList('ListProcessRequestGo', data).subscribe(
+      item => {},
+      error => {
+        this.CloseRotiniPanel();
+        console.log("error when add item to list ListProcessRequestGo: "+ error.error.error.message.value),
+        this.notificationService.error('Thêm phiếu xử lý thất bại');
+      },
+      () => {
+        console.log("Add item of approval user to list ListProcessRequestGo successfully!");
+        this.saveItemAttachment(0, this.DocumentID);
+      });
+  }
+
+  reset() {
+    this.form.reset();
+    this.form.clearValidators();
+    this.form.clearAsyncValidators();
+    this.form.controls['bookType'].setValue('GT');
+    // this.form.controls['numberTo'].setValue(this.docTo.formatNumberTo(this.currentNumberTo));
+    // this.form.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
+  }
+
+  addAttachmentFile() {
+    try {
+      const inputNode: any = document.querySelector('#fileAttachment');
+      if (this.isNotNull(inputNode.files[0])) {
+        console.log(inputNode.files[0]);
+        if (this.outputFile.length > 0) {
+          if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
+            this.outputFile.push(inputNode.files[0]);
+          }
+        }
+        else {
+          this.outputFile.push(inputNode.files[0]);
+        }
+      }
+    } catch (error) {
+      console.log("addAttachmentFile error: " + error);
+    }
+  }
+  removeAttachmentFile(index) {
+    try {
+      console.log(this.outputFile.indexOf(index))
+      this.outputFile.splice(this.outputFile.indexOf(index), 1);
+    } catch (error) {
+      console.log("removeAttachmentFile error: " + error);
+    }
+  }
+
+  isNotNull(str) {
+    return (str !== null && str !== "" && str !== undefined);
+  }
+
+  saveItemAttachment(index, idItem){
+    try {
+      this.buffer = this.getFileBuffer(this.outputFile[index]);
+      this.buffer.onload = (e: any) => {
+        console.log(e.target.result);
+        const dataFile = e.target.result;
+        this.services.inserAttachmentFile(dataFile, this.outputFile[index].name, this.listTitle, idItem).subscribe(
+          itemAttach => {
+            console.log('inserAttachmentFile success');
+          },
+          error => { 
+            console.log("error: " + error);
+            this.CloseRotiniPanel();
+          },
+          () => {
+            console.log('inserAttachmentFile successfully');
+            if(Number(index) < (this.outputFile.length-1)){
+              this.saveItemAttachment((Number(index)+ 1), idItem);
+            }
+            else{
+              //alert("Save request successfully");
+              this.callbackfunc();
+            }
+          }
+        )
+      }
+    } catch (error) {
+      console.log("saveItemAttachment error: "+error);
+    }
+  }
+
+  getFileBuffer(file) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    return reader;
+  }
+
+  callbackfunc(){
+    // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
+    this.CloseRotiniPanel();
+    this.notificationService.success('Thêm văn bản trình thành công');
+    this.getListDocumentGo();
+    this.addNew = !this.addNew;
+    this.showList = !this.showList;
+  }
+
+}
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
+
+@Component({
+  selector: 'rotini-panel',
+  template: '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Waiting....</p>'
+})
+
+export class RotiniPanel {
 }

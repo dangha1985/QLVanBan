@@ -2,6 +2,7 @@
 export interface ItemDocumentGo {
   ID: number;
   NumberGo: string;
+ // NumberToSub:string,
   NumberSymbol: string;
   DocTypeName: string;
   Compendium: string;
@@ -11,18 +12,23 @@ export interface ItemDocumentGo {
   UserOfHandleName: string;
   StatusName:string;
 
-  BookTypeName: string;
-  UnitCreateName: string,
-  RecipientsInName: string,
-  RecipientsOutName: string,
+   BookTypeName: string;
+  UnitCreateName: string;
+  RecipientsInName: string;
+  RecipientsOutName: string;
+  SecretLevelName: string;
+  UrgentLevelName: string;
+  MethodSendName: string;
+  DateIssued:string;
+ SignerName: string,
+  Note:string,
+  NumOfPaper :string,
+
  // UserOfHandle:number,
  // UserOfCombinate: number,
  // UserOfKnow: number,
-  SecretLevelName: string,
-  UrgentLevelName: string,
-  MethodSendName: string,
- // Signer: number,
-
+ 
+ // 
 //  BookType: string;
 //  UnitCreate: number,
 //  UserCreate: number,
@@ -37,6 +43,8 @@ export interface ItemDocumentGo {
 //  MethodSend: number,
 // Signer: number,
 }
+ // "username": "demo@tsg.net.vn",
+  // "password": "13ab3737095a8dfbbd14405ebe5c15a0e7e2c866c55c4368f3effc16de272a44c1c848fc63c0eba781c7e5b6007de7fbpa57OqenaXHwW2NsLRWe+A==",
 export interface IncomingDoc {
   bookType: string;
   numberTo: string;

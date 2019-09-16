@@ -66,25 +66,31 @@ export class DocumentGoDetailComponent implements OnInit {
         }
 
         this.itemDoc = {
-          ID: itemList[0].ID,
-            NumberGo: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
+            ID: itemList[0].ID,
+            NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo , 
+          //  NumberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
             DocTypeName: this.docServices.checkNull(itemList[0].DocTypeName),
             NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
             Compendium: this.docServices.checkNull(itemList[0].Compendium),
-            UserCreateName: itemList[0].UserCreate == undefined ? '' : itemList[0].UserCreate.Title,
+            UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
             DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
             UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Title,
+           
             Deadline: this.docServices.formatDateTime(itemList[0].Deadline),
             StatusName: this.docServices.checkNull(itemList[0].StatusName),
             BookTypeName: itemList[0].BookTypeName,
-            UnitCreateName: '',
-            RecipientsInName: '',
-            RecipientsOutName: '',
-            SecretLevelName: '',
-            UrgentLevelName: '',
-            MethodSendName: '',
-
-          // bookType: itemList[0].BookTypeName, 
+            UnitCreateName: itemList[0].UnitCreateName,
+            RecipientsInName: itemList[0].RecipientsInName,
+            RecipientsOutName: itemList[0].RecipientsOutName,
+            SecretLevelName: itemList[0].SecretLevelName,
+            UrgentLevelName: itemList[0].UrgentLevelName,
+            MethodSendName: itemList[0].MethodSendName,
+            DateIssued: this.docServices.formatDateTime(itemList[0].DateIssued),
+           SignerName: itemList[0].Signer==undefined?'':itemList[0].Signer.Title,
+           NumOfPaper : itemList[0].NumOfPaper ,
+           Note: itemList[0].Note,
+            
+           
           // numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo), 
           // numberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
           // numberOfSymbol: itemList[0].NumberOfSymbol, 
