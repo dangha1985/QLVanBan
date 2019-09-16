@@ -120,28 +120,28 @@ export class DocumentGoWaitingComponent implements OnInit {
        
     //   }
       //Load ds văn bản
-      this.getListDocumentGo();
+      this.getListDocumentGo_Wait();
     //});
   }
   //lấy ds văn bản
-  getListDocumentGo() {
-      this.strFilter = `&$filter=ID ne ''and StatusCode eq 'VBCXL'`;
+  getListDocumentGo_Wait() {
+      this.strFilter = `&$filter=ID ne ''and StatusID eq '0'`;
     try {
       this.ListDocumentGo = [];
-      this.docServices.getListDocumentGo(this.strFilter).subscribe(itemValue => {
+      this.docServices.getListProcessRequestGo(this.strFilter).subscribe(itemValue => {
         let item = itemValue["value"] as Array<any>;
         item.forEach(element => {
           // console.log('UserCreate:'+ element.UserCreate.Title);
           // console.log('UserOfHandle:'+ element.UserOfHandle.Title);
           this.ListDocumentGo.push({
             ID: element.ID,
-            NumberGo: this.docServices.checkNull(element.NumberGo),
+            NumberGo:'',// this.docServices.checkNull(element.NumberGo),
             DocTypeName: this.docServices.checkNull(element.DocTypeName),
-            NumberSymbol: this.docServices.checkNull(element.NumberSymbol),
+            NumberSymbol:'',// this.docServices.checkNull(element.NumberSymbol),
             Compendium: this.docServices.checkNull(element.Compendium),
-            UserCreateName: element.UserCreate == undefined ? '' : element.UserCreate.Title,
+            UserCreateName: element.Author == undefined ? '' : element.Author.Title,
             DateCreated: this.docServices.formatDateTime(element.DateCreated),
-            UserOfHandleName: element.UserOfHandle == undefined ? '' : element.UserOfHandle.Title,
+            UserOfHandleName: element.UserApprover == undefined ? '' : element.UserApprover.Title,
             Deadline: this.docServices.formatDateTime(element.Deadline),
             StatusName: this.docServices.checkNull(element.StatusName),
             BookTypeName: '',
@@ -151,6 +151,10 @@ export class DocumentGoWaitingComponent implements OnInit {
             SecretLevelName: '',
             UrgentLevelName: '',
             MethodSendName: '',
+            DateIssued:'',
+              SignerName: '',
+              Note:'',
+             NumOfPaper :'',
           })
         })
 

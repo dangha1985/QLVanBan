@@ -11,7 +11,10 @@ export class DocumentGoService {
   private restUrl = environment.proxyUrl;
   private urlAddDocumentGo="/_api/web/lists/getbytitle('ListDocumentGo')/items";
   private getDocumentGoAPI = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=ID,NumberGo,DocTypeName,NumberSymbol,Compendium,DateCreated,Deadline,StatusName,UserCreate/Title,UserOfHandle/Title&$expand=UserCreate/Id,UserOfHandle/Id";
+  private getProcessRequestGo= "/_api/web/lists/getbytitle('ListProcessRequestGo')/items?$select=*,Author/Id,Author/Title,Author/Name,UserApprover/Id,UserApprover/Title&$expand=Author/Id,UserApprover/Id";
   private  urlGroupApprover = "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=User/Name,User/Title,User/Id&$expand=User"
+  private urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,"
+  + "AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$filter=ID eq ";
 //  private getHistoryStepAPI = "/_api/web/lists/getbytitle('ListHistoryStep')/items?$select=ID,Title,DateRequest,ListName,StatusName,IsFinnish,NameUserRequest";
   constructor(private http: HttpClient) {
     if (environment.production) {
@@ -47,7 +50,10 @@ export class DocumentGoService {
       + pad(d.getMinutes()) + ':'
       + pad(d.getSeconds()) + 'Z'
   }
-   // format định dạng ngày    
+  formatNumberTo(value) {
+    return ('0000000' + value).slice(-4);
+  }
+   //    
    checkNull(value): string {
     if (!value) {
       return '';
@@ -72,6 +78,11 @@ export class DocumentGoService {
     console.log(`${this.restUrl}${this.getDocumentGoAPI}`  + strFilter + `&$orderby=DateCreated desc`);
     return this.http.get(`${this.restUrl}${this.getDocumentGoAPI}`  + strFilter + `&$orderby=DateCreated desc`);
   }
+  //lấy ds phiếu xử lý vb đi
+  getListProcessRequestGo(strFilter): Observable<any> {
+    console.log(`${this.restUrl}${this.getProcessRequestGo}`  + strFilter + `&$orderby=DateCreated desc`);
+    return this.http.get(`${this.restUrl}${this.getProcessRequestGo}`  + strFilter + `&$orderby=DateCreated desc`);
+  }
  //lấy người dùng theo điều kiện tìm kiếm
   getUser(strFilter) {
     return this.http.get(`${this.restUrl}${this.urlGroupApprover}` + strFilter );
@@ -86,9 +97,9 @@ export class DocumentGoService {
   }
   //get item by id in list document incoming  
   getListDocByID(id) {
-    let urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,"
-    + "AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$filter=ID eq ";
-    return this.http.get(`${this.restUrl}${urlDetailLeave}` + `'` + id + `'`);
+  
+   
+    return this.http.get(`${this.restUrl}${this.urlDetailLeave}` + `'` + id + `'`);
   }
   // getHistoryStepItemComment(strFilter): Observable<any> {
   //   console.log(`${this.restUrl}${this.getHistoryStepAPI}`  + strFilter + `&$orderby=DateRequest desc`);
