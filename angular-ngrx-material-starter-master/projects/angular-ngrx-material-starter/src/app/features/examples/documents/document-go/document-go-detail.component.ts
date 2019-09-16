@@ -35,6 +35,7 @@ export class DocumentGoDetailComponent implements OnInit {
   outputFile = []; 
   displayFile = '';
   buffer;
+  strFilter='';
   displayedColumns: string[] = ['stt','created' , 'userRequest', 'userApprover', 'deadline','status', 'taskType']; //'select'
   ListItem: DocumentGoTicket[] = [];
   dataSource = new MatTableDataSource<DocumentGoTicket>();
@@ -46,7 +47,7 @@ export class DocumentGoDetailComponent implements OnInit {
 
   ngOnInit() {
    this.GetItemDetail();
-  // this.GetHistory();
+   this.GetHistory();
   }
 
   GetItemDetail() {
@@ -90,17 +91,7 @@ export class DocumentGoDetailComponent implements OnInit {
            NumOfPaper : itemList[0].NumOfPaper ,
            Note: itemList[0].Note,
             
-           
           // numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo), 
-          // numberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
-          // numberOfSymbol: itemList[0].NumberOfSymbol, 
-          // source: itemList[0].Source, 
-          // docType: itemList[0].DocTypeName, 
-          // promulgatedDate: this.docTo.CheckNull(itemList[0].PromulgatedDate) === '' ? '' : moment(itemList[0].PromulgatedDate).format('DD/MM/YYYY'), 
-          // dateTo: this.docTo.CheckNull(itemList[0].DateTo) === '' ? '' : moment(itemList[0].DateTo).format('DD/MM/YYYY'), 
-          // compendium: itemList[0].Compendium, 
-          // secretLevel: itemList[0].SecretLevelName, 
-          // urgentLevel: itemList[0].UrgentLevelName, 
           // deadline: this.docTo.CheckNull(itemList[0].Deadline) === '' ? '' : moment(itemList[0].Deadline).format('DD/MM/YYYY'), 
           // numberOfCopies: itemList[0].NumOfCopies, 
           // methodReceipt: itemList[0].MethodReceipt, 
@@ -116,33 +107,34 @@ export class DocumentGoDetailComponent implements OnInit {
     })
   }
 
-  // GetHistory() {
-  //   this.docTo.getListRequestByDocID(this.ItemId).subscribe((itemValue: any[]) => {
-  //     let item = itemValue["value"] as Array<any>;     
-  //     this.ListItem = []; 
-  //     item.forEach(element => {
-  //       this.ListItem.push({
-  //         documentID: element.NoteBookID, 
-  //         compendium: element.Compendium, 
-  //         userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
-  //         userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
-  //         deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
-  //         status: 'Chờ xử lý',
-  //         source: '',
-  //         destination: '',
-  //         taskType: '',
-  //         typeCode: '',
-  //         content: this.docTo.CheckNull(element.Content),
-  //         indexStep: element.IndexStep,
-  //         created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
-  //         numberTo: element.Title
-  //       })
-  //     })
-  //     this.dataSource = new MatTableDataSource<IncomingTicket>(this.ListItem);
-  //     this.ref.detectChanges();
-  //     this.dataSource.paginator = this.paginator;
-  //   });   
-  // }
+  GetHistory() {
+    this.strFilter = `&$filter=DocumentGoID eq '`+ this.ItemId+`'`;
+    this.docServices.getListRequestGoByDocID(this.strFilter).subscribe((itemValue: any[]) => {
+      let item = itemValue["value"] as Array<any>;     
+      this.ListItem = []; 
+      item.forEach(element => {
+        this.ListItem.push({
+          documentID: element.NoteBookID, 
+          compendium: element.Compendium, 
+          userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+          userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
+          deadline: this.docServices.formatDateTime(element.Deadline),
+          status: element.StatusName,
+          source: '',
+          destination: '',
+          taskType: '',
+          typeCode: '',
+          content: this.docServices.checkNull(element.Content),
+          indexStep: element.IndexStep,
+          created: this.docServices.formatDateTime(element.DateCreated),
+          numberTo: element.ID
+        })
+      })
+      this.dataSource = new MatTableDataSource<DocumentGoTicket>(this.ListItem);
+      this.ref.detectChanges();
+      this.dataSource.paginator = this.paginator;
+    });   
+  }
 
   gotoBack() {
     window.history.back()

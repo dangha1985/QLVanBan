@@ -123,7 +123,7 @@ export class DocumentGoWaitingComponent implements OnInit {
       this.getListDocumentGo_Wait();
     //});
   }
-  //lấy ds văn bản
+  //lấy ds phiếu xử lý
   getListDocumentGo_Wait() {
       this.strFilter = `&$filter=ID ne ''and StatusID eq '0'`;
     try {
@@ -134,7 +134,7 @@ export class DocumentGoWaitingComponent implements OnInit {
           // console.log('UserCreate:'+ element.UserCreate.Title);
           // console.log('UserOfHandle:'+ element.UserOfHandle.Title);
           this.ListDocumentGo.push({
-            ID: element.ID,
+            ID: element.DocumentGoID,
             NumberGo:'',// this.docServices.checkNull(element.NumberGo),
             DocTypeName: this.docServices.checkNull(element.DocTypeName),
             NumberSymbol:'',// this.docServices.checkNull(element.NumberSymbol),
