@@ -487,7 +487,7 @@ export class DocumentAddComponent implements OnInit {
       TypeCode: 'CXL',
       TypeName: 'Chuyển xử lý',
       Content: dataForm.note,
-      IndexStep: 1,
+      IndexStep: 2,
       Compendium: dataForm.compendium
     };
     this.services.AddItemToList('ListProcessRequestTo', data).subscribe(

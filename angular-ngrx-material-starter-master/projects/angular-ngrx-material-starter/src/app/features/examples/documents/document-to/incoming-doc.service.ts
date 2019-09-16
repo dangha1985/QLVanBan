@@ -217,6 +217,7 @@ export interface IncomingDoc {
 }
 
 export interface IncomingTicket {
+  ID: number;
   compendium: string;
   documentID: number;
   userRequest: number;

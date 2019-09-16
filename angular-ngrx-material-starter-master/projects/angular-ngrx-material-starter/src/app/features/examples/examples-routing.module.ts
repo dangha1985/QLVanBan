@@ -44,6 +44,11 @@ const routes: Routes = [
         data: { title: 'Xem chi tiết' }
       },
       {
+        path: 'doc-detail/:id/:step',
+        component: DocumentDetailComponent,
+        data: { title: 'Xử lý' }
+      },
+      {
         path: 'todos',
         component: TodosContainerComponent,
         data: { title: 'Todos' }

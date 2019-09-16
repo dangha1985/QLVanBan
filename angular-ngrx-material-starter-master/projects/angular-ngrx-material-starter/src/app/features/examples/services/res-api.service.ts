@@ -27,7 +27,8 @@ export class ResApiService {
     headers: new HttpHeaders({
       'accept': 'application/json;odata=verbose',
       'dataType': 'json',
-      'Content-Type': 'application/json;odata=verbose'
+      'Content-Type': 'application/json;odata=verbose',
+      // "x-requestdigest": window['__frmSPDigest']
     })
   }
   httpOptionsFile = {
@@ -35,6 +36,17 @@ export class ResApiService {
       'accept': 'application/json;odata=verbose',
       // 'dataType': 'json',
       'Content-Type': 'application/json;odata=verbose',
+      // "x-requestdigest": window['__frmSPDigest']
+    })
+  }
+  httpOptionsUpdate = {
+    headers: new HttpHeaders({
+      'accept': 'application/json;odata=verbose',
+      'dataType': 'json',
+      'Content-Type': 'application/json;odata=verbose',
+      // "x-requestdigest": window['__frmSPDigest'],
+      // "X-HTTP-Method": "MERGE",
+      // "IF-MATCH": "*",
     })
   }
   
@@ -92,5 +104,27 @@ export class ResApiService {
   //attachment file
   inserAttachmentFile(data, filename, listName, indexItem) {
     return this.http.post(`${this.restUrl}/_api/web/lists/GetByTitle('`+ listName +`')/items(`+ indexItem +`)/AttachmentFiles/add(FileName='` + filename + `')`,data, this.httpOptionsFile);
+  }
+
+  urlInforApproval =
+  "/_api/web/lists/getbytitle('ListConfig')/items?$select=*&$filter=BookTypeCode eq ";
+  getInforApprovalByStep(typeCode, step) {
+    return this.http.get(`${this.restUrl}${this.urlInforApproval}` + `'` + typeCode + `' and IndexStep eq '` + step + `'`);
+  }
+
+  getDepartmnetOfUser(userId) {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Id,User/Title,User/Name&$expand=User&$filter=User/Id eq '` + userId + `'`);
+  }
+
+  getUserByRole(role) {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Id,User/Title,User/Name&$expand=User&$filter=RoleCode eq '` + role + `'`);
+  }
+
+  getUserByRole2(strFilter) {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Id,User/Title,User/Name&$expand=User` + strFilter);
+  }
+
+  updateListById(listName, data, id) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items` + `(` + id + `)`, data, this.httpOptionsUpdate);
   }
 }

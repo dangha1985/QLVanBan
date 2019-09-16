@@ -52,6 +52,7 @@ export class DocumentWaitingComponent implements OnInit {
       this.inDocs$ = []; 
       item.forEach(element => {
         this.inDocs$.push({
+          ID: element.ID,
           documentID: element.NoteBookID, 
           compendium: element.Compendium, 
           userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
