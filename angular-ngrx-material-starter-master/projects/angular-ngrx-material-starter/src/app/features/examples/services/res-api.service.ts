@@ -45,8 +45,8 @@ export class ResApiService {
       'dataType': 'json',
       'Content-Type': 'application/json;odata=verbose',
       // "x-requestdigest": window['__frmSPDigest'],
-      // "X-HTTP-Method": "MERGE",
-      // "IF-MATCH": "*",
+      "X-HTTP-Method": "MERGE",
+      "IF-MATCH": "*",
     })
   }
   

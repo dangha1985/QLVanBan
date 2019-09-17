@@ -364,6 +364,7 @@ export class DocumentDetailComponent implements OnInit {
   AddListTicket() {
     this.bsModalRef.hide();
     this.OpenRotiniPanel();
+    //let data: Array<any> = [];
     const data = {
       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
       Title: this.itemDoc.numberTo,
@@ -384,6 +385,54 @@ export class DocumentDetailComponent implements OnInit {
       IndexStep: this.IndexStep + 1,
       Compendium: this.itemDoc.compendium
     };
+    // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
+    //   this.selectedCombiner.forEach(element => {
+    //     data.push({
+    //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+    //       Title: this.itemDoc.numberTo,
+    //       DateCreated: new Date(),
+    //       NoteBookID: this.IncomingDocID,
+    //       UserRequestId: this.currentUserId,
+    //       UserApproverId: element.split('|')[0],
+    //       Deadline: this.deadline,
+    //       StatusID: 0,
+    //       StatusName: 'Đang xử lý',
+    //       Source: '',
+    //       Destination: '',
+    //       TaskTypeCode: 'PH',
+    //       TaskTypeName: 'Phối hợp',
+    //       TypeCode: 'CXL',
+    //       TypeName: 'Chuyển xử lý',
+    //       Content: this.content,
+    //       IndexStep: this.IndexStep + 1,
+    //       Compendium: this.itemDoc.compendium
+    //     });
+    //   });
+    // }
+    // if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+    //   this.selectedKnower.forEach(element => {
+    //     data.push({
+    //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+    //       Title: this.itemDoc.numberTo,
+    //       DateCreated: new Date(),
+    //       NoteBookID: this.IncomingDocID,
+    //       UserRequestId: this.currentUserId,
+    //       UserApproverId: element.split('|')[0],
+    //       Deadline: this.deadline,
+    //       StatusID: 0,
+    //       StatusName: 'Đang xử lý',
+    //       Source: '',
+    //       Destination: '',
+    //       TaskTypeCode: 'NĐB',
+    //       TaskTypeName: 'Nhận để biết',
+    //       TypeCode: 'CXL',
+    //       TypeName: 'Chuyển xử lý',
+    //       Content: this.content,
+    //       IndexStep: this.IndexStep + 1,
+    //       Compendium: this.itemDoc.compendium
+    //     });
+    //   });
+    // }
     this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
       item => {},
       error => {
@@ -436,7 +485,7 @@ export class DocumentDetailComponent implements OnInit {
       },
       () => {
         console.log(
-          'update item' + this.selectedCombiner[this.index] + ' of approval user to list ListProcessRequestTo successfully!'
+          'update item ' + this.selectedCombiner[this.index] + ' of approval user to list ListProcessRequestTo successfully!'
         );
         this.index ++;
         if(this.index < this.selectedCombiner.length) {
@@ -444,7 +493,12 @@ export class DocumentDetailComponent implements OnInit {
         }
         else {
           this.index = 0;
-          this.AddUserKnow();
+          if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+            this.AddUserKnow();
+          } else {
+            this.CloseRotiniPanel();     
+            this.notificationService.success('Cập nhật thông tin xử lý thành công.');
+          }
         }
       }
     );
@@ -464,9 +518,9 @@ export class DocumentDetailComponent implements OnInit {
       Source: '',
       Destination: '',
       TaskTypeCode: 'NĐB',
-      TaskTypeName: 'Phối hợp',
+      TaskTypeName: 'Nhận để biết',
       TypeCode: 'CXL',
-      TypeName: 'Nhận để biết',
+      TypeName: 'Chuyển xử lý',
       Content: this.content,
       IndexStep: this.IndexStep + 1,
       Compendium: this.itemDoc.compendium
@@ -504,7 +558,7 @@ export class DocumentDetailComponent implements OnInit {
         __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
         StatusID: 1, StatusName: "Đã xử lý",
       };
-      this.services.updateListById('ListProcessRequestTo', dataTicket, this.ArrayItemId[this.index]).subscribe(
+      this.services.updateListById('ListProcessRequestTo', dataTicket, this.ArrayItemId[this.index].ID).subscribe(
         item => {},
         error => {
           this.CloseRotiniPanel();
@@ -516,7 +570,7 @@ export class DocumentDetailComponent implements OnInit {
         },
         () => {
           console.log(
-            'update item' + this.ArrayItemId[this.index] + ' of approval user to list ListProcessRequestTo successfully!'
+            'update item ' + this.ArrayItemId[this.index] + ' of approval user to list ListProcessRequestTo successfully!'
           );
           this.index ++;
           if(this.index < this.ArrayItemId.length) {
@@ -524,12 +578,14 @@ export class DocumentDetailComponent implements OnInit {
           }
           else {
             this.index = 0;
-            if(this.selectedCombiner !== null && this.selectedCombiner.length > 0) {
+            if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
               this.AddUserCombine();
-            } else if(this.selectedKnower !== null && this.selectedKnower.length > 0) {
+            } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
               this.AddUserKnow();
+            } else {
+              this.CloseRotiniPanel();
+              this.notificationService.success('Cập nhật thông tin xử lý thành công.');
             }
-            //this.notificationService.success('Cập nhật thông tin xử lý thành công.');
           }
         }
       );
