@@ -7,6 +7,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import {MatTableModule} from '@angular/material/table';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {MatTreeModule} from '@angular/material/tree'
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../../shared/shared.module';
 import { environment } from '../../../environments/environment';
@@ -34,7 +35,7 @@ import { ElementsComponent } from './elements/elements.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent, RotiniPanel} from './documents/document-to/components/document-add.component'
 import {DocumentDetailComponent, ModalContentComponent} from './documents/document-to/components/document-detail.component'
-import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
+import { DocumentWaitingComponent, ChecklistDatabase} from './documents/document-to/components/document-waiting.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -67,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       FormEffects
     ]),
      MatTableModule,
+     MatTreeModule,
      FlexLayoutModule,
      ModalModule.forRoot(),
   ],
@@ -86,10 +88,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentAddComponent,
     DocumentDetailComponent,
     DocumentWaitingComponent,
+    // ChecklistDatabase,
     RotiniPanel,
     ModalContentComponent,
   ],
-  providers: [StockMarketService, UserService],
+  providers: [StockMarketService, UserService, ChecklistDatabase],
   entryComponents: [
     RotiniPanel,
     ModalContentComponent,

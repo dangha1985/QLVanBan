@@ -165,4 +165,33 @@ table {
     .cdk-overlay-container {
         z-index: 9999!important;
     }
+    .modal-dialog {
+        width: 90% !important;
+        max-width: 97% !important;
+    }
+}
+
+.input-checkox {
+    width: 100px
+}
+
+.role-name {
+    width: 200px
+}
+
+.example-container {
+    height: 400px;
+    overflow: auto;
+}
+
+.user-choice {
+    padding-left: 36px;
+    border: 1px solid #0000001f;
+    border-right: none;
+}
+
+.dev {
+    padding-left: 20px;
+    border: 1px solid #0000001f;
+    border-right: none;
 }

@@ -20,6 +20,7 @@ import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
+import {SelectionModel} from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material';
 import * as moment from 'moment';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -27,8 +28,51 @@ import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
 } from '../../../../../core/core.module';
-import { isPlatformBrowser } from '@angular/common';
+import { StringNullableChain } from 'lodash';
 import { element } from 'protractor';
+
+export interface PeriodicElement {
+  name: string;
+  position: number;
+  process: boolean;
+  combine: boolean;
+  know: boolean
+}
+
+const ELEMENT_DATA: PeriodicElement[] = [
+  {position: 1, name: 'Hydrogen', process: false, combine: false, know: false},
+  {position: 2, name: 'Helium', process: false, combine: false, know: false},
+  {position: 3, name: 'Lithium', process: false, combine: false, know: false},
+  // {position: 4, name: 'Beryllium', process: false, combine: false, know: false},
+  // {position: 5, name: 'Boron', process: false, combine: false, know: false},
+  // {position: 6, name: 'Carbon', process: false, combine: false, know: false},
+  // {position: 7, name: 'Nitrogen', process: false, combine: false, know: false},
+  // {position: 8, name: 'Oxygen', process: false, combine: false, know: false},
+  // {position: 9, name: 'Fluorine', process: false, combine: false, know: false},
+  // {position: 10, name: 'Neon', process: false, combine: false, know: false},
+];
+
+export class UserOfDepartment {
+  IsDepartment: boolean;
+  Code: string;
+  Name: string;
+  Role: string;
+  IsHandle: boolean;
+  IsCombine: boolean;
+  IsKnow : boolean;
+  Icon: string;
+  Class: string;
+}
+
+export class UserChoice {
+  Id: Number;
+  Email: string;
+  DisplayName: string;
+  DeCode: string;
+  DeName: string;
+  RoleCode: string;
+  RoleName: string;
+}
 
 @Component({
   selector: 'anms-document-detail',
@@ -44,7 +88,10 @@ export class DocumentDetailComponent implements OnInit {
   IndexStep = 0;
   DepartmentCode = [];
   RoleCode = [];
+  ListDepartment = [];
   ListUserApprover = [];
+  ListUserChoice: UserChoice[] = [];
+  ListUserOfDepartment: UserOfDepartment[] = [];
   ListUserCombine = [];
   ListUserKnow = [];
   currentUserId = 0;
@@ -76,6 +123,11 @@ export class DocumentDetailComponent implements OnInit {
   dataSource = new MatTableDataSource<IncomingTicket>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
+  displayedColumns2 = ['person', 'role', 'process', 'combine', 'know'];
+  //dataSource2 = ELEMENT_DATA;
+  dataSource2 = new MatTableDataSource<UserOfDepartment>();
+  selection = new SelectionModel<UserOfDepartment>(true, []);
+
   constructor(
     private docTo: IncomingDocService,
     private services: ResApiService,
@@ -90,6 +142,7 @@ export class DocumentDetailComponent implements OnInit {
   ngOnInit() {
     this.GetItemDetail();
     this.GetHistory();
+    this.GetAllUser();
   }
 
   OpenRotiniPanel() {
@@ -166,6 +219,7 @@ export class DocumentDetailComponent implements OnInit {
       });
 
       // Load list config by step
+      if(this.IndexStep > 0) {
       this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
         let item = valueItem['value'] as Array<any>;
         item.forEach(element => {
@@ -190,6 +244,9 @@ export class DocumentDetailComponent implements OnInit {
         })        
         this.getCurrentUser();
       });
+    } else {
+      this.getCurrentUser();
+    }
     });
   }
 
@@ -237,6 +294,86 @@ export class DocumentDetailComponent implements OnInit {
       });
   }
 
+  GetAllUser() {
+    this.services.getListDepartment().subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      this.ListDepartment = [];
+      item.forEach(element => {
+        this.ListDepartment.push({
+          Id: element.ID,
+          Code: element.Code,
+          Name: element.Title
+        })
+      })
+    },
+    error => {
+      console.log("get list department error: " + error);
+    }, 
+    () => {
+      this.docTo.getAllUser().subscribe((itemValue: any[]) => {
+        let item = itemValue['value'] as Array<any>;
+        let ListDe = [];
+        this.ListUserChoice = [];
+        item.forEach(element => {
+          this.ListUserChoice.push({
+            Id: element.User.Id,
+            DisplayName: element.User.Title,
+            Email: element.User.Name.split('|')[2],
+            DeCode: element.DepartmentCode,
+            DeName: element.DepartmentName,
+            RoleCode: element.RoleCode,
+            RoleName: element.RoleName
+          });
+          if(ListDe.indexOf(element.DepartmentCode) < 0) {
+            ListDe.push(element.DepartmentCode);
+          }
+        })
+        console.log("array " + ListDe);
+        ListDe.forEach(element => {
+          let DeName = '';
+          let itemDe = this.ListDepartment.find(d => d.Code === element);
+          if(itemDe !== undefined) {
+            DeName = itemDe.Name;
+          }
+          this.ListUserOfDepartment.push({
+            IsDepartment: true,
+            Code: element,
+            Name: DeName,
+            Role: '',
+            IsHandle: false,
+            IsCombine: false,
+            IsKnow: false,
+            Icon: 'apartment',
+            Class: 'dev'
+          })
+          this.ListUserChoice.forEach(user => {
+            if(user.DeCode === element) {
+              this.ListUserOfDepartment.push({
+                IsDepartment: false,
+                Code: user.Id + '_' + user.Email + '_' + user.DisplayName,
+                Name: user.DisplayName,
+                Role: user.RoleName,
+                IsHandle: false,
+                IsCombine: false,
+                IsKnow: false,
+                Icon: 'person',
+                Class: 'user-choice'
+              })
+            }
+          })
+        })
+        console.log("List User " + this.ListUserOfDepartment);
+        this.dataSource2 = new MatTableDataSource<UserOfDepartment>(this.ListUserOfDepartment);
+        this.ref.detectChanges();        
+      },
+      error => {
+        console.log("Load all user error " + error);
+      },
+      () =>{}
+      )
+    })
+  }
+
   gotoBack() {
     window.history.back();
   }
@@ -260,8 +397,10 @@ export class DocumentDetailComponent implements OnInit {
             item.forEach(element => {
               this.DepartmentCode.push(element.DepartmentCode);
               this.RoleCode.push(element.RoleCode);
-            });            
-            this.GetUserApprover();
+            });       
+            if(this.IndexStep > 0) {     
+              this.GetUserApprover();
+            }
           },
           error => { 
             console.log("Load department code error: " + error);
@@ -277,7 +416,7 @@ export class DocumentDetailComponent implements OnInit {
 
   NextApprval(template: TemplateRef<any>) {
     this.notificationService.warn('Chọn người xử lý tiếp theo');
-    this.bsModalRef = this.modalService.show(template);
+    this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
   }
 
   ReturnRequest() {
@@ -362,6 +501,7 @@ export class DocumentDetailComponent implements OnInit {
 
   // Add phiếu xử lý
   AddListTicket() {
+    console.log("List user choice " + this.ListUserOfDepartment);
     this.bsModalRef.hide();
     this.OpenRotiniPanel();
     //let data: Array<any> = [];
@@ -590,6 +730,44 @@ export class DocumentDetailComponent implements OnInit {
         }
       );
     }
+  }
+
+  CheckUserHandle(code, isCheck) {
+    console.log(code);
+    if(isCheck) {
+      this.ListUserOfDepartment.forEach(element => {
+        if(element.Code !== code){
+          element.IsHandle = false;
+          element.IsCombine = false;
+          element.IsKnow = false;
+        } else {
+          element.IsCombine = false;
+          element.IsKnow = false;
+        }
+      })
+    }
+  }
+
+  CheckUserNotHandle(code, isCheck) {
+    console.log(code);
+    this.ListUserOfDepartment.forEach(element => {
+      if(element.Code === code){
+        if(element.IsHandle){
+          element.IsCombine = false;
+          element.IsKnow = false;
+        } else if(element.IsCombine) {
+          element.IsHandle = false;
+          element.IsKnow = false;
+        } else if(element.IsKnow) {
+          element.IsCombine = false;
+          element.IsHandle = false;
+        }
+      } else {
+        // element.IsHandle = false;
+        // element.IsCombine = false;
+        // element.IsKnow = false;
+      }        
+    })    
   }
 }
 
