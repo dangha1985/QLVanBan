@@ -1,7 +1,7 @@
 {
-    "siteUrl": "https://tsgvietnam.sharepoint.com/sites/dev/Ha_Document",
-    "strategy": "UserCredentials",
-    "username": "loan.ha@tsg.net.vn",
-    "password": "fc3bdfca10dd8f73ede6a03ce416f2ba0b2d6e51971f4bb35e7c70b80ee3c10eec2bd1ee0e0588f7243c6802342b218c4f7XHXZ61KXwwpD7os1bjg==",
-    "online": true
+  "siteUrl": "https://tsgvietnam.sharepoint.com/sites/dev/Ha_Document",
+  "strategy": "UserCredentials",
+  "username": "tuyen.nguyen@tsg.net.vn",
+  "password": "cc7d51189fc3d7d84ebc7ebcc24721b88e2ae00b8d0d024227b8e60fdb39a71ea2e4989a8d36744b36777f9fc3d11029jrfW8MzBkTE51qsSFDDCdA==",
+  "online": true
 }
