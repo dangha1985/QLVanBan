@@ -738,8 +738,8 @@ export class DocumentDetailComponent implements OnInit {
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code !== code){
           element.IsHandle = false;
-          element.IsCombine = false;
-          element.IsKnow = false;
+          // element.IsCombine = false;
+          // element.IsKnow = false;
         } else {
           element.IsCombine = false;
           element.IsKnow = false;
@@ -748,26 +748,28 @@ export class DocumentDetailComponent implements OnInit {
     }
   }
 
-  CheckUserNotHandle(code, isCheck) {
+  CheckUserNotHandle1(code, isCheck) {
     console.log(code);
-    this.ListUserOfDepartment.forEach(element => {
-      if(element.Code === code){
-        if(element.IsHandle){
-          element.IsCombine = false;
-          element.IsKnow = false;
-        } else if(element.IsCombine) {
+    if(isCheck){
+      this.ListUserOfDepartment.forEach(element => {
+        if(element.Code === code){
           element.IsHandle = false;
           element.IsKnow = false;
-        } else if(element.IsKnow) {
+        }       
+      }) 
+    }   
+  }
+
+  CheckUserNotHandle2(code, isCheck) {
+    console.log(code);
+    if(isCheck){
+      this.ListUserOfDepartment.forEach(element => {
+        if(element.Code === code){
           element.IsCombine = false;
           element.IsHandle = false;
-        }
-      } else {
-        // element.IsHandle = false;
-        // element.IsCombine = false;
-        // element.IsKnow = false;
-      }        
-    })    
+        }       
+      }) 
+    }   
   }
 }
 
