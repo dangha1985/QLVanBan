@@ -18,6 +18,7 @@ import { DocumentComponent } from '../../../features/examples/documents/document
 import { DocumentGoComponent } from './document-go/document-go.component';
 import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
 import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
+import { CommentComponent }from './document-go/comment.component';
 import { from } from 'rxjs';
 const routes: Routes = [
   {
@@ -46,9 +47,9 @@ const routes: Routes = [
         data: { title: 'Xem chi tiết' }
       },
       // {
-      //   path: 'detail/:id',
-      //   component: DocumentGoDetailComponent,
-      //   data: { title: 'Xem chi tiết' }
+      //   path: 'documentgo-comment',
+      //   component: CommentComponent,
+      //   data: { title: 'Xin ý kiến' }
       // },
     ]
   },

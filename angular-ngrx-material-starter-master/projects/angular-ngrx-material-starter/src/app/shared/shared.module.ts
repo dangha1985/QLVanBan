@@ -23,10 +23,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSliderModule } from '@angular/material/';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material';
+import { MatNativeDateModule,MatDialogModule } from '@angular/material';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import {MatTreeModule} from '@angular/material/tree';
 import {
   faBars,
   faUserCircle,
@@ -119,8 +120,9 @@ import { RtlSupportDirective } from './rtl-support/rtl-support.directive';
     MatSnackBarModule,
     MatSlideToggleModule,
     MatDividerModule,
-
-    FontAwesomeModule
+    MatTreeModule,
+    FontAwesomeModule,
+    MatDialogModule,
   ],
   declarations: [
     BigInputComponent,
@@ -154,12 +156,13 @@ import { RtlSupportDirective } from './rtl-support/rtl-support.directive';
     MatSliderModule,
     MatDatepickerModule,
     MatNativeDateModule,
-
+    MatDialogModule,
     FontAwesomeModule,
 
     BigInputComponent,
     BigInputActionComponent,
-    RtlSupportDirective
+    RtlSupportDirective,
+    MatTreeModule
   ]
 })
 export class SharedModule {}

@@ -9,30 +9,105 @@ import * as moment from 'moment';
 })
 export class DocumentGoService {
   private restUrl = environment.proxyUrl;
+
+  httpOptions = {
+    headers: new HttpHeaders({
+      'accept': 'application/json;odata=verbose',
+      'dataType': 'json',
+      'Content-Type': 'application/json;odata=verbose',
+      "x-requestdigest": window['__frmSPDigest']
+    })
+  }
+
+  httpOptionsUpdate = {
+    headers: new HttpHeaders({
+      'accept': 'application/json;odata=verbose',
+      'dataType': 'json',
+      'Content-Type': 'application/json;odata=verbose',
+      "X-HTTP-Method": "MERGE",
+      "IF-MATCH": "*",
+    })
+  }
+
+  httpOptionsFile = {
+    headers: new HttpHeaders({
+      'accept': 'application/json;odata=verbose',
+      // 'dataType': 'json',
+      'Content-Type': 'application/json;odata=verbose',
+      "x-requestdigest": window['__frmSPDigest']
+    })
+  }
+
+  constructor(private http: HttpClient) {
+    http.options(this.restUrl,
+      {
+        headers: {
+          "accept": 'application/json;odata=verbose',
+        }
+      }),
+      this.httpOptions = {
+        headers: new HttpHeaders({
+          'accept': 'application/json;odata=verbose',
+          'dataType': 'json',
+          'Content-Type': 'application/json;odata=verbose',
+          "x-requestdigest": window['__frmSPDigest']
+        })
+      },
+      this.httpOptionsUpdate = {
+        headers: new HttpHeaders({
+          'accept': 'application/json;odata=verbose',
+          'dataType': 'json',
+          'Content-Type': 'application/json;odata=verbose',
+          "x-requestdigest": window['__frmSPDigest'],
+          "X-HTTP-Method": "MERGE",
+          "IF-MATCH": "*",
+        })
+      },
+      this.httpOptionsFile = {
+        headers: new HttpHeaders({
+          'accept': 'application/json;odata=verbose',
+          'Content-Type': 'application/json;odata=verbose',
+          "x-requestdigest": window['__frmSPDigest'],
+        })
+      };
+  }
+
+  getItem(listName, select) {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items` + select);
+  }
+
+  insertItem(listName, data) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items`, data, this.httpOptions);
+  }
+
+  updateItem(listName, id, data) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items(` + id + `)`, data, this.httpOptionsUpdate);
+  }
+
+  getCurrentUserAPI() {
+    return this.http.get(`${this.restUrl}/_api/web/currentUser`);
+  }
+
+  //attachment file
+  inserAttachmentFile(data, filename, listName, indexItem) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/GetByTitle('` + listName + `')/items(` + indexItem + `)/AttachmentFiles/add(FileName='` + filename + `')`, data, this.httpOptionsFile);
+  }
+
+  getUserInfo(loginName) {
+    // loginName = 'i:0%23.f|membership|tuyen.nguyen@tsg.net.vn';
+    return this.http.get(`${this.restUrl}/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v=` + `'` + loginName + `'`);
+  }
+
+  getUserFormSite(loginName){
+    return this.http.get(`${this.restUrl}/_api/web/siteusers(@v)?@v=` + `'` + loginName + `'`);
+  }
   private urlAddDocumentGo="/_api/web/lists/getbytitle('ListDocumentGo')/items";
   private getDocumentGoAPI = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=ID,NumberGo,DocTypeName,NumberSymbol,Compendium,DateCreated,Deadline,StatusName,UserCreate/Title,UserOfHandle/Title&$expand=UserCreate/Id,UserOfHandle/Id";
   private getProcessRequestGo= "/_api/web/lists/getbytitle('ListProcessRequestGo')/items?$select=*,UserRequest/Title,UserRequest/Id,Author/Id,Author/Title,Author/Name,UserApprover/Id,UserApprover/Title&$expand=Author/Id,UserApprover/Id,UserRequest";
   private  urlGroupApprover = "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=User/Name,User/Title,User/Id&$expand=User"
   private urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,"
   + "AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$filter=ID eq ";
- // private getHistoryStepAPI = "/_api/web/lists/getbytitle('ListHistoryStep')/items?$select=ID,Title,DateRequest,ListName,StatusName,IsFinnish,NameUserRequest";
-  constructor(private http: HttpClient) {
-    if (environment.production) {
-      http.options(this.restUrl,
-        {
-          headers: {
-            "accept": 'application/json;odata=verbose',
-          }
-        });
-    }
-  }
-  httpOptions = {
-    headers: new HttpHeaders({
-      'accept': 'application/json;odata=verbose',
-      'dataType': 'json',
-      'Content-Type': 'application/json;odata=verbose'
-    })
-  }
+ 
    // format định dạng ngày    
    formatDateTime(date: Date): string {
     if (!date) {

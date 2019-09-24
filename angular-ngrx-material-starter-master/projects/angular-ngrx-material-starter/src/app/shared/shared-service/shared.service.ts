@@ -12,7 +12,7 @@ export class SharedService {
       'accept': 'application/json;odata=verbose',
       'dataType': 'json',
       'Content-Type': 'application/json;odata=verbose',
-      "x-requestdigest": window['__frmSPDigest']
+    //  "x-requestdigest": window['__frmSPDigest']
     })
   }
   opInsertFile = {
@@ -49,7 +49,7 @@ export class SharedService {
         'accept': 'application/json;odata=verbose',
         'dataType': 'json',
         'Content-Type': 'application/json;odata=verbose',
-        "x-requestdigest": window['__frmSPDigest']
+      //  "x-requestdigest": window['__frmSPDigest']
       })
     }
     this.opInsertFile = {

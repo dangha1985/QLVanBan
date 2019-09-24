@@ -24,5 +24,6 @@ export const environment = {
     typescript: packageJson.devDependencies['typescript'],
     cypress: packageJson.devDependencies['cypress']
   },
-  proxyUrl: 'http://localhost:8080'
+  proxyUrl: 'http://localhost:8080',
+  assetFolder: "../assets"
 };

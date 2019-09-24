@@ -14,11 +14,11 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
 import { BrowserModule } from '@angular/platform-browser';
 import {DocumentRoutingModule} from './document-routing.module';
-import { DocumentGoComponent }from './document-go/document-go.component';
+import { DocumentGoComponent,DocumentGoPanel }from './document-go/document-go.component';
 import { DocumentComponent } from './document-go/document.component';
 import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
 import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
-
+import { CommentComponent } from './document-go/comment.component';
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(
       http,
@@ -61,10 +61,16 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     DocumentComponent,
       DocumentGoComponent,
+      DocumentGoPanel,
       DocumentGoDetailComponent,
-      DocumentGoWaitingComponent
+      DocumentGoWaitingComponent,
+      CommentComponent
   ],
-  providers: []
+  entryComponents: [
+    DocumentGoPanel,
+    CommentComponent
+    ],
+  providers: [CommentComponent]
 })
 export class DocumentsModule {
   constructor() {}

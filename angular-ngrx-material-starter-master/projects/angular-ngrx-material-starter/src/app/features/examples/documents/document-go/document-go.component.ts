@@ -156,7 +156,7 @@ export class DocumentGoComponent implements OnInit {
         },
         error => { 
           console.log("error: " + error);
-          this.CloseRotiniPanel();
+          this.CloseDocumentGoPanel();
         },
         () => {
           console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
@@ -164,16 +164,16 @@ export class DocumentGoComponent implements OnInit {
         }
       );
   }
-  OpenRotiniPanel() {
+  OpenDocumentGoPanel() {
     let config = new OverlayConfig();
     config.positionStrategy = this.overlay.position()
       .global().centerVertically().centerHorizontally();
     config.hasBackdrop = true;
     this.overlayRef = this.overlay.create(config);
-    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+    this.overlayRef.attach(new ComponentPortal(DocumentGoPanel, this.viewContainerRef));
   }
 
-  CloseRotiniPanel() {
+  CloseDocumentGoPanel() {
     this.overlayRef.dispose();
   }
   //lấy ds văn bản
@@ -433,7 +433,7 @@ export class DocumentGoComponent implements OnInit {
             this.DocumentID = item['d'].Id;
           },
           error => {
-            this.CloseRotiniPanel();
+            this.CloseDocumentGoPanel();
             console.log("error when add item to list " + this.listTitle + ": "+ error.error.error.message.value),
             this.notificationService.error('Thêm văn bản trình thất bại');
             },
@@ -466,10 +466,10 @@ export class DocumentGoComponent implements OnInit {
       console.log("error add:" + error);
     }
   }
-  ChuyenXuLy(isChuyenXL) {
-    this.save(isChuyenXL);
-    this.notificationService.info('Chuyển xử lý');
-  }
+  // ChuyenXuLy(isChuyenXL) {
+  //   this.save(isChuyenXL);
+  //   this.notificationService.info('Chuyển xử lý');
+  // }
  
   //  /** Whether the number of selected elements matches the total number of rows. */
   //  isAllSelected() {
@@ -501,7 +501,7 @@ export class DocumentGoComponent implements OnInit {
   // ,Deadline:DateTime,Content:Note,TypeCode:,TypeName:,StatusID:Number,StatusName:,Compendium:Note
     const data = {
       __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
-      Title:'Văn bản đi',
+      Title:dataForm.NumberSymbol,
       DocTypeName: DocTypeName==undefined?'':DocTypeName.Title,
       DateCreated: new Date(),
       DocumentGoID: this.DocumentID,
@@ -523,7 +523,7 @@ export class DocumentGoComponent implements OnInit {
     this.services.AddItemToList('ListProcessRequestGo', data).subscribe(
       item => {},
       error => {
-        this.CloseRotiniPanel();
+        this.CloseDocumentGoPanel();
         console.log("error when add item to list ListProcessRequestGo: "+ error.error.error.message.value),
         this.notificationService.error('Thêm phiếu xử lý thất bại');
       },
@@ -585,7 +585,7 @@ export class DocumentGoComponent implements OnInit {
           },
           error => { 
             console.log("error: " + error);
-            this.CloseRotiniPanel();
+            this.CloseDocumentGoPanel();
           },
           () => {
             console.log('inserAttachmentFile successfully');
@@ -612,7 +612,7 @@ export class DocumentGoComponent implements OnInit {
 
   callbackfunc(){
     // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
-    this.CloseRotiniPanel();
+    this.CloseDocumentGoPanel();
     this.notificationService.success('Thêm văn bản trình thành công');
     this.getListDocumentGo();
     this.addNew = !this.addNew;
@@ -629,9 +629,9 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 }
 
 @Component({
-  selector: 'rotini-panel',
+  selector: 'document-go-panel',
   template: '<p class="demo-rotini" style="padding: 10px; background-color: #F6753C !important;color:white;">Waiting....</p>'
 })
 
-export class RotiniPanel {
+export class DocumentGoPanel {
 }

@@ -2,7 +2,7 @@
 export interface ItemDocumentGo {
   ID: number;
   NumberGo: string;
- // NumberToSub:string,
+  // NumberToSub:string,
   NumberSymbol: string;
   DocTypeName: string;
   Compendium: string;
@@ -10,41 +10,20 @@ export interface ItemDocumentGo {
   DateCreated: string;
   UserCreateName: string;
   UserOfHandleName: string;
-  StatusName:string;
+  StatusName: string;
 
-   BookTypeName: string;
+  BookTypeName: string;
   UnitCreateName: string;
   RecipientsInName: string;
   RecipientsOutName: string;
   SecretLevelName: string;
   UrgentLevelName: string;
   MethodSendName: string;
-  DateIssued:string;
- SignerName: string,
-  Note:string,
-  NumOfPaper :string,
-
- // UserOfHandle:number,
- // UserOfCombinate: number,
- // UserOfKnow: number,
- 
- // 
-//  BookType: string;
-//  UnitCreate: number,
-//  UserCreate: number,
-//  DocType: number,
-//  RecipientsIn: number,
-//  RecipientsOut: number,
-// UserOfHandle:number,
-// UserOfCombinate: number,
-// UserOfKnow: number,
-//  SecretLevel: number,
-//  UrgentLevel: number,
-//  MethodSend: number,
-// Signer: number,
+  DateIssued: string;
+  SignerName: string,
+  Note: string,
+  NumOfPaper: string,
 }
- // "username": "demo@tsg.net.vn",
-  // "password": "13ab3737095a8dfbbd14405ebe5c15a0e7e2c866c55c4368f3effc16de272a44c1c848fc63c0eba781c7e5b6007de7fbpa57OqenaXHwW2NsLRWe+A==",
 export interface IncomingDoc {
   bookType: string;
   numberTo: string;
@@ -91,12 +70,12 @@ export interface ItemSeleted {
 export interface ItemSeletedCode {
   ID: number;
   Title: string;
-  Code:string;
+  Code: string;
 }
 export interface ItemUser {
   UserId: number,
   UserName: string,
-  UserEmail:string
+  UserEmail: string
 }
 export class AttachmentsObject {
   name: string;

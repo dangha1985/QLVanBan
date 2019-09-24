@@ -137,7 +137,7 @@ export class DocumentGoWaitingComponent implements OnInit {
             ID: element.DocumentGoID,
             NumberGo:'',// this.docServices.checkNull(element.NumberGo),
             DocTypeName: this.docServices.checkNull(element.DocTypeName),
-            NumberSymbol:'',// this.docServices.checkNull(element.NumberSymbol),
+            NumberSymbol:this.docServices.checkNull(element.Title),
             Compendium: this.docServices.checkNull(element.Compendium),
             UserCreateName: element.Author == undefined ? '' : element.Author.Title,
             DateCreated: this.docServices.formatDateTime(element.DateCreated),
