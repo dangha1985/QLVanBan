@@ -172,11 +172,11 @@ table {
 }
 
 .input-checkox {
-    width: 100px
+    width: 90px
 }
 
 .role-name {
-    width: 200px
+    width: 150px
 }
 
 .example-container {
@@ -194,4 +194,26 @@ table {
     padding-left: 20px;
     border: 1px solid #0000001f;
     border-right: none;
+}
+
+.title-handle {
+    font-size: 16px;
+    font-weight: 500;
+    color: #d84545;
+}
+
+.title-combine {
+    font-size: 16px;
+    font-weight: 500;
+    color: #4c9df5;
+}
+
+.title-know {
+    font-size: 16px;
+    font-weight: 500;
+    color: #578a57;
+}
+
+.required-field {
+    color: red;
 }

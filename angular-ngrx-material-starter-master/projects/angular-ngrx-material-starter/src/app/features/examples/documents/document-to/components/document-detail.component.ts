@@ -18,7 +18,7 @@ import {RotiniPanel} from './document-add.component';
 import {ResApiService} from '../../../services/res-api.service';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router} from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import {SelectionModel} from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material';
@@ -43,13 +43,6 @@ const ELEMENT_DATA: PeriodicElement[] = [
   {position: 1, name: 'Hydrogen', process: false, combine: false, know: false},
   {position: 2, name: 'Helium', process: false, combine: false, know: false},
   {position: 3, name: 'Lithium', process: false, combine: false, know: false},
-  // {position: 4, name: 'Beryllium', process: false, combine: false, know: false},
-  // {position: 5, name: 'Boron', process: false, combine: false, know: false},
-  // {position: 6, name: 'Carbon', process: false, combine: false, know: false},
-  // {position: 7, name: 'Nitrogen', process: false, combine: false, know: false},
-  // {position: 8, name: 'Oxygen', process: false, combine: false, know: false},
-  // {position: 9, name: 'Fluorine', process: false, combine: false, know: false},
-  // {position: 10, name: 'Neon', process: false, combine: false, know: false},
 ];
 
 export class UserOfDepartment {
@@ -84,6 +77,7 @@ export class DocumentDetailComponent implements OnInit {
   bsModalRef: BsModalRef;
   itemDoc: IncomingDoc;
   isDisplay: boolean = false;
+  isExecution: boolean = false;
   ArrayItemId = []; IncomingDocID;
   IndexStep = 0;
   DepartmentCode = [];
@@ -103,12 +97,14 @@ export class DocumentDetailComponent implements OnInit {
   urlAttachment = environment.proxyUrl.split('/sites/', 1);
   listName = 'ListDocumentTo';
   outputFile = [];
+  outputFileHandle = [];
   displayFile = '';
   closeResult = '';
+  historyId = 0;
   buffer;
   index = 0;
   overlayRef;
-  selectedKnower; selectedCombiner; selectedApprover;
+  selectedKnower = []; selectedCombiner = []; selectedApprover;
   content;deadline;
   displayedColumns: string[] = [
     'stt',
@@ -132,6 +128,7 @@ export class DocumentDetailComponent implements OnInit {
     private docTo: IncomingDocService,
     private services: ResApiService,
     private route: ActivatedRoute,
+    private routes: Router,
     private readonly notificationService: NotificationService,
     private ref: ChangeDetectorRef,
     private modalService: BsModalService,
@@ -143,6 +140,7 @@ export class DocumentDetailComponent implements OnInit {
     this.GetItemDetail();
     this.GetHistory();
     this.GetAllUser();
+    this.getCurrentUser();
   }
 
   OpenRotiniPanel() {
@@ -167,6 +165,7 @@ export class DocumentDetailComponent implements OnInit {
     this.route.paramMap.subscribe(parames => {
       this.IncomingDocID = parames.get('id');
       this.IndexStep = parseInt(parames.get('step'));
+      this.OpenRotiniPanel();
       this.docTo.getListDocByID(this.IncomingDocID).subscribe(items => {
         console.log('items: ' + items);
         let itemList = items['value'] as Array<any>;
@@ -213,41 +212,48 @@ export class DocumentDetailComponent implements OnInit {
           isResponse: itemList[0].IsResponse === 0 ? 'Không' : 'Có',
           isSendMail: 'Có',
           isRetrieve: itemList[0].IsRetrieve === 0 ? 'Không' : 'Có',
-          signer: itemList[0].signer
+          signer: itemList[0].Signer,
+          created: itemList[0].Author.Id
         };
         this.ref.detectChanges();
       });
 
       // Load list config by step
-      if(this.IndexStep > 0) {
-      this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
-        let item = valueItem['value'] as Array<any>;
-        item.forEach(element => {
-          if(this.docTo.CheckNull(element.RoleCode) !== '') {
-            let arr = element.RoleCode.split(',');
-            arr.forEach(element => {
-              this.RoleApprover.push(element);
-            });
-          }
-          if(this.docTo.CheckNull(element.RoleCodeCombine) !== '') {
-            let arr = element.RoleCodeCombine.split(',');
-            arr.forEach(element => {
-            this.RoleCombine.push(element);
-            })
-          }
-          if(this.docTo.CheckNull(element.RoleCodeKnow) !== '') {
-            let arr = element.RoleCodeKnow.split(',');
-            arr.forEach(element => {
-            this.RoleKnow.push(element);
-            })
-          }
-        })        
-        this.getCurrentUser();
-      });
-    } else {
-      this.getCurrentUser();
+      // if(this.IndexStep > 0) {
+      //   this.isExecution = true;
+      //   this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
+      //     let item = valueItem['value'] as Array<any>;
+      //     item.forEach(element => {
+      //       if(this.docTo.CheckNull(element.RoleCode) !== '') {
+      //         let arr = element.RoleCode.split(',');
+      //         arr.forEach(element => {
+      //           this.RoleApprover.push(element);
+      //         });
+      //       }
+      //       if(this.docTo.CheckNull(element.RoleCodeCombine) !== '') {
+      //         let arr = element.RoleCodeCombine.split(',');
+      //         arr.forEach(element => {
+      //         this.RoleCombine.push(element);
+      //         })
+      //       }
+      //       if(this.docTo.CheckNull(element.RoleCodeKnow) !== '') {
+      //         let arr = element.RoleCodeKnow.split(',');
+      //         arr.forEach(element => {
+      //         this.RoleKnow.push(element);
+      //         })
+      //       }
+      //     })        
+      //     this.getCurrentUser();
+      //   });
+      // } else {
+      //   this.getCurrentUser();
+      // }
+    },
+    error => {
+      console.log("Load detail item: " + error);
+      this.CloseRotiniPanel();
     }
-    });
+    );
   }
 
   GetHistory() {
@@ -273,7 +279,7 @@ export class DocumentDetailComponent implements OnInit {
               this.docTo.CheckNull(element.Deadline) === ''
                 ? ''
                 : moment(element.Deadline).format('DD/MM/YYYY'),
-            status: 'Chờ xử lý',
+            status: element.StatusID === 0? 'Chờ xử lý' : 'Đã xử lý',
             source: '',
             destination: '',
             taskType: element.TaskTypeCode === 'XLC'? "Xử lý chính" : element.TaskTypeCode === 'PH'? 'Phối hợp' : 'Nhận để biết',
@@ -284,14 +290,30 @@ export class DocumentDetailComponent implements OnInit {
               this.docTo.CheckNull(element.DateCreated) === ''
                 ? ''
                 : moment(element.DateCreated).format('DD/MM/YYYY'),
-            numberTo: element.Title
+            numberTo: element.Title,
+            link: ''
           });
         });
         this.dataSource = new MatTableDataSource<IncomingTicket>(this.ListItem);
         this.ref.detectChanges();
         this.dataSource.paginator = this.paginator;
         this.ArrayItemId = this.ListItem.filter(e => e.indexStep === this.IndexStep);
-      });
+      },
+      error => {
+        console.log("Load history item: " + error);
+        this.CloseRotiniPanel();
+      },
+      () => {
+        this.docTo.getHistoryStep(this.IncomingDocID).subscribe((itemValue: any[]) => {
+          let item = itemValue['value'] as Array<any>;
+          this.historyId = item[0].ID;
+        },
+        error => {
+          console.log("Load history id item: " + error);
+          this.CloseRotiniPanel();
+        })
+      }
+      );
   }
 
   GetAllUser() {
@@ -350,7 +372,7 @@ export class DocumentDetailComponent implements OnInit {
             if(user.DeCode === element) {
               this.ListUserOfDepartment.push({
                 IsDepartment: false,
-                Code: user.Id + '_' + user.Email + '_' + user.DisplayName,
+                Code: user.Id + '|' + user.Email + '|' + user.DisplayName,
                 Name: user.DisplayName,
                 Role: user.RoleName,
                 IsHandle: false,
@@ -415,7 +437,7 @@ export class DocumentDetailComponent implements OnInit {
   }
 
   NextApprval(template: TemplateRef<any>) {
-    this.notificationService.warn('Chọn người xử lý tiếp theo');
+    //this.notificationService.warn('Chọn người xử lý tiếp theo');
     this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
   }
 
@@ -499,9 +521,27 @@ export class DocumentDetailComponent implements OnInit {
     });
   }
 
+  validation() {
+    if (this.docTo.CheckNull(this.selectedApprover) === '') {
+      alert("Bạn chưa chọn người xử lý chính! Vui lòng kiểm tra lại");
+      return false;
+    }
+    else if (this.docTo.CheckNull(this.content) === '') {
+      alert("Bạn chưa nhập nội dung xử lý! Vui lòng kiểm tra lại");
+      return false;
+    }
+    else if (this.docTo.CheckNull(this.deadline) === '') {
+      alert("Bạn chưa nhập hạn xử lý! Vui lòng kiểm tra lại");
+      return false;
+    } else {
+      return true;
+    }
+  }
   // Add phiếu xử lý
   AddListTicket() {
-    console.log("List user choice " + this.ListUserOfDepartment);
+    if(!this.validation) {
+      return;
+    }
     this.bsModalRef.hide();
     this.OpenRotiniPanel();
     //let data: Array<any> = [];
@@ -585,8 +625,25 @@ export class DocumentDetailComponent implements OnInit {
       },
       () => {
         console.log(
-          'Add item of approval user to list ListProcessRequestTo successfully!'
+          'Add item of approval user to list ListHistoryRequestTo successfully!'
         );
+        if(this.historyId > 0) {
+          const dataTicket = {
+            __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+            StatusID: 1, StatusName: "Đã xử lý",
+          };
+          this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+            item => {},
+            error => {
+              this.CloseRotiniPanel();
+              console.log(
+                'error when update item to list ListHistoryRequestTo: ' +
+                  error.error.error.message.value
+              );
+            },
+            () => {}
+          );
+        }
         this.UpdateStatus();
       }
     );
@@ -636,8 +693,9 @@ export class DocumentDetailComponent implements OnInit {
           if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
             this.AddUserKnow();
           } else {
-            this.CloseRotiniPanel();     
-            this.notificationService.success('Cập nhật thông tin xử lý thành công.');
+            this.callbackFunc(this.IncomingDocID);
+            // this.CloseRotiniPanel();     
+            // this.notificationService.success('Cập nhật thông tin xử lý thành công.');
           }
         }
       }
@@ -684,9 +742,9 @@ export class DocumentDetailComponent implements OnInit {
           this.AddUserKnow();
         }
         else {
-          this.index = 0;   
-          this.CloseRotiniPanel();     
-          this.notificationService.success('Cập nhật thông tin xử lý thành công.');  
+          this.callbackFunc(this.IncomingDocID);
+          // this.CloseRotiniPanel();     
+          // this.notificationService.success('Cập nhật thông tin xử lý thành công.');  
         }
       }
     );
@@ -718,17 +776,61 @@ export class DocumentDetailComponent implements OnInit {
           }
           else {
             this.index = 0;
-            if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
-              this.AddUserCombine();
-            } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
-              this.AddUserKnow();
-            } else {
-              this.CloseRotiniPanel();
-              this.notificationService.success('Cập nhật thông tin xử lý thành công.');
-            }
+            this.AddHistoryStep();
           }
         }
       );
+    }
+  }
+
+  AddHistoryStep() {
+    const data = {
+      __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+      Title: this.itemDoc.numberTo,
+      DateCreated: new Date(),
+      NoteBookID: this.itemDoc.ID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.selectedApprover.split('|')[0],
+      Deadline: this.deadline,
+      StatusID: 0,
+      StatusName: 'Chờ xử lý',
+      Content: this.content,
+      IndexStep: this.IndexStep + 1,
+      Compendium: this.itemDoc.compendium,
+      StatusApproval: "1_0"
+    };
+    this.services.AddItemToList('ListHistoryRequestTo', data).subscribe(
+      item => {},
+      error => {
+        this.CloseRotiniPanel();
+        console.log(
+          'error when add item to list ListHistoryRequestTo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Thêm phiếu xử lý thất bại');
+      },
+      () => {
+        console.log(
+          'Add item of approval user to list ListHistoryRequestTo successfully!'
+        );
+        if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
+          this.AddUserCombine();
+        } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+          this.AddUserKnow();
+        } else {
+          this.callbackFunc(this.IncomingDocID);
+          // this.CloseRotiniPanel();
+          // this.notificationService.success('Cập nhật thông tin xử lý thành công.');
+        }
+      }
+    );
+  }
+
+  callbackFunc(id) {
+    if (this.outputFileHandle.length > 0) {
+      this.saveItemAttachment(0, id, this.outputFileHandle);
+    } else {
+      this.routes.navigate(['examples/doc-detail/' + id]);
     }
   }
 
@@ -741,10 +843,23 @@ export class DocumentDetailComponent implements OnInit {
           // element.IsCombine = false;
           // element.IsKnow = false;
         } else {
+          this.selectedApprover = element.Code;
           element.IsCombine = false;
           element.IsKnow = false;
+
+          let index = this.selectedCombiner.indexOf(code);
+          if(index >= 0){
+            this.selectedCombiner.splice(index, 1);
+          }
+
+          let index2 = this.selectedKnower.indexOf(code);
+          if(index2 >= 0){
+            this.selectedKnower.splice(index2, 1);
+          }
         }
       })
+    } else {
+      this.selectedApprover = '';
     }
   }
 
@@ -753,10 +868,27 @@ export class DocumentDetailComponent implements OnInit {
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code === code){
+          if(code.includes('|')) {
+            this.selectedCombiner.push(element.Code);
+          }
           element.IsHandle = false;
           element.IsKnow = false;
+
+          if(this.selectedApprover === code) {
+            this.selectedApprover = '';
+          }
+
+          let index2 = this.selectedKnower.indexOf(code);
+          if(index2 >= 0){
+            this.selectedKnower.splice(index2, 1);
+          }
         }       
       }) 
+    } else {
+      let index = this.selectedCombiner.indexOf(code);
+      if(index >= 0){
+        this.selectedCombiner.splice(index, 1);
+      }
     }   
   }
 
@@ -765,11 +897,116 @@ export class DocumentDetailComponent implements OnInit {
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code === code){
+          if(code.includes('|')) {
+            this.selectedKnower.push(element.Code);
+          }
           element.IsCombine = false;
           element.IsHandle = false;
+
+          if(this.selectedApprover === code) {
+            this.selectedApprover = '';
+          }
+          let index = this.selectedCombiner.indexOf(code);
+          if(index >= 0){
+            this.selectedCombiner.splice(index, 1);
+          }
         }       
       }) 
-    }   
+    } else {
+      let index = this.selectedKnower.indexOf(code);
+      if(index >= 0){
+        this.selectedKnower.splice(index, 1);
+      }
+    }
+  }
+
+  addAttachmentFile(sts) {
+    try {
+      if(sts === 0) {
+        const inputNode: any = document.querySelector('#fileAttachment');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFile.length > 0) {
+            if (
+              this.outputFile.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFile.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFile.push(inputNode.files[0]);
+          }
+        }
+      } else {
+        const inputNode: any = document.querySelector('#fileAttachmentHandle');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileHandle.length > 0) {
+            if (
+              this.outputFileHandle.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileHandle.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFileHandle.push(inputNode.files[0]);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('addAttachmentFile error: ' + error);
+    }
+  }
+
+  removeAttachmentFile(index, sts) {
+    try {
+      if(sts === 0) {
+        console.log(this.outputFile.indexOf(index))
+        this.outputFile.splice(this.outputFile.indexOf(index), 1);
+      } else {
+        console.log(this.outputFileHandle.indexOf(index))
+        this.outputFileHandle.splice(this.outputFileHandle.indexOf(index), 1);
+      }
+    } catch (error) {
+      console.log("removeAttachmentFile error: " + error);
+    }
+  }
+
+  saveItemAttachment(index, idItem, arr) {
+    try {
+      this.buffer = this.getFileBuffer(arr[index]);
+      this.buffer.onload = (e: any) => {
+        console.log(e.target.result);
+        const dataFile = e.target.result;
+        this.services.inserAttachmentFile(dataFile, arr[index].name, 'ListDocumentTo', idItem).subscribe(
+          itemAttach => {
+            console.log('inserAttachmentFile success');
+          },
+          error => console.log(error),
+          () => {
+            console.log('inserAttachmentFile successfully');
+            if (Number(index) < (arr.length - 1)) {
+              this.saveItemAttachment((Number(index) + 1), idItem, arr);
+            }
+            else {
+              // this.outputFile = [];
+              // this.CloseRotiniPanel();
+              this.routes.navigate(['examples/doc-detail/' + idItem]);
+            }
+          }
+        )
+      }
+    } catch (error) {
+      console.log("saveItemAttachment error: " + error);
+    }
+  }
+
+  getFileBuffer(file) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    return reader;
   }
 }
 

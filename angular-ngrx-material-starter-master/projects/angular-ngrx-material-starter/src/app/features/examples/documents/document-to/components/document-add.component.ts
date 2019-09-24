@@ -88,6 +88,7 @@ export class DocumentAddComponent implements OnInit {
   ApproverStep: ApproverObject[] = [];
   DocumentID = 0;
   outputFile = [];
+  outputFileHandle = [];
   displayFile = '';
   buffer;
   overlayRef;
@@ -176,7 +177,8 @@ export class DocumentAddComponent implements OnInit {
             isResponse: element.IsResponse === 0 ? 'Không' : 'Có',
             isSendMail: 'Có',
             isRetrieve: element.IsRetrieve === 0 ? 'Không' : 'Có',
-            signer: element.signer
+            signer: element.signer,
+            created: element.Author.Title
           });
         });
         this.dataSource = new MatTableDataSource<IncomingDoc>(this.inDocs$);
@@ -193,7 +195,7 @@ export class DocumentAddComponent implements OnInit {
       }
     );
 
-    this.docTo.getDocumentToMax(this.currentUserId).subscribe(
+    this.docTo.getDocumentToMax().subscribe(
       (itemValue: any[]) => {
         let item = itemValue['value'] as Array<any>;
         if (item.length === 0) {
@@ -559,7 +561,7 @@ export class DocumentAddComponent implements OnInit {
     );
   }
 
-  addAttachmentFile() {
+  addAttachmentFile(sts) {
     try {
       const inputNode: any = document.querySelector('#fileAttachment');
       if (this.isNotNull(inputNode.files[0])) {
@@ -633,9 +635,9 @@ export class DocumentAddComponent implements OnInit {
         console.log('saveItemAttachment error: ' + error);
         this.CloseRotiniPanel();
       }
-  } else {
-    this.callbackfunc();
-  }
+    } else {
+      this.callbackfunc();
+    }
   }
 
   getFileBuffer(file) {

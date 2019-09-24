@@ -7,54 +7,6 @@ import { MatListItem } from '@angular/material';
 import { createAction, props } from '@ngrx/store';
 
 export const actionFormReset = createAction('[Form] Reset');
-const ELEMENT_DATA: IncomingDoc[] = [
-  {
-    ID: -1,
-    bookType: 'DT',
-    numberTo: '1',
-    numberToSub: 0,
-    numberOfSymbol: '',
-    source: 0,
-    docType: 1,
-    promulgatedDate: null,
-    dateTo: null,
-    compendium: '123',
-    secretLevel: 1,
-    urgentLevel: 2,
-    deadline: null,
-    numberOfCopies: 2,
-    methodReceipt: 1,
-    userHandle: 12,
-    note: '',
-    isResponse: 'Không',
-    isSendMail: 'Có',
-    isRetrieve: 'Không',
-    signer: ''
-  },
-  {
-    ID: -1,
-    bookType: 'DT',
-    numberTo: '2',
-    numberToSub: 0,
-    numberOfSymbol: '',
-    source: 0,
-    docType: 1,
-    promulgatedDate: null,
-    dateTo: null,
-    compendium: '456',
-    secretLevel: 1,
-    urgentLevel: 2,
-    deadline: null,
-    numberOfCopies: 2,
-    methodReceipt: 1,
-    userHandle: 12,
-    note: '',
-    isResponse: 'Có',
-    isSendMail: 'Không',
-    isRetrieve: 'Không',
-    signer: ''
-  }
-];
 
 @Injectable({
   providedIn: 'root'
@@ -132,15 +84,15 @@ export class IncomingDocService {
   }
 
   urlDocumentToMax =
-    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$top=1&$orderby=ID desc&$filter=Author/Id eq ";
-  getDocumentToMax(userId): Observable<any> {
+    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$top=1&$orderby=ID desc";
+  getDocumentToMax(): Observable<any> {
     return this.http.get(
-      `${this.restUrl}${this.urlDocumentToMax}` + `'` + userId + `'`
+      `${this.restUrl}${this.urlDocumentToMax}`
     );
   }
 
   urlDocumentTo =
-    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$orderby=ID desc&$filter=Author/Id eq ";
+    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title&$expand=UserOfHandle,Author&$orderby=ID desc&$filter=Author/Id eq ";
   getListDocumentTo(userId): Observable<any> {
     return this.http.get(
       `${this.restUrl}${this.urlDocumentTo}` +
@@ -176,6 +128,12 @@ export class IncomingDocService {
   getAllUser() {
     return this.http.get(
       `${this.restUrl}` + `/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Name,User/Title,User/Id&$expand=User`
+    );
+  }
+
+  getHistoryStep(noteBookID) {
+    return this.http.get(
+      `${this.restUrl}` + `/_api/web/lists/getbytitle('ListHistoryRequestTo')/items?$select=*,UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserRequest,UserApprover&$filter=NoteBookID eq '` + noteBookID + `'`
     );
   }
 
@@ -220,6 +178,7 @@ export interface IncomingDoc {
   isSendMail: string;
   isRetrieve: string;
   signer: string;
+  created: number;
 }
 
 export interface IncomingTicket {
@@ -238,6 +197,7 @@ export interface IncomingTicket {
   indexStep: number;
   created: string;
   numberTo: string;
+  link: string;
 }
 
 export interface ItemSeleted {
