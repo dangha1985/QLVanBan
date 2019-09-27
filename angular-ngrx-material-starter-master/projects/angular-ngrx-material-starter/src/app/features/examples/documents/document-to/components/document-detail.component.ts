@@ -98,6 +98,7 @@ export class DocumentDetailComponent implements OnInit {
   listName = 'ListDocumentTo';
   outputFile = [];
   outputFileHandle = [];
+  outputFileRetrieve = [];
   displayFile = '';
   closeResult = '';
   historyId = 0;
@@ -105,6 +106,7 @@ export class DocumentDetailComponent implements OnInit {
   index = 0;
   overlayRef;
   selectedKnower = []; selectedCombiner = []; selectedApprover;
+  ReasonRetrieve;
   content;deadline;
   displayedColumns: string[] = [
     'stt',
@@ -165,6 +167,9 @@ export class DocumentDetailComponent implements OnInit {
     this.route.paramMap.subscribe(parames => {
       this.IncomingDocID = parames.get('id');
       this.IndexStep = parseInt(parames.get('step'));
+      if(this.IndexStep > 0) {
+        this.isExecution = true;
+      }
       this.OpenRotiniPanel();
       this.docTo.getListDocByID(this.IncomingDocID).subscribe(items => {
         console.log('items: ' + items);
@@ -264,6 +269,7 @@ export class DocumentDetailComponent implements OnInit {
         this.ListItem = [];
         item.forEach(element => {
           this.ListItem.push({
+            STT: this.ListItem.length + 1,
             ID: element.ID,
             documentID: element.NoteBookID,
             compendium: element.Compendium,
@@ -271,6 +277,7 @@ export class DocumentDetailComponent implements OnInit {
               element.UserRequest !== undefined
                 ? element.UserRequest.Title
                 : '',
+            userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : 0,
             userApprover:
               element.UserApprover !== undefined
                 ? element.UserApprover.Title
@@ -306,16 +313,21 @@ export class DocumentDetailComponent implements OnInit {
       () => {
         this.docTo.getHistoryStep(this.IncomingDocID).subscribe((itemValue: any[]) => {
           let item = itemValue['value'] as Array<any>;
-          this.historyId = item[0].ID;
+          if(item.length > 0) {
+            this.historyId = item[0].ID;
+          }
         },
         error => {
           console.log("Load history id item: " + error);
           this.CloseRotiniPanel();
         })
+
+        this.CloseRotiniPanel();
       }
       );
   }
 
+  // Load all user approval
   GetAllUser() {
     this.services.getListDepartment().subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
@@ -390,6 +402,7 @@ export class DocumentDetailComponent implements OnInit {
       },
       error => {
         console.log("Load all user error " + error);
+        this.CloseRotiniPanel();
       },
       () =>{}
       )
@@ -420,12 +433,13 @@ export class DocumentDetailComponent implements OnInit {
               this.DepartmentCode.push(element.DepartmentCode);
               this.RoleCode.push(element.RoleCode);
             });       
-            if(this.IndexStep > 0) {     
-              this.GetUserApprover();
-            }
+            // if(this.IndexStep > 0) {     
+            //   this.GetUserApprover();
+            // }
           },
           error => { 
             console.log("Load department code error: " + error);
+            this.CloseRotiniPanel();
           }
         )
       }
@@ -441,8 +455,9 @@ export class DocumentDetailComponent implements OnInit {
     this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
   }
 
-  ReturnRequest() {
-    this.notificationService.warn('Chọn phòng ban để trả lại');
+  ReturnRequest(template: TemplateRef<any>) {
+    //this.notificationService.warn('Chọn phòng ban để trả lại');
+    this.bsModalRef = this.modalService.show(template, {class: 'modal-md'});
   }
 
   GetUserApprover() {
@@ -523,130 +538,210 @@ export class DocumentDetailComponent implements OnInit {
 
   validation() {
     if (this.docTo.CheckNull(this.selectedApprover) === '') {
-      alert("Bạn chưa chọn người xử lý chính! Vui lòng kiểm tra lại");
+      alert("Bạn chưa chọn Người xử lý chính! Vui lòng kiểm tra lại");
       return false;
     }
     else if (this.docTo.CheckNull(this.content) === '') {
-      alert("Bạn chưa nhập nội dung xử lý! Vui lòng kiểm tra lại");
+      alert("Bạn chưa nhập Nội dung xử lý! Vui lòng kiểm tra lại");
       return false;
     }
     else if (this.docTo.CheckNull(this.deadline) === '') {
-      alert("Bạn chưa nhập hạn xử lý! Vui lòng kiểm tra lại");
+      alert("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
       return false;
     } else {
       return true;
     }
   }
+
+  AddTicketRetrieve() {
+    try {
+      if (this.docTo.CheckNull(this.ReasonRetrieve) === '') {
+        alert("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
+        return;
+      }
+      this.bsModalRef.hide();
+      this.OpenRotiniPanel();
+      let item  = this.ListItem.find(i => i.indexStep === this.IndexStep);
+      let approver;
+      if(item !== undefined) {
+        approver = item.userRequestId;
+      }
+
+      const data = {
+        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+        Title: this.itemDoc.numberTo,
+        DateCreated: new Date(),
+        NoteBookID: this.IncomingDocID,
+        UserRequestId: this.currentUserId,
+        UserApproverId: approver,
+        // Deadline: this.deadline,
+        StatusID: 0,
+        StatusName: 'Đang xử lý',
+        Source: '',
+        Destination: '',
+        TaskTypeCode: 'XLC',
+        TaskTypeName: 'Xử lý chính',
+        TypeCode: 'CXL',
+        TypeName: 'Chuyển xử lý',
+        Content: this.content,
+        IndexStep: this.IndexStep + 1,
+        Compendium: this.itemDoc.compendium
+      };
+      this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
+        item => {},
+        error => {
+          this.CloseRotiniPanel();
+          console.log(
+            'error when add item to list ListProcessRequestTo: ' +
+              error.error.error.message.value
+          ),
+            this.notificationService.error('Thêm phiếu xử lý thất bại');
+        },
+        () => {
+          console.log(
+            'Add item of approval user to list ListHistoryRequestTo successfully!'
+          );
+          if(this.historyId > 0) {
+            const dataTicket = {
+              __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+              StatusID: 1, StatusName: "Đã xử lý",
+            };
+            this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+              item => {},
+              error => {
+                this.CloseRotiniPanel();
+                console.log(
+                  'error when update item to list ListHistoryRequestTo: ' +
+                    error.error.error.message.value
+                );
+              },
+              () => {}
+            );
+          }
+          this.UpdateStatus();
+        }
+      );
+    } catch (err) {
+      console.log("try catch AddTicketRetrieve error: " + err.message);
+      this.CloseRotiniPanel();
+    }
+  }
+
   // Add phiếu xử lý
   AddListTicket() {
-    if(!this.validation) {
-      return;
-    }
-    this.bsModalRef.hide();
-    this.OpenRotiniPanel();
-    //let data: Array<any> = [];
-    const data = {
-      __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      Title: this.itemDoc.numberTo,
-      DateCreated: new Date(),
-      NoteBookID: this.IncomingDocID,
-      UserRequestId: this.currentUserId,
-      UserApproverId: this.selectedApprover.split('|')[0],
-      Deadline: this.deadline,
-      StatusID: 0,
-      StatusName: 'Đang xử lý',
-      Source: '',
-      Destination: '',
-      TaskTypeCode: 'XLC',
-      TaskTypeName: 'Xử lý chính',
-      TypeCode: 'CXL',
-      TypeName: 'Chuyển xử lý',
-      Content: this.content,
-      IndexStep: this.IndexStep + 1,
-      Compendium: this.itemDoc.compendium
-    };
-    // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
-    //   this.selectedCombiner.forEach(element => {
-    //     data.push({
-    //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-    //       Title: this.itemDoc.numberTo,
-    //       DateCreated: new Date(),
-    //       NoteBookID: this.IncomingDocID,
-    //       UserRequestId: this.currentUserId,
-    //       UserApproverId: element.split('|')[0],
-    //       Deadline: this.deadline,
-    //       StatusID: 0,
-    //       StatusName: 'Đang xử lý',
-    //       Source: '',
-    //       Destination: '',
-    //       TaskTypeCode: 'PH',
-    //       TaskTypeName: 'Phối hợp',
-    //       TypeCode: 'CXL',
-    //       TypeName: 'Chuyển xử lý',
-    //       Content: this.content,
-    //       IndexStep: this.IndexStep + 1,
-    //       Compendium: this.itemDoc.compendium
-    //     });
-    //   });
-    // }
-    // if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
-    //   this.selectedKnower.forEach(element => {
-    //     data.push({
-    //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-    //       Title: this.itemDoc.numberTo,
-    //       DateCreated: new Date(),
-    //       NoteBookID: this.IncomingDocID,
-    //       UserRequestId: this.currentUserId,
-    //       UserApproverId: element.split('|')[0],
-    //       Deadline: this.deadline,
-    //       StatusID: 0,
-    //       StatusName: 'Đang xử lý',
-    //       Source: '',
-    //       Destination: '',
-    //       TaskTypeCode: 'NĐB',
-    //       TaskTypeName: 'Nhận để biết',
-    //       TypeCode: 'CXL',
-    //       TypeName: 'Chuyển xử lý',
-    //       Content: this.content,
-    //       IndexStep: this.IndexStep + 1,
-    //       Compendium: this.itemDoc.compendium
-    //     });
-    //   });
-    // }
-    this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
-      item => {},
-      error => {
-        this.CloseRotiniPanel();
-        console.log(
-          'error when add item to list ListProcessRequestTo: ' +
-            error.error.error.message.value
-        ),
-          this.notificationService.error('Thêm phiếu xử lý thất bại');
-      },
-      () => {
-        console.log(
-          'Add item of approval user to list ListHistoryRequestTo successfully!'
-        );
-        if(this.historyId > 0) {
-          const dataTicket = {
-            __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
-            StatusID: 1, StatusName: "Đã xử lý",
-          };
-          this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
-            item => {},
-            error => {
-              this.CloseRotiniPanel();
-              console.log(
-                'error when update item to list ListHistoryRequestTo: ' +
-                  error.error.error.message.value
-              );
-            },
-            () => {}
-          );
-        }
-        this.UpdateStatus();
+    try {
+      if(!this.validation) {
+        return;
       }
-    );
+      this.bsModalRef.hide();
+      this.OpenRotiniPanel();
+      //let data: Array<any> = [];
+      const data = {
+        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+        Title: this.itemDoc.numberTo,
+        DateCreated: new Date(),
+        NoteBookID: this.IncomingDocID,
+        UserRequestId: this.currentUserId,
+        UserApproverId: this.selectedApprover.split('|')[0],
+        Deadline: this.deadline,
+        StatusID: 0,
+        StatusName: 'Đang xử lý',
+        Source: '',
+        Destination: '',
+        TaskTypeCode: 'XLC',
+        TaskTypeName: 'Xử lý chính',
+        TypeCode: 'CXL',
+        TypeName: 'Chuyển xử lý',
+        Content: this.content,
+        IndexStep: this.IndexStep + 1,
+        Compendium: this.itemDoc.compendium
+      };
+      // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
+      //   this.selectedCombiner.forEach(element => {
+      //     data.push({
+      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+      //       Title: this.itemDoc.numberTo,
+      //       DateCreated: new Date(),
+      //       NoteBookID: this.IncomingDocID,
+      //       UserRequestId: this.currentUserId,
+      //       UserApproverId: element.split('|')[0],
+      //       Deadline: this.deadline,
+      //       StatusID: 0,
+      //       StatusName: 'Đang xử lý',
+      //       Source: '',
+      //       Destination: '',
+      //       TaskTypeCode: 'PH',
+      //       TaskTypeName: 'Phối hợp',
+      //       TypeCode: 'CXL',
+      //       TypeName: 'Chuyển xử lý',
+      //       Content: this.content,
+      //       IndexStep: this.IndexStep + 1,
+      //       Compendium: this.itemDoc.compendium
+      //     });
+      //   });
+      // }
+      // if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+      //   this.selectedKnower.forEach(element => {
+      //     data.push({
+      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+      //       Title: this.itemDoc.numberTo,
+      //       DateCreated: new Date(),
+      //       NoteBookID: this.IncomingDocID,
+      //       UserRequestId: this.currentUserId,
+      //       UserApproverId: element.split('|')[0],
+      //       Deadline: this.deadline,
+      //       StatusID: 0,
+      //       StatusName: 'Đang xử lý',
+      //       Source: '',
+      //       Destination: '',
+      //       TaskTypeCode: 'NĐB',
+      //       TaskTypeName: 'Nhận để biết',
+      //       TypeCode: 'CXL',
+      //       TypeName: 'Chuyển xử lý',
+      //       Content: this.content,
+      //       IndexStep: this.IndexStep + 1,
+      //       Compendium: this.itemDoc.compendium
+      //     });
+      //   });
+      // }
+      this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
+        item => {},
+        error => {
+          this.CloseRotiniPanel();
+          console.log(
+            'error when add item to list ListProcessRequestTo: ' +
+              error.error.error.message.value
+          ),
+            this.notificationService.error('Thêm phiếu xử lý thất bại');
+        },
+        () => {
+          console.log(
+            'Add item of approval user to list ListHistoryRequestTo successfully!'
+          );
+          if(this.historyId > 0) {
+            const dataTicket = {
+              __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+              StatusID: 1, StatusName: "Đã xử lý",
+            };
+            this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+              item => {},
+              error => {
+                this.CloseRotiniPanel();
+                console.log(
+                  'error when update item to list ListHistoryRequestTo: ' +
+                    error.error.error.message.value
+                );
+              },
+              () => {}
+            );
+          }
+          this.UpdateStatus();
+        }
+      );
+    } catch(err) {
+      console.log("try catch AddListTicket error: " + err.message);
+      this.CloseRotiniPanel();
+    }
   }
 
   AddUserCombine() {
@@ -938,7 +1033,7 @@ export class DocumentDetailComponent implements OnInit {
             this.outputFile.push(inputNode.files[0]);
           }
         }
-      } else {
+      } else if(sts === 1) {
         const inputNode: any = document.querySelector('#fileAttachmentHandle');
         if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
           console.log(inputNode.files[0]);
@@ -954,6 +1049,22 @@ export class DocumentDetailComponent implements OnInit {
             this.outputFileHandle.push(inputNode.files[0]);
           }
         }
+      } else if(sts === 2) {
+        const inputNode: any = document.querySelector('#fileAttachmentRetrieve');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileRetrieve.length > 0) {
+            if (
+              this.outputFileRetrieve.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileRetrieve.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFileRetrieve.push(inputNode.files[0]);
+          }
+        }
       }
     } catch (error) {
       console.log('addAttachmentFile error: ' + error);
@@ -965,9 +1076,12 @@ export class DocumentDetailComponent implements OnInit {
       if(sts === 0) {
         console.log(this.outputFile.indexOf(index))
         this.outputFile.splice(this.outputFile.indexOf(index), 1);
-      } else {
+      } else if(sts === 1) {
         console.log(this.outputFileHandle.indexOf(index))
         this.outputFileHandle.splice(this.outputFileHandle.indexOf(index), 1);
+      } else if(sts === 2) {
+        console.log(this.outputFileRetrieve.indexOf(index))
+        this.outputFileRetrieve.splice(this.outputFileRetrieve.indexOf(index), 1);
       }
     } catch (error) {
       console.log("removeAttachmentFile error: " + error);

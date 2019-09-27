@@ -165,9 +165,13 @@ table {
     .cdk-overlay-container {
         z-index: 9999!important;
     }
-    .modal-dialog {
+    .modal-lg {
         width: 90% !important;
         max-width: 97% !important;
+    }
+    .modal-md {
+        width: 60% !important;
+        max-width: 70% !important;
     }
 }
 
@@ -216,4 +220,20 @@ table {
 
 .required-field {
     color: red;
+}
+
+#tableOnsiteCost {
+    font-family: 'Roboto', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 5px;
+}
+
+#tableOnsiteCost td {
+    border: 1px solid #ddd;
+    padding: 8px 0 8px 5px;
+}
+
+mat-icon {
+    font-size: 18px !important;
 }

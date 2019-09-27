@@ -159,10 +159,12 @@ export class DocumentWaitingComponent implements OnInit {
       this.inDocs$ = []; 
       item.forEach(element => {
         this.inDocs$.push({
+          STT: this.inDocs$.length + 1,
           ID: element.ID,
           documentID: element.NoteBookID, 
           compendium: element.Compendium, 
           userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+          userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : '',
           userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
           deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
           status: 'Chờ xử lý',

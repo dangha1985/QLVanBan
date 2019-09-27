@@ -182,10 +182,12 @@ export interface IncomingDoc {
 }
 
 export interface IncomingTicket {
+  STT: number;
   ID: number;
   compendium: string;
   documentID: number;
-  userRequest: number;
+  userRequest: string;
+  userRequestId: number;
   userApprover: string;
   deadline: string;
   status: string;
