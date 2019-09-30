@@ -78,6 +78,7 @@ export class DocumentDetailComponent implements OnInit {
   itemDoc: IncomingDoc;
   isDisplay: boolean = false;
   isExecution: boolean = false;
+  isReturn: boolean = false;
   ArrayItemId = []; IncomingDocID;
   IndexStep = 0;
   DepartmentCode = [];
@@ -98,7 +99,7 @@ export class DocumentDetailComponent implements OnInit {
   listName = 'ListDocumentTo';
   outputFile = [];
   outputFileHandle = [];
-  outputFileRetrieve = [];
+  outputFileReturn = [];
   displayFile = '';
   closeResult = '';
   historyId = 0;
@@ -106,7 +107,7 @@ export class DocumentDetailComponent implements OnInit {
   index = 0;
   overlayRef;
   selectedKnower = []; selectedCombiner = []; selectedApprover;
-  ReasonRetrieve;
+  ReasonReturn;
   content;deadline;
   displayedColumns: string[] = [
     'stt',
@@ -115,7 +116,9 @@ export class DocumentDetailComponent implements OnInit {
     'userApprover',
     'deadline',
     'status',
-    'taskType'
+    'taskType',
+    '_content',
+    'type'
   ]; //'select'
   ListItem: IncomingTicket[] = [];
   dataSource = new MatTableDataSource<IncomingTicket>();
@@ -140,7 +143,6 @@ export class DocumentDetailComponent implements OnInit {
 
   ngOnInit() {
     this.GetItemDetail();
-    this.GetHistory();
     this.GetAllUser();
     this.getCurrentUser();
   }
@@ -165,94 +167,116 @@ export class DocumentDetailComponent implements OnInit {
 
   GetItemDetail() {
     this.route.paramMap.subscribe(parames => {
-      this.IncomingDocID = parames.get('id');
+      this.historyId = parseInt(parames.get('id'));
       this.IndexStep = parseInt(parames.get('step'));
       if(this.IndexStep > 0) {
         this.isExecution = true;
+        this.isReturn = true;
       }
       this.OpenRotiniPanel();
-      this.docTo.getListDocByID(this.IncomingDocID).subscribe(items => {
-        console.log('items: ' + items);
-        let itemList = items['value'] as Array<any>;
-        if (itemList[0].AttachmentFiles.length > 0) {
-          itemList[0].AttachmentFiles.forEach(element => {
-            this.ItemAttachments.push({
-              name: element.FileName,
-              urlFile: this.urlAttachment + element.ServerRelativeUrl
-            });
-          });
+      // Load thong tin phieu
+      let strFilter = `&$filter=ID eq '` + this.historyId + `'`;
+      this.docTo.getListRequestTo(strFilter).subscribe((itemValue: any[]) => {
+        let item = itemValue["value"] as Array<any>;
+        if(item.length > 0) {
+          this.IncomingDocID = item[0].NoteBookID;
+          if(item[0].TypeCode === "TL") {
+            this.isReturn = false;
+          }
         }
-
-        this.itemDoc = {
-          ID: itemList[0].ID,
-          bookType: itemList[0].BookTypeName,
-          numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo),
-          numberToSub:
-            itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub,
-          numberOfSymbol: itemList[0].NumberOfSymbol,
-          source: itemList[0].Source,
-          docType: itemList[0].DocTypeName,
-          promulgatedDate:
-            this.docTo.CheckNull(itemList[0].PromulgatedDate) === ''
-              ? ''
-              : moment(itemList[0].PromulgatedDate).format('DD/MM/YYYY'),
-          dateTo:
-            this.docTo.CheckNull(itemList[0].DateTo) === ''
-              ? ''
-              : moment(itemList[0].DateTo).format('DD/MM/YYYY'),
-          compendium: itemList[0].Compendium,
-          secretLevel: itemList[0].SecretLevelName,
-          urgentLevel: itemList[0].UrgentLevelName,
-          deadline:
-            this.docTo.CheckNull(itemList[0].Deadline) === ''
-              ? ''
-              : moment(itemList[0].Deadline).format('DD/MM/YYYY'),
-          numberOfCopies: itemList[0].NumOfCopies,
-          methodReceipt: itemList[0].MethodReceipt,
-          userHandle:
-            itemList[0].UserOfHandle !== undefined
-              ? itemList[0].UserOfHandle.Title
-              : '',
-          note: itemList[0].Note,
-          isResponse: itemList[0].IsResponse === 0 ? 'Không' : 'Có',
-          isSendMail: 'Có',
-          isRetrieve: itemList[0].IsRetrieve === 0 ? 'Không' : 'Có',
-          signer: itemList[0].Signer,
-          created: itemList[0].Author.Id
-        };
-        this.ref.detectChanges();
-      });
-
-      // Load list config by step
-      // if(this.IndexStep > 0) {
-      //   this.isExecution = true;
-      //   this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
-      //     let item = valueItem['value'] as Array<any>;
-      //     item.forEach(element => {
-      //       if(this.docTo.CheckNull(element.RoleCode) !== '') {
-      //         let arr = element.RoleCode.split(',');
-      //         arr.forEach(element => {
-      //           this.RoleApprover.push(element);
-      //         });
-      //       }
-      //       if(this.docTo.CheckNull(element.RoleCodeCombine) !== '') {
-      //         let arr = element.RoleCodeCombine.split(',');
-      //         arr.forEach(element => {
-      //         this.RoleCombine.push(element);
-      //         })
-      //       }
-      //       if(this.docTo.CheckNull(element.RoleCodeKnow) !== '') {
-      //         let arr = element.RoleCodeKnow.split(',');
-      //         arr.forEach(element => {
-      //         this.RoleKnow.push(element);
-      //         })
-      //       }
-      //     })        
-      //     this.getCurrentUser();
-      //   });
-      // } else {
-      //   this.getCurrentUser();
-      // }
+      },
+      error => {
+        console.log("Load list process item: " + error);
+        this.CloseRotiniPanel();
+      },
+      () => {
+        this.GetHistory();
+        // Load thong tin van ban
+        this.docTo.getListDocByID(this.IncomingDocID).subscribe(items => {
+          console.log('items: ' + items);
+          let itemList = items['value'] as Array<any>;
+          if(itemList.length > 0){
+            if (itemList[0].AttachmentFiles.length > 0) {
+              itemList[0].AttachmentFiles.forEach(element => {
+                this.ItemAttachments.push({
+                  name: element.FileName,
+                  urlFile: this.urlAttachment + element.ServerRelativeUrl
+                });
+              });
+            }
+            this.itemDoc = {
+              ID: itemList[0].ID,
+              bookType: itemList[0].BookTypeName,
+              numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo),
+              numberToSub:
+                itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub,
+              numberOfSymbol: itemList[0].NumberOfSymbol,
+              source: itemList[0].Source,
+              docType: itemList[0].DocTypeName,
+              promulgatedDate:
+                this.docTo.CheckNull(itemList[0].PromulgatedDate) === ''
+                  ? ''
+                  : moment(itemList[0].PromulgatedDate).format('DD/MM/YYYY'),
+              dateTo:
+                this.docTo.CheckNull(itemList[0].DateTo) === ''
+                  ? ''
+                  : moment(itemList[0].DateTo).format('DD/MM/YYYY'),
+              compendium: itemList[0].Compendium,
+              secretLevel: itemList[0].SecretLevelName,
+              urgentLevel: itemList[0].UrgentLevelName,
+              deadline:
+                this.docTo.CheckNull(itemList[0].Deadline) === ''
+                  ? ''
+                  : moment(itemList[0].Deadline).format('DD/MM/YYYY'),
+              numberOfCopies: itemList[0].NumOfCopies,
+              methodReceipt: itemList[0].MethodReceipt,
+              userHandle:
+                itemList[0].UserOfHandle !== undefined
+                  ? itemList[0].UserOfHandle.Title
+                  : '',
+              note: itemList[0].Note,
+              isResponse: itemList[0].IsResponse === 0 ? 'Không' : 'Có',
+              isSendMail: 'Có',
+              isRetrieve: itemList[0].IsRetrieve === 0 ? 'Không' : 'Có',
+              signer: itemList[0].Signer,
+              created: itemList[0].Author.Id
+            };
+          }
+          this.ref.detectChanges();
+        });
+  
+        // Load list config by step
+        // if(this.IndexStep > 0) {
+        //   this.isExecution = true;
+        //   this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
+        //     let item = valueItem['value'] as Array<any>;
+        //     item.forEach(element => {
+        //       if(this.docTo.CheckNull(element.RoleCode) !== '') {
+        //         let arr = element.RoleCode.split(',');
+        //         arr.forEach(element => {
+        //           this.RoleApprover.push(element);
+        //         });
+        //       }
+        //       if(this.docTo.CheckNull(element.RoleCodeCombine) !== '') {
+        //         let arr = element.RoleCodeCombine.split(',');
+        //         arr.forEach(element => {
+        //         this.RoleCombine.push(element);
+        //         })
+        //       }
+        //       if(this.docTo.CheckNull(element.RoleCodeKnow) !== '') {
+        //         let arr = element.RoleCodeKnow.split(',');
+        //         arr.forEach(element => {
+        //         this.RoleKnow.push(element);
+        //         })
+        //       }
+        //     })        
+        //     this.getCurrentUser();
+        //   });
+        // } else {
+        //   this.getCurrentUser();
+        // }
+      }
+      );         
     },
     error => {
       console.log("Load detail item: " + error);
@@ -290,7 +314,7 @@ export class DocumentDetailComponent implements OnInit {
             source: '',
             destination: '',
             taskType: element.TaskTypeCode === 'XLC'? "Xử lý chính" : element.TaskTypeCode === 'PH'? 'Phối hợp' : 'Nhận để biết',
-            typeCode: '',
+            typeCode: this.GetTypeCode(element.TypeCode),
             content: this.docTo.CheckNull(element.Content),
             indexStep: element.IndexStep,
             created:
@@ -553,9 +577,9 @@ export class DocumentDetailComponent implements OnInit {
     }
   }
 
-  AddTicketRetrieve() {
+  AddTicketReturn() {
     try {
-      if (this.docTo.CheckNull(this.ReasonRetrieve) === '') {
+      if (this.docTo.CheckNull(this.ReasonReturn) === '') {
         alert("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
         return;
       }
@@ -581,11 +605,12 @@ export class DocumentDetailComponent implements OnInit {
         Destination: '',
         TaskTypeCode: 'XLC',
         TaskTypeName: 'Xử lý chính',
-        TypeCode: 'CXL',
-        TypeName: 'Chuyển xử lý',
-        Content: this.content,
-        IndexStep: this.IndexStep + 1,
-        Compendium: this.itemDoc.compendium
+        TypeCode: 'TL',
+        TypeName: 'Trả lại',
+        Content: this.ReasonReturn,
+        IndexStep: this.IndexStep - 1,
+        Compendium: this.itemDoc.compendium,
+        IndexReturn: this.IndexStep + '_' + (this.IndexStep - 1)
       };
       this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
         item => {},
@@ -604,7 +629,7 @@ export class DocumentDetailComponent implements OnInit {
           if(this.historyId > 0) {
             const dataTicket = {
               __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
-              StatusID: 1, StatusName: "Đã xử lý",
+              StatusID: -1, StatusName: "Đã trả lại",
             };
             this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
               item => {},
@@ -618,11 +643,11 @@ export class DocumentDetailComponent implements OnInit {
               () => {}
             );
           }
-          this.UpdateStatus();
+          this.UpdateStatus(0);
         }
       );
     } catch (err) {
-      console.log("try catch AddTicketRetrieve error: " + err.message);
+      console.log("try catch AddTicketReturn error: " + err.message);
       this.CloseRotiniPanel();
     }
   }
@@ -735,7 +760,7 @@ export class DocumentDetailComponent implements OnInit {
               () => {}
             );
           }
-          this.UpdateStatus();
+          this.UpdateStatus(1);
         }
       );
     } catch(err) {
@@ -788,7 +813,7 @@ export class DocumentDetailComponent implements OnInit {
           if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
             this.AddUserKnow();
           } else {
-            this.callbackFunc(this.IncomingDocID);
+            this.callbackFunc(this.historyId);
             // this.CloseRotiniPanel();     
             // this.notificationService.success('Cập nhật thông tin xử lý thành công.');
           }
@@ -837,7 +862,7 @@ export class DocumentDetailComponent implements OnInit {
           this.AddUserKnow();
         }
         else {
-          this.callbackFunc(this.IncomingDocID);
+          this.callbackFunc(this.historyId);
           // this.CloseRotiniPanel();     
           // this.notificationService.success('Cập nhật thông tin xử lý thành công.');  
         }
@@ -845,7 +870,7 @@ export class DocumentDetailComponent implements OnInit {
     );
   }
 
-  UpdateStatus() {
+  UpdateStatus(sts) {
     if(this.ArrayItemId !== undefined && this.ArrayItemId.length > 0) {
       const dataTicket = {
         __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
@@ -867,11 +892,15 @@ export class DocumentDetailComponent implements OnInit {
           );
           this.index ++;
           if(this.index < this.ArrayItemId.length) {
-            this.UpdateStatus();
+            this.UpdateStatus(sts);
           }
           else {
             this.index = 0;
-            this.AddHistoryStep();
+            if(sts === 0) {
+              this.callbackFunc(this.historyId);
+            } else if(sts === 1) {
+              this.AddHistoryStep();
+            }
           }
         }
       );
@@ -913,7 +942,7 @@ export class DocumentDetailComponent implements OnInit {
         } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
           this.AddUserKnow();
         } else {
-          this.callbackFunc(this.IncomingDocID);
+          this.callbackFunc(this.historyId);
           // this.CloseRotiniPanel();
           // this.notificationService.success('Cập nhật thông tin xử lý thành công.');
         }
@@ -924,7 +953,14 @@ export class DocumentDetailComponent implements OnInit {
   callbackFunc(id) {
     if (this.outputFileHandle.length > 0) {
       this.saveItemAttachment(0, id, this.outputFileHandle);
-    } else {
+    }
+    else if (this.outputFile.length > 0) {
+      this.saveItemAttachment(0, id, this.outputFile);
+    }
+    else if (this.outputFileReturn.length > 0) {
+      this.saveItemAttachment(0, id, this.outputFileReturn);
+    }
+    else {
       this.routes.navigate(['examples/doc-detail/' + id]);
     }
   }
@@ -1050,19 +1086,19 @@ export class DocumentDetailComponent implements OnInit {
           }
         }
       } else if(sts === 2) {
-        const inputNode: any = document.querySelector('#fileAttachmentRetrieve');
+        const inputNode: any = document.querySelector('#fileAttachmentReturn');
         if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
           console.log(inputNode.files[0]);
-          if (this.outputFileRetrieve.length > 0) {
+          if (this.outputFileReturn.length > 0) {
             if (
-              this.outputFileRetrieve.findIndex(
+              this.outputFileReturn.findIndex(
                 index => index.name === inputNode.files[0].name
               ) === -1
             ) {
-              this.outputFileRetrieve.push(inputNode.files[0]);
+              this.outputFileReturn.push(inputNode.files[0]);
             }
           } else {
-            this.outputFileRetrieve.push(inputNode.files[0]);
+            this.outputFileReturn.push(inputNode.files[0]);
           }
         }
       }
@@ -1080,8 +1116,8 @@ export class DocumentDetailComponent implements OnInit {
         console.log(this.outputFileHandle.indexOf(index))
         this.outputFileHandle.splice(this.outputFileHandle.indexOf(index), 1);
       } else if(sts === 2) {
-        console.log(this.outputFileRetrieve.indexOf(index))
-        this.outputFileRetrieve.splice(this.outputFileRetrieve.indexOf(index), 1);
+        console.log(this.outputFileReturn.indexOf(index))
+        this.outputFileReturn.splice(this.outputFileReturn.indexOf(index), 1);
       }
     } catch (error) {
       console.log("removeAttachmentFile error: " + error);
@@ -1107,6 +1143,7 @@ export class DocumentDetailComponent implements OnInit {
             else {
               // this.outputFile = [];
               // this.CloseRotiniPanel();
+              arr = [];
               this.routes.navigate(['examples/doc-detail/' + idItem]);
             }
           }
@@ -1121,6 +1158,21 @@ export class DocumentDetailComponent implements OnInit {
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
     return reader;
+  }
+
+  GetTypeCode(code) {
+    if(this.docTo.CheckNull(code) === '') {
+      return '';
+    }
+    else if(code === "CXL") {
+      return 'Chuyển xử lý';
+    }
+    else if(code === "TL") {
+      return 'Trả lại';
+    }
+    else if(code === "XYK") {
+      return 'Xin ý kiến';
+    }
   }
 }
 

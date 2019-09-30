@@ -153,7 +153,7 @@ export class DocumentWaitingComponent implements OnInit {
   }
 
   getAllListRequest() {
-    this.strFilter = `&$filter=UserApprover/Id eq ` + this.currentUserId + ` and TypeCode eq 'CXL' and StatusID eq '0'`;
+    this.strFilter = `&$filter=UserApprover/Id eq ` + this.currentUserId + ` and (TypeCode eq 'CXL' or TypeCode eq 'TL') and StatusID eq '0'`;
     this.docTo.getListRequestTo(this.strFilter).subscribe((itemValue: any[]) => {
       let item = itemValue["value"] as Array<any>;     
       this.inDocs$ = []; 
@@ -176,7 +176,7 @@ export class DocumentWaitingComponent implements OnInit {
           indexStep: element.IndexStep,
           created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
           numberTo: element.Title,
-          link: this.getLinkItemByRole(element.TaskTypeCode, element.NoteBookID, element.IndexStep),
+          link: this.getLinkItemByRole(element.TaskTypeCode, element.ID, element.IndexStep),
         })
       })
       this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
@@ -206,7 +206,7 @@ export class DocumentWaitingComponent implements OnInit {
 
   getLinkItemByRole(taskType, id, step) {
     let link = '';
-    if(taskType === 'XLC') {
+    if(taskType === 'XLC' || taskType === 'TL') {
       link = '/examples/doc-detail/' + id + '/' + step;
     } else {
       link = '/examples/doc-detail/' + id;

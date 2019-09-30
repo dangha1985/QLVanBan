@@ -49,6 +49,15 @@ export class ResApiService {
       "IF-MATCH": "*",
     })
   }
+  httpOptionsDelete = {
+    headers: new HttpHeaders({
+      'accept': 'application/json;odata=verbose',
+      'dataType': 'json',
+      'Content-Type': 'application/json;odata=verbose',
+      "X-HTTP-Method": "DELETE",
+      "IF-MATCH": "*",
+    })
+  }
   
   getCurrentUser(){
     return this. http.get(`${this.restUrl}${this.currentUserAPI}`);
@@ -126,5 +135,13 @@ export class ResApiService {
 
   updateListById(listName, data, id) {
     return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items` + `(` + id + `)`, data, this.httpOptionsUpdate);
+  }
+
+  DeleteItemById(listName, data, id) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items` + `(` + id + `)`, data, this.httpOptionsDelete);
+  }
+  
+  DeleteAttachmentById(listName, data, id, fileName) {
+    return this.http.post(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items` + `(` + id + `)/AttachmentFiles/getByFileName('` + fileName + `')`, data, this.httpOptionsDelete);
   }
 }

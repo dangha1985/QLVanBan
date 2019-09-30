@@ -150,7 +150,7 @@ export class IncomingDocService {
   //get item by id in list document incoming
   getListDocByID(id) {
     let urlDetailLeave =
-      "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title," +
+      "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,UserOfHandle/Name," +
       'AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$filter=ID eq ';
     return this.http.get(`${this.restUrl}${urlDetailLeave}` + `'` + id + `'`);
   }

@@ -3,13 +3,12 @@
     overflow: auto;
 }
 
-table {
-    width: 100%;
+a:hover {
+    cursor: pointer;
 }
 
-td,
-th {
-    width: 20%;
+table {
+    width: 100%;
 }
 
 .search-hero {
@@ -68,4 +67,14 @@ th {
 
 .required-field {
     color: red;
+}
+
+::ng-deep {
+    .mat-form-field-appearance-legacy.mat-form-field-disabled .mat-form-field-underline {
+        background-image: none !important;
+        background-color: rgba(0, 0, 0, 0.42) !important;
+    }
+    .default-theme .mat-select-disabled .mat-select-value {
+        color: rgba(0, 0, 0, 0.87) !important;
+    }
 }

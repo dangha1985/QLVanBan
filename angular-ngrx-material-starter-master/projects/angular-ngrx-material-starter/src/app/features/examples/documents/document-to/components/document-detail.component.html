@@ -3,7 +3,7 @@
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo1 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
-        <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalRetrieve)" *ngIf="isExecution"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
+        <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
     </div>
     <div fxLayout="row" fxFlexFill fxLayoutGap="15px">
         <div fxFlex="60" fxFlex.sm="100" fxLayout="column" class="content-side">
@@ -204,6 +204,14 @@
                         <th mat-header-cell *matHeaderCellDef> Loại xử lý </th>
                         <td mat-cell *matCellDef="let element">{{element.taskType}}</td>
                     </ng-container>
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef> Loại phiếu </th>
+                        <td mat-cell *matCellDef="let element">{{element.typeCode}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="_content">
+                        <th mat-header-cell *matHeaderCellDef> Nội dung xử lý </th>
+                        <td mat-cell *matCellDef="let element">{{element.content}}</td>
+                    </ng-container>
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
                     </tr>
@@ -216,7 +224,7 @@
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
-        <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalRetrieve)" *ngIf="isExecution"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
+        <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
     </div>
 
     <ng-template #template>
@@ -375,7 +383,7 @@
         </div>
     </ng-template>
 
-    <ng-template #modalRetrieve>
+    <ng-template #modalReturn>
         <div class="modal-header">
             <h4 class="modal-title pull-left">Gửi trả lại</h4>
             <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
@@ -388,19 +396,19 @@
                     <mat-card fxLayout="column">
                         <mat-form-field fxFlex="100">
                             <mat-label>Lý do trả lại <span class="required-field">*</span></mat-label>
-                            <textarea matInput [(ngModel)]="ReasonRetrieve"></textarea>
+                            <textarea matInput [(ngModel)]="ReasonReturn"></textarea>
                         </mat-form-field>
 
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="100" fxLayoutGap="5px">
                             <div fxFlex="120px" fxFlex.xs="auto">
-                                <button type="button" mat-stroked-button color="primary" (click)="fileInputRetrieve.click()">
+                                <button type="button" mat-stroked-button color="primary" (click)="fileInputReturn.click()">
                                                          <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span>
                                                         </button>
-                                <input hidden (change)="addAttachmentFile(2)" #fileInputRetrieve type="file" id="fileAttachmentRetrieve">
+                                <input hidden (change)="addAttachmentFile(2)" #fileInputReturn type="file" id="fileAttachmentReturn">
                             </div>
                             <div fxFlex="auto">
                                 <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                                    <div *ngFor="let items of outputFileRetrieve">
+                                    <div *ngFor="let items of outputFileReturn">
                                         <a (click)="removeAttachmentFile(items, 2)"> <i class="material-icons delFile">clear</i>&nbsp;</a> {{items.name}}
                                     </div>
                                 </div>
@@ -411,7 +419,7 @@
             </div>
         </div>
         <div class="modal-footer" fxLayoutAlign="center center">
-            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddTicketRetrieve()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddTicketReturn()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
         </div>
     </ng-template>
