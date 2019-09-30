@@ -66,7 +66,7 @@ export class DocumentAddComponent implements OnInit {
     'compendium',
     'dateTo',
     'edit',
-    'delete'
+    'delete',
   ]; //'select'
   dataSource = new MatTableDataSource<IncomingDoc>();
   selection = new SelectionModel<IncomingDoc>(true, []);
