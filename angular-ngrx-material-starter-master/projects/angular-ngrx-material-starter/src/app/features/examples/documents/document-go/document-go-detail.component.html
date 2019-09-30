@@ -12,7 +12,7 @@
                     <h3 class="title">Thông tin văn bản</h3>
                 </span>
             </div>
-            <div fxFlexFill>
+            <div class="UMinHeight">
                 <form class="example-form" *ngIf="itemDoc">
                     <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
@@ -149,64 +149,14 @@
                     </div>
                 </form>
             </div>
-        </div>
-
-        <div fxFlex="auto" fxLayout="column" class="content-side">
-            <div class="caption">
-                <span class="d-flex justify-content-between align-items-baseline" style="display:inline-block !important">
-                    <h3 class="title">Ý kiến xử lý</h3>
-                </span>
-                <span class="span-icon justify-content-between align-items-baseline">
-                    <i class="material-icons" style="font-size: 18px !important">comment</i>
-                </span>
-            </div>
-            <div fxFlexFill>
-                <div fxLayout="column" fxFlexFill fxLayoutGap="15px">
-                    <div fxLayout="column">
-                        <mat-form-field>
-                            <mat-label>Bình luận</mat-label>
-                            <textarea matInput [(ngModel)]="Comments" rows="3" required></textarea>
-                        </mat-form-field>
-                        <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
-                            <div fxFlex="120px" fxFlex.xs="auto">
-                                <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
-                                <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
-                            </div>
-                            <div fxFlex="auto">
-                                <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                                    <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div fxLayout="row" fxLayoutAlign="end start" fxLayout.xs="column" fxFlexFill fxLayoutGap="5px">
-                            <button mat-stroked-button color="primary" type="button" (click)="SendComment()"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
-                        </div>
-                    </div>
-                    <div class="cmt-item" *ngFor="let item of listComment">
-                        <div class="cmt-img">
-                            <img src="item.userPicture">
-                        </div>
-                        <div class="cmt-content">
-                            <h3 id="cmt-author">item.Author <span id="cmt-date">item.Created</span></h3>
-                            <p id="cmt-title">item.Chat_Comments</p>
-                            <div fxLayout="column">
-                                <a *ngFor="let itemAtt of item.itemAttach" href="itemAtt.urlFile" target="_blank">itemAtt.name</a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div fxLayout="row" fxFlexFill fxLayoutGap="15px">
-        <div fxFlex="60" fxFlex.sm="100" fxLayout="column" class="content-side">
+            <!-- <div fxLayout="row" fxFlexFill fxLayoutGap="15px">
+                <div fxFlex="60" fxFlex.sm="100" fxLayout="column" class="content-side">  -->
             <div class="caption">
                 <span class="d-flex justify-content-between align-items-baseline">
-                        <h3 class="title">Thông tin gửi nhận</h3>
-                    </span>
+                                <h3 class="title">Thông tin gửi nhận</h3>
+                            </span>
             </div>
-            <div fxFlexFill>
+            <div>
                 <table mat-table [dataSource]="dataSource_Ticket" class="mat-elevation-z8">
                     <ng-container matColumnDef="stt">
                         <th mat-header-cell *matHeaderCellDef> STT </th>
@@ -242,15 +192,121 @@
                 </table>
                 <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
             </div>
+            <!-- </div>
+            </div> -->
+        </div>
+
+        <div fxFlex="auto" fxLayout="column" class="content-side">
+            <div class="caption">
+                <span class="d-flex justify-content-between align-items-baseline" style="display:inline-block !important">
+                    <h3 class="title">Ý kiến xử lý</h3>
+                </span>
+                <span class="span-icon justify-content-between align-items-baseline">
+                    <i class="material-icons" style="font-size: 18px !important">comment</i>
+                </span>
+            </div>
+            <div fxFlexFill>
+                <div fxLayout="column" fxFlexFill fxLayoutGap="15px">
+                    <div fxLayout="column">
+                        <mat-form-field>
+                            <mat-label>Bình luận</mat-label>
+                            <textarea matInput [(ngModel)]="Comments" rows="3" required></textarea>
+                        </mat-form-field>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
+                            <div fxFlex="120px" fxFlex.xs="auto">
+                                <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
+                                <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
+                            </div>
+                            <div fxFlex="auto">
+                                <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                    <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayoutAlign="end start" fxLayout.xs="column" fxFlexFill fxLayoutGap="5px">
+                            <button mat-stroked-button color="primary" type="button" (click)="SendComment()"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
+                        </div>
+                    </div>
+                    <div style="height:800px ;overflow: auto;">
+                        <div class="cmt-item" *ngFor="let item of listCommentParent; let i=index; ">
+                            <div class="cmt-img">
+                                <img src="{{item.userPicture}}">
+                            </div>
+                            <div class="cmt-content">
+                                <h3 id="cmt-author">{{item.Author}} <span id="cmt-date">{{item.Created}}</span></h3>
+                                <button mat-stroked-button color="primary" type="button" (click)="Reply(i)">Trả lời</button>
+                                <p id="cmt-title">{{item.Chat_Comments}}</p>
+                                <div fxLayout="column">
+                                    <a *ngFor="let itemAtt of item.itemAttach" href="{{itemAtt.urlFile}}" target="_blank">{{itemAtt.name}}</a>
+                                </div>
+                                <div fxLayout="column" class="content-side" [style.display]="item.DisplayReply">
+                                    <div class="row">
+                                        <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                                            <textarea matInput placeholder="Nội dung trả lời" [(ngModel)]="item.Content" minlength="0" maxlength="1000" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="2" cdkAutosizeMaxRows="10"></textarea>
+                                        </mat-form-field>
+                                    </div>
+                                    <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
+                                    <div fxFlex="120px" fxFlex.xs="auto">
+                                        <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
+                                        <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment1">
+                                    </div>
+                                    <div fxFlex="auto">
+                                        <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                            <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                    <div class="actions">
+                                        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="saveCommentReply(i)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Gửi</span></button>
+                                    </div>
+                                </div>
+                                <div class="cmt-item" *ngFor="let itemChild of item.children; let j=index">
+                                    <div class="cmt-img">
+                                        <img src="{{itemChild.userPicture}}">
+                                    </div>
+                                    <div class="cmt-content">
+                                        <h3 id="cmt-author">{{itemChild.Author}} <span id="cmt-date">{{itemChild.Created}}</span></h3>
+                                        <button mat-stroked-button color="primary" type="button" (click)="Reply(i,j)">Trả lời</button>
+                                        <p id="cmt-title">{{itemChild.Chat_Comments}}</p>
+                                        <div fxLayout="column">
+                                            <a *ngFor="let itemAttChild of itemChild.itemAttach" href="{{itemAttChild.urlFile}}" target="_blank">{{itemAttChild.name}}</a>
+                                        </div>
+                                        <div fxLayout="column" class="content-side" [style.display]="itemChild.DisplayReply">
+                                            <div class="row">
+                                                <mat-form-field class="col" [ngClass]="routeAnimationsElements">
+                                                    <textarea matInput placeholder="Nội dung trả lời" [(ngModel)]="itemChild.Content" minlength="0" maxlength="1000" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="2" cdkAutosizeMaxRows="10"></textarea>
+                                                </mat-form-field>
+                                            </div>
+                                            <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
+                                            <div fxFlex="120px" fxFlex.xs="auto">
+                                                <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
+                                                <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
+                                            </div>
+                                            <div fxFlex="auto">
+                                                <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                                    <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                            <div class="actions">
+                                                <button mat-stroked-button color="primary" type="button" class="MR5" (click)="saveCommentReply(i,j)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Gửi</span></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
     <div fxFlexFil class="actions-bottom PB10">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="XinYKien(template_XYK)"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval()"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest()"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
     </div>
-    <ng-template #template_XYK>
 
-    </ng-template>
 </div>

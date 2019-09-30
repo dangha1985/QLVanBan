@@ -49,7 +49,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
     );
   }
 }
-
+//substringof(\'' + Name + '\', Title)
 @Component({
   selector: 'anms-document-add',
   templateUrl: './document-add.component.html',

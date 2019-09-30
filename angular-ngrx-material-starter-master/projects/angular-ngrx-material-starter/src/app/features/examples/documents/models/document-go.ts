@@ -88,3 +88,7 @@ export const ListDocType: ItemSeleted[] = [
   { ID: 4, Title: 'Giấy mời' },
   { ID: 5, Title: 'Quyết định' }
 ];
+export interface UserProfilePropertiesObject {
+  Key: string;
+  Value: string;
+}

@@ -23,7 +23,7 @@ import {
   actionFormUpdate
 } from '../../../examples/form/form.actions';
 import { selectFormState } from '../../../examples/form/form.selectors';
-import { ResApiService } from '../../services/res-api.service'
+import { SharedService } from '../../../../shared/shared-service/shared.service'
 import { DocumentGoService } from './document-go.service';
 import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser } from './../models/document-go';
 
@@ -34,48 +34,15 @@ import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser } f
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentGoWaitingComponent implements OnInit {
-  form = this.fb.group({
-    // NumSymbol: ['', [Validators.required]],
-    // password: ['', [Validators.required]],
-    // email: ['', [Validators.required, Validators.email]],
-    Compendium: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(1000)
-      ]
-    ],
-    UnitCreate: null,
-    UserCreate: null,
-    BookType: ['DG', [Validators.required]],
-    NumberGo: null,
-    NumberSymbol: '',
-    DocType: null,
-    RecipientsIn: null,
-    RecipientsOut: null,
-    UserOfHandle: ['', [Validators.required]],
-    UserOfCombinate: null,
-    UserOfKnow: null,
-    SecretLevel: null,
-    UrgentLevel: null,
-    MethodSend: null,
-    Signer: null,
-    Note: '',
-    NumOfPaper: null,
-    Deadline: null,
-    DateIssued: null,
-    isRespinse: false,
-    isSendMail: false,
-  });
-  formValueChanges$: Observable<ItemDocumentGo>;
+
+ 
   constructor(
     private fb: FormBuilder,
     private store: Store<State>,
     private translate: TranslateService,
     private notificationService: NotificationService,
-    private docServices: DocumentGoService,
-    private services: ResApiService,
+   // private docServices: DocumentGoService,
+    private resServices: SharedService,
     private route: ActivatedRoute,
     private ref: ChangeDetectorRef,
   ) { }
@@ -88,47 +55,104 @@ export class DocumentGoWaitingComponent implements OnInit {
   date = new FormControl(new Date());
   addNew = false;
   showList = true;
-  ListDocumentGo: ItemDocumentGo[] = [];
-  ListBookType: ItemSeletedCode[] = [];
-  ListDocType: ItemSeleted[] = [];
-  ListSecret: ItemSeleted[] = [];
-  ListUrgent: ItemSeleted[] = [];
-  ListMethodSend: ItemSeleted[] = [];
-  ListDepartment: ItemSeleted[] = [];
-  ListSource: ItemSeletedCode[] = [];
-  ListApproverStep: ItemUser[] = [];
-  ListUserSigner: ItemUser[] = [];
-  ListUserCreate: ItemUser[] = [];
-  idStatus = '';
+   ListDocumentGo: ItemDocumentGo[] = [];
+  // ListBookType: ItemSeletedCode[] = [];
+  // ListDocType: ItemSeleted[] = [];
+  // ListSecret: ItemSeleted[] = [];
+  // ListUrgent: ItemSeleted[] = [];
+  // ListMethodSend: ItemSeleted[] = [];
+  // ListDepartment: ItemSeleted[] = [];
+  // ListSource: ItemSeletedCode[] = [];
+  // ListApproverStep: ItemUser[] = [];
+  // ListUserSigner: ItemUser[] = [];
+  // ListUserCreate: ItemUser[] = [];
+  id = null;
   strFilter = '';
   strFilterUser = '';
   userApproverId = '';
   userApproverEmail = '';
+  currentUserId = '';
+  currentUserName = '';
+  currentUserEmail='';
   ngOnInit() {
 
-    //lấy tham số truyền vào qua url
-    // this.route.paramMap.subscribe(parames => {
-    //   this.idStatus = parames.get('idStatus');
-    //   if (this.idStatus == '1') {//chờ xử lý
-    //     //ẩn nút thêm mới
-
-    //   }
-    //   else {
-    //     //hiện nút thêm mới
-
-    //     // danh mục
-       
-    //   }
+   // lấy tham số truyền vào qua url
+    this.route.paramMap.subscribe(parames => {
+      this.id = parames.get('id');
       //Load ds văn bản
-      this.getListDocumentGo_Wait();
-    //});
+     // this.getListDocumentGo_Wait();
+    });
+    this.getCurrentUser();
+  }
+  isNotNull(str) {
+    return (str !== null && str !== "" && str !== undefined);
+  }
+
+  CheckNull(str) {
+    if (!this.isNotNull(str)) {
+      return "";
+    }
+    else {
+      return str;
+    }
+  }
+   // format định dạng ngày    
+   formatDateTime(date: Date): string {
+    if (!date) {
+      return '';
+    }
+    return moment(date).format('DD/MM/YYYY');
+    //return moment(date).format('DD/MM/YYYY hh:mm A');
+  }
+   //Lấy người dùng hiện tại
+   getCurrentUser() {
+    this.resServices.getCurrentUser().subscribe(
+      itemValue => {
+        this.currentUserId = itemValue["Id"];
+        this.currentUserName = itemValue["Title"];
+        this.currentUserEmail = itemValue["Email"];
+        console.log("currentUserEmail: " + this.currentUserEmail);
+      },
+      error => {
+        console.log("error: " + error);
+        
+      },
+      () => {
+        console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName);
+        this.getListDocumentGo_Wait();
+      }
+    );
   }
   //lấy ds phiếu xử lý
   getListDocumentGo_Wait() {
-      this.strFilter = `&$filter=ID ne ''and StatusID eq '0'`;
+    let idStatus;
+    let TypeCode='';
+    //chờ xử lý
+    if(this.id=='1'){
+      idStatus=0;
+      TypeCode='CXL' ;
+    }
+    //Đã xử lý
+    else  if(this.id=='2'){
+      idStatus=1;
+      TypeCode='CXL' ;
+    }
+    //Chờ xin ý kiến
+    else  if(this.id=='3'){
+      idStatus=0;
+      TypeCode='XYK' ;
+    }
+      //Đã cho ý kiến
+    else  if(this.id=='4'){
+      idStatus=1;
+      TypeCode='XYK';
+    }
+      let strSelect = `?$select=*,Author/Id,Author/Title,UserApprover/Id,UserApprover/Title&$expand=Author,UserApprover`
+     +`&$filter=TypeCode eq '`+TypeCode+`'and StatusID eq '`+idStatus+ `'and UserApprover/Id eq '`+this.currentUserId+`'&$orderby=Created desc`;
+     console.log('strSelect='+strSelect);
     try {
       this.ListDocumentGo = [];
-      this.docServices.getListProcessRequestGo(this.strFilter).subscribe(itemValue => {
+      this.resServices.getItemList('ListProcessRequestGo',strSelect).subscribe(itemValue => {
         let item = itemValue["value"] as Array<any>;
         item.forEach(element => {
           // console.log('UserCreate:'+ element.UserCreate.Title);
@@ -136,14 +160,14 @@ export class DocumentGoWaitingComponent implements OnInit {
           this.ListDocumentGo.push({
             ID: element.DocumentGoID,
             NumberGo:'',// this.docServices.checkNull(element.NumberGo),
-            DocTypeName: this.docServices.checkNull(element.DocTypeName),
-            NumberSymbol:this.docServices.checkNull(element.Title),
-            Compendium: this.docServices.checkNull(element.Compendium),
+            DocTypeName: this.CheckNull(element.DocTypeName),
+            NumberSymbol:this.CheckNull(element.Title),
+            Compendium: this.CheckNull(element.Compendium),
             UserCreateName: element.Author == undefined ? '' : element.Author.Title,
-            DateCreated: this.docServices.formatDateTime(element.DateCreated),
+            DateCreated: this.formatDateTime(element.DateCreated),
             UserOfHandleName: element.UserApprover == undefined ? '' : element.UserApprover.Title,
-            Deadline: this.docServices.formatDateTime(element.Deadline),
-            StatusName: this.docServices.checkNull(element.StatusName),
+            Deadline: this.formatDateTime(element.Deadline),
+            StatusName: this.CheckNull(element.StatusName),
             BookTypeName: '',
             UnitCreateName: '',
             RecipientsInName: '',
@@ -157,7 +181,6 @@ export class DocumentGoWaitingComponent implements OnInit {
              NumOfPaper :'',
           })
         })
-
       },
         error => console.log(error),
         () => {

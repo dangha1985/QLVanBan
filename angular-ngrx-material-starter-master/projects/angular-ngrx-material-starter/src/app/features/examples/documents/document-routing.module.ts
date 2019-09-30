@@ -37,9 +37,24 @@ const routes: Routes = [
         data: { title: 'Văn bản trình ký' }
       },
       {
-        path: 'documentgo-waiting',
+        path: 'documentgo-waiting-process/:id',
         component: DocumentGoWaitingComponent,
         data: { title: 'Chờ xử lý' }
+      },
+      {
+        path: 'documentgo-process/:id',
+        component: DocumentGoWaitingComponent,
+        data: { title: 'Đã xử lý' }
+      },
+      {
+        path: 'documentgo-waiting-comment/:id',
+        component: DocumentGoWaitingComponent,
+        data: { title: 'Chờ xin ý kiến' }
+      },
+      {
+        path: 'documentgo-comment/:id',
+        component: DocumentGoWaitingComponent,
+        data: { title: 'Đã cho ý kiến' }
       },
       {
         path: 'documentgo-detail/:id',

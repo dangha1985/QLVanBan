@@ -122,9 +122,9 @@ export class CommentComponent implements OnInit {
         },
         error => console.log(error),
         () => {
-          //lưu attach file
+          //lưu attach file vào văn bản
           if (this.outputFile.length > 0) {
-            this.saveItemAttachment(0, this.idItemProcess, 'ListProcessRequestGo');
+            this.saveItemAttachment(0, this.data[0].ID, 'ListDocumentGo');
           }
 
           else {
@@ -145,7 +145,8 @@ export class CommentComponent implements OnInit {
         __metadata: { type: 'SP.Data.ListCommentsListItem' },
         Title: "ListDocumentGo_" + this.data[0].ID,
         Chat_Comments: this.content,
-        KeyList: "ListDocumentGo_" + this.data[0].ID
+        KeyList: "ListDocumentGo_" + this.data[0].ID,
+        ProcessID:this.idItemProcess
       }
       this.restService.insertItemList('ListComments', dataComment).subscribe(
         itemComment => {
