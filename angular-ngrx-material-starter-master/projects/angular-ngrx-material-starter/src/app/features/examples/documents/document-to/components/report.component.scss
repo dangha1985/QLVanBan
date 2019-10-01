@@ -1,12 +1,3 @@
-.example-container {
-    height: 400px;
-    overflow: auto;
-}
-
-a:hover {
-    cursor: pointer;
-}
-
 table {
     width: 100%;
 }
@@ -15,16 +6,6 @@ table {
     display: flex;
     float: right;
     margin-bottom: 10px;
-}
-
-.entry {
-    margin-top: 40px;
-    margin-bottom: 40px;
-}
-
-.todos-filter-info {
-    float: right;
-    font-weight: normal;
 }
 
 .docadd-filter {
@@ -65,21 +46,9 @@ table {
     margin-top: 10px;
 }
 
-.required-field {
-    color: red;
-}
-
 ::ng-deep {
     .mat-form-field-appearance-legacy.mat-form-field-disabled .mat-form-field-underline {
         background-image: none !important;
         background-color: rgba(0, 0, 0, 0.42) !important;
-    }
-    .default-theme .mat-select-disabled .mat-select-value {
-        color: rgba(0, 0, 0, 0.87) !important;
-    }
-    td.mat-cell,
-    td.mat-footer-cell,
-    th.mat-header-cell {
-        padding: 4px !important;
     }
 }

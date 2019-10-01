@@ -237,3 +237,11 @@ table {
 mat-icon {
     font-size: 18px !important;
 }
+
+::ng-deep {
+    td.mat-cell,
+    td.mat-footer-cell,
+    th.mat-header-cell {
+        padding: 4px !important;
+    }
+}

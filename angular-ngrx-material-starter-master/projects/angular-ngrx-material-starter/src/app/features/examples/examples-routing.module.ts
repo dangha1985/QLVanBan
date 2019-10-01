@@ -17,6 +17,7 @@ import {DocumentGoComponent }from './documents/document-go/document-go.component
 import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
 import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
 import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
+import {ReportComponent} from './documents/document-to/components/report.component'
 
 const routes: Routes = [
   {
@@ -37,6 +38,11 @@ const routes: Routes = [
         path: 'doc-list',
         component: DocumentWaitingComponent,
         data: { title: 'Chờ xử lý' }
+      },
+      {
+        path: 'report-list',
+        component: ReportComponent,
+        data: { title: 'Báo cáo, thống kê' }
       },
       {
         path: 'doc-detail/:id',

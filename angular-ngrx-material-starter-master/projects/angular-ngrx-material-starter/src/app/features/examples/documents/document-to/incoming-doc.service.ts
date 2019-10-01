@@ -92,13 +92,19 @@ export class IncomingDocService {
   }
 
   urlDocumentTo =
-    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title&$expand=UserOfHandle,Author&$orderby=ID desc&$filter=Author/Id eq ";
+    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title&$expand=UserOfHandle,Author&$orderby=ID desc";
   getListDocumentTo(userId): Observable<any> {
     return this.http.get(
-      `${this.restUrl}${this.urlDocumentTo}` +
+      `${this.restUrl}${this.urlDocumentTo}&$filter=Author/Id eq ` +
         `'` +
         userId +
         `' and StatusID eq '-1'`
+    );
+  }
+
+  getAllDocumentTo(strFilter) {
+    return this.http.get(
+      `${this.restUrl}${this.urlDocumentTo}` + strFilter
     );
   }
 
@@ -131,9 +137,9 @@ export class IncomingDocService {
     );
   }
 
-  getHistoryStep(noteBookID) {
+  getHistoryStep(noteBookID, step) {
     return this.http.get(
-      `${this.restUrl}` + `/_api/web/lists/getbytitle('ListHistoryRequestTo')/items?$select=*,UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserRequest,UserApprover&$filter=NoteBookID eq '` + noteBookID + `'`
+      `${this.restUrl}` + `/_api/web/lists/getbytitle('ListHistoryRequestTo')/items?$select=*,UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserRequest,UserApprover&$filter=NoteBookID eq '` + noteBookID + `' and IndexStep eq '` + step + `'`
     );
   }
 
@@ -200,6 +206,7 @@ export interface IncomingTicket {
   created: string;
   numberTo: string;
   link: string;
+  stsClass: string;
 }
 
 export interface ItemSeleted {

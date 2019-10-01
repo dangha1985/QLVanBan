@@ -66,3 +66,27 @@ body {
     color: #333333;
     min-width: 180px;
 }
+
+.Ongoing {
+    background-color: #ffa500;
+    padding: 5px;
+    color: white;
+}
+
+.Approved {
+    background-color: #26C281;
+    padding: 5px;
+    color: white;
+}
+
+p {
+    margin-bottom: 0 !important;
+}
+
+.form-main {
+    padding: 0 20px !important;
+}
+
+.mat-input-element:disabled {
+    color: rgba(0, 0, 0, 0.87) !important;
+}

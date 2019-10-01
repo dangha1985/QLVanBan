@@ -143,6 +143,7 @@ export class DocumentDetailComponent implements OnInit {
 
   ngOnInit() {
     this.GetItemDetail();
+    this.GetHistory();
     this.GetAllUser();
     this.getCurrentUser();
   }
@@ -167,120 +168,97 @@ export class DocumentDetailComponent implements OnInit {
 
   GetItemDetail() {
     this.route.paramMap.subscribe(parames => {
-      this.historyId = parseInt(parames.get('id'));
+      this.IncomingDocID = parseInt(parames.get('id'));
       this.IndexStep = parseInt(parames.get('step'));
       if(this.IndexStep > 0) {
         this.isExecution = true;
         this.isReturn = true;
       }
-      this.OpenRotiniPanel();
-      // Load thong tin phieu
-      let strFilter = `&$filter=ID eq '` + this.historyId + `'`;
-      this.docTo.getListRequestTo(strFilter).subscribe((itemValue: any[]) => {
-        let item = itemValue["value"] as Array<any>;
-        if(item.length > 0) {
-          this.IncomingDocID = item[0].NoteBookID;
-          if(item[0].TypeCode === "TL") {
-            this.isReturn = false;
-          }
-        }
-      },
-      error => {
-        console.log("Load list process item: " + error);
-        this.CloseRotiniPanel();
-      },
-      () => {
-        this.GetHistory();
-        // Load thong tin van ban
-        this.docTo.getListDocByID(this.IncomingDocID).subscribe(items => {
-          console.log('items: ' + items);
-          let itemList = items['value'] as Array<any>;
-          if(itemList.length > 0){
-            if (itemList[0].AttachmentFiles.length > 0) {
-              itemList[0].AttachmentFiles.forEach(element => {
-                this.ItemAttachments.push({
-                  name: element.FileName,
-                  urlFile: this.urlAttachment + element.ServerRelativeUrl
-                });
+      this.OpenRotiniPanel();       
+      // Load thong tin van ban
+      this.docTo.getListDocByID(this.IncomingDocID).subscribe(items => {
+        console.log('items: ' + items);
+        let itemList = items['value'] as Array<any>;
+        if(itemList.length > 0){
+          if (itemList[0].AttachmentFiles.length > 0) {
+            itemList[0].AttachmentFiles.forEach(element => {
+              this.ItemAttachments.push({
+                name: element.FileName,
+                urlFile: this.urlAttachment + element.ServerRelativeUrl
               });
-            }
-            this.itemDoc = {
-              ID: itemList[0].ID,
-              bookType: itemList[0].BookTypeName,
-              numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo),
-              numberToSub:
-                itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub,
-              numberOfSymbol: itemList[0].NumberOfSymbol,
-              source: itemList[0].Source,
-              docType: itemList[0].DocTypeName,
-              promulgatedDate:
-                this.docTo.CheckNull(itemList[0].PromulgatedDate) === ''
-                  ? ''
-                  : moment(itemList[0].PromulgatedDate).format('DD/MM/YYYY'),
-              dateTo:
-                this.docTo.CheckNull(itemList[0].DateTo) === ''
-                  ? ''
-                  : moment(itemList[0].DateTo).format('DD/MM/YYYY'),
-              compendium: itemList[0].Compendium,
-              secretLevel: itemList[0].SecretLevelName,
-              urgentLevel: itemList[0].UrgentLevelName,
-              deadline:
-                this.docTo.CheckNull(itemList[0].Deadline) === ''
-                  ? ''
-                  : moment(itemList[0].Deadline).format('DD/MM/YYYY'),
-              numberOfCopies: itemList[0].NumOfCopies,
-              methodReceipt: itemList[0].MethodReceipt,
-              userHandle:
-                itemList[0].UserOfHandle !== undefined
-                  ? itemList[0].UserOfHandle.Title
-                  : '',
-              note: itemList[0].Note,
-              isResponse: itemList[0].IsResponse === 0 ? 'Không' : 'Có',
-              isSendMail: 'Có',
-              isRetrieve: itemList[0].IsRetrieve === 0 ? 'Không' : 'Có',
-              signer: itemList[0].Signer,
-              created: itemList[0].Author.Id
-            };
+            });
           }
-          this.ref.detectChanges();
-        });
-  
-        // Load list config by step
-        // if(this.IndexStep > 0) {
-        //   this.isExecution = true;
-        //   this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
-        //     let item = valueItem['value'] as Array<any>;
-        //     item.forEach(element => {
-        //       if(this.docTo.CheckNull(element.RoleCode) !== '') {
-        //         let arr = element.RoleCode.split(',');
-        //         arr.forEach(element => {
-        //           this.RoleApprover.push(element);
-        //         });
-        //       }
-        //       if(this.docTo.CheckNull(element.RoleCodeCombine) !== '') {
-        //         let arr = element.RoleCodeCombine.split(',');
-        //         arr.forEach(element => {
-        //         this.RoleCombine.push(element);
-        //         })
-        //       }
-        //       if(this.docTo.CheckNull(element.RoleCodeKnow) !== '') {
-        //         let arr = element.RoleCodeKnow.split(',');
-        //         arr.forEach(element => {
-        //         this.RoleKnow.push(element);
-        //         })
-        //       }
-        //     })        
-        //     this.getCurrentUser();
-        //   });
-        // } else {
-        //   this.getCurrentUser();
-        // }
-      }
-      );         
-    },
-    error => {
-      console.log("Load detail item: " + error);
-      this.CloseRotiniPanel();
+          this.itemDoc = {
+            ID: itemList[0].ID,
+            bookType: itemList[0].BookTypeName,
+            numberTo: this.docTo.formatNumberTo(itemList[0].NumberTo),
+            numberToSub:
+              itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub,
+            numberOfSymbol: itemList[0].NumberOfSymbol,
+            source: itemList[0].Source,
+            docType: itemList[0].DocTypeName,
+            promulgatedDate:
+              this.docTo.CheckNull(itemList[0].PromulgatedDate) === ''
+                ? ''
+                : moment(itemList[0].PromulgatedDate).format('DD/MM/YYYY'),
+            dateTo:
+              this.docTo.CheckNull(itemList[0].DateTo) === ''
+                ? ''
+                : moment(itemList[0].DateTo).format('DD/MM/YYYY'),
+            compendium: itemList[0].Compendium,
+            secretLevel: itemList[0].SecretLevelName,
+            urgentLevel: itemList[0].UrgentLevelName,
+            deadline:
+              this.docTo.CheckNull(itemList[0].Deadline) === ''
+                ? ''
+                : moment(itemList[0].Deadline).format('DD/MM/YYYY'),
+            numberOfCopies: itemList[0].NumOfCopies,
+            methodReceipt: itemList[0].MethodReceipt,
+            userHandle:
+              itemList[0].UserOfHandle !== undefined
+                ? itemList[0].UserOfHandle.Title
+                : '',
+            note: itemList[0].Note,
+            isResponse: itemList[0].IsResponse === 0 ? 'Không' : 'Có',
+            isSendMail: 'Có',
+            isRetrieve: itemList[0].IsRetrieve === 0 ? 'Không' : 'Có',
+            signer: itemList[0].Signer,
+            created: itemList[0].Author.Id
+          };
+        }
+        this.ref.detectChanges();
+      });
+
+      // Load list config by step
+      // if(this.IndexStep > 0) {
+      //   this.isExecution = true;
+      //   this.services.getInforApprovalByStep('DT',this.IndexStep + 1).subscribe(valueItem => {
+      //     let item = valueItem['value'] as Array<any>;
+      //     item.forEach(element => {
+      //       if(this.docTo.CheckNull(element.RoleCode) !== '') {
+      //         let arr = element.RoleCode.split(',');
+      //         arr.forEach(element => {
+      //           this.RoleApprover.push(element);
+      //         });
+      //       }
+      //       if(this.docTo.CheckNull(element.RoleCodeCombine) !== '') {
+      //         let arr = element.RoleCodeCombine.split(',');
+      //         arr.forEach(element => {
+      //         this.RoleCombine.push(element);
+      //         })
+      //       }
+      //       if(this.docTo.CheckNull(element.RoleCodeKnow) !== '') {
+      //         let arr = element.RoleCodeKnow.split(',');
+      //         arr.forEach(element => {
+      //         this.RoleKnow.push(element);
+      //         })
+      //       }
+      //     })        
+      //     this.getCurrentUser();
+      //   });
+      // } else {
+      //   this.getCurrentUser();
+      // }
     }
     );
   }
@@ -292,6 +270,13 @@ export class DocumentDetailComponent implements OnInit {
         let item = itemValue['value'] as Array<any>;
         this.ListItem = [];
         item.forEach(element => {
+          if(element.IndexStep === this.IndexStep) {
+            if(element.TypeCode === "TL") {
+              this.isReturn = false;
+            } else {
+              this.isReturn = true;
+            }
+          }
           this.ListItem.push({
             STT: this.ListItem.length + 1,
             ID: element.ID,
@@ -322,7 +307,8 @@ export class DocumentDetailComponent implements OnInit {
                 ? ''
                 : moment(element.DateCreated).format('DD/MM/YYYY'),
             numberTo: element.Title,
-            link: ''
+            link: '',
+            stsClass: element.StatusID === 0? 'Ongoing' : 'Approved',
           });
         });
         this.dataSource = new MatTableDataSource<IncomingTicket>(this.ListItem);
@@ -335,7 +321,7 @@ export class DocumentDetailComponent implements OnInit {
         this.CloseRotiniPanel();
       },
       () => {
-        this.docTo.getHistoryStep(this.IncomingDocID).subscribe((itemValue: any[]) => {
+        this.docTo.getHistoryStep(this.IncomingDocID, this.IndexStep).subscribe((itemValue: any[]) => {
           let item = itemValue['value'] as Array<any>;
           if(item.length > 0) {
             this.historyId = item[0].ID;
@@ -600,7 +586,7 @@ export class DocumentDetailComponent implements OnInit {
         UserApproverId: approver,
         // Deadline: this.deadline,
         StatusID: 0,
-        StatusName: 'Đang xử lý',
+        StatusName: 'Chờ xử lý',
         Source: '',
         Destination: '',
         TaskTypeCode: 'XLC',
@@ -670,7 +656,7 @@ export class DocumentDetailComponent implements OnInit {
         UserApproverId: this.selectedApprover.split('|')[0],
         Deadline: this.deadline,
         StatusID: 0,
-        StatusName: 'Đang xử lý',
+        StatusName: 'Chờ xử lý',
         Source: '',
         Destination: '',
         TaskTypeCode: 'XLC',
@@ -681,54 +667,7 @@ export class DocumentDetailComponent implements OnInit {
         IndexStep: this.IndexStep + 1,
         Compendium: this.itemDoc.compendium
       };
-      // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
-      //   this.selectedCombiner.forEach(element => {
-      //     data.push({
-      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      //       Title: this.itemDoc.numberTo,
-      //       DateCreated: new Date(),
-      //       NoteBookID: this.IncomingDocID,
-      //       UserRequestId: this.currentUserId,
-      //       UserApproverId: element.split('|')[0],
-      //       Deadline: this.deadline,
-      //       StatusID: 0,
-      //       StatusName: 'Đang xử lý',
-      //       Source: '',
-      //       Destination: '',
-      //       TaskTypeCode: 'PH',
-      //       TaskTypeName: 'Phối hợp',
-      //       TypeCode: 'CXL',
-      //       TypeName: 'Chuyển xử lý',
-      //       Content: this.content,
-      //       IndexStep: this.IndexStep + 1,
-      //       Compendium: this.itemDoc.compendium
-      //     });
-      //   });
-      // }
-      // if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
-      //   this.selectedKnower.forEach(element => {
-      //     data.push({
-      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      //       Title: this.itemDoc.numberTo,
-      //       DateCreated: new Date(),
-      //       NoteBookID: this.IncomingDocID,
-      //       UserRequestId: this.currentUserId,
-      //       UserApproverId: element.split('|')[0],
-      //       Deadline: this.deadline,
-      //       StatusID: 0,
-      //       StatusName: 'Đang xử lý',
-      //       Source: '',
-      //       Destination: '',
-      //       TaskTypeCode: 'NĐB',
-      //       TaskTypeName: 'Nhận để biết',
-      //       TypeCode: 'CXL',
-      //       TypeName: 'Chuyển xử lý',
-      //       Content: this.content,
-      //       IndexStep: this.IndexStep + 1,
-      //       Compendium: this.itemDoc.compendium
-      //     });
-      //   });
-      // }
+     
       this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
         item => {},
         error => {
@@ -779,7 +718,7 @@ export class DocumentDetailComponent implements OnInit {
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
       Deadline: this.deadline,
       StatusID: 0,
-      StatusName: 'Đang xử lý',
+      StatusName: 'Chờ xử lý',
       Source: '',
       Destination: '',
       TaskTypeCode: 'PH',
@@ -813,7 +752,7 @@ export class DocumentDetailComponent implements OnInit {
           if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
             this.AddUserKnow();
           } else {
-            this.callbackFunc(this.historyId);
+            this.callbackFunc(this.IncomingDocID);
             // this.CloseRotiniPanel();     
             // this.notificationService.success('Cập nhật thông tin xử lý thành công.');
           }
@@ -832,7 +771,7 @@ export class DocumentDetailComponent implements OnInit {
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
       Deadline: this.deadline,
       StatusID: 0,
-      StatusName: 'Đang xử lý',
+      StatusName: 'Chờ xử lý',
       Source: '',
       Destination: '',
       TaskTypeCode: 'NĐB',
@@ -862,7 +801,7 @@ export class DocumentDetailComponent implements OnInit {
           this.AddUserKnow();
         }
         else {
-          this.callbackFunc(this.historyId);
+          this.callbackFunc(this.IncomingDocID);
           // this.CloseRotiniPanel();     
           // this.notificationService.success('Cập nhật thông tin xử lý thành công.');  
         }
@@ -897,7 +836,7 @@ export class DocumentDetailComponent implements OnInit {
           else {
             this.index = 0;
             if(sts === 0) {
-              this.callbackFunc(this.historyId);
+              this.callbackFunc(this.IncomingDocID);
             } else if(sts === 1) {
               this.AddHistoryStep();
             }
@@ -942,7 +881,7 @@ export class DocumentDetailComponent implements OnInit {
         } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
           this.AddUserKnow();
         } else {
-          this.callbackFunc(this.historyId);
+          this.callbackFunc(this.IncomingDocID);
           // this.CloseRotiniPanel();
           // this.notificationService.success('Cập nhật thông tin xử lý thành công.');
         }
@@ -1176,58 +1115,53 @@ export class DocumentDetailComponent implements OnInit {
   }
 }
 
-/* This is a component which we pass in modal*/
-@Component({
-  selector: 'modal-content',
-  template: `
-    <div class="modal-header">
-      <h4 class="modal-title pull-left">{{title}}</h4>
-      <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body" fxLayout="column">
-      <mat-form-field fxFlex="100">
-        <mat-label>Người xử lý</mat-label>
-        <mat-select>
-            <mat-option>None</mat-option>
-            <mat-option value="1">Loan</mat-option>
-        </mat-select>
-      </mat-form-field>
-  
-      <mat-form-field fxFlex="100">
-        <mat-label>Người phối hợp</mat-label>
-        <mat-select>
-            <mat-option>None</mat-option>
-            <mat-option *ngFor="let item of this.ListUserCombine" value="{{item.UserId}}|{{item.UserId}}">{{item.UserName}}</mat-option>
-        </mat-select>
-      </mat-form-field>
 
-      <mat-form-field fxFlex="100">
-        <mat-label>Nhận để biết</mat-label>
-        <mat-select>
-            <mat-option>None</mat-option>      
-            <mat-option *ngFor="let item of this.ListUserKnow" value="{{item.UserId}}|{{item.UserId}}">{{item.UserName}}</mat-option>     
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field fxFlex="100">
-        <mat-label>Nội dung xử lý <span class="required-field">*</span></mat-label>
-        <textarea matInput></textarea>
-      </mat-form-field>
-
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">{{closeBtnName}}</button>
-    </div>
-  `,
-})
-
-export class ModalContentComponent {
-  title: string;
-  closeBtnName: string;
-  list: any[] = [];
-
-  constructor(public bsModalRef: BsModalRef) {}
-}
+ // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
+      //   this.selectedCombiner.forEach(element => {
+      //     data.push({
+      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+      //       Title: this.itemDoc.numberTo,
+      //       DateCreated: new Date(),
+      //       NoteBookID: this.IncomingDocID,
+      //       UserRequestId: this.currentUserId,
+      //       UserApproverId: element.split('|')[0],
+      //       Deadline: this.deadline,
+      //       StatusID: 0,
+      //       StatusName: 'Chờ xử lý',
+      //       Source: '',
+      //       Destination: '',
+      //       TaskTypeCode: 'PH',
+      //       TaskTypeName: 'Phối hợp',
+      //       TypeCode: 'CXL',
+      //       TypeName: 'Chuyển xử lý',
+      //       Content: this.content,
+      //       IndexStep: this.IndexStep + 1,
+      //       Compendium: this.itemDoc.compendium
+      //     });
+      //   });
+      // }
+      // if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+      //   this.selectedKnower.forEach(element => {
+      //     data.push({
+      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+      //       Title: this.itemDoc.numberTo,
+      //       DateCreated: new Date(),
+      //       NoteBookID: this.IncomingDocID,
+      //       UserRequestId: this.currentUserId,
+      //       UserApproverId: element.split('|')[0],
+      //       Deadline: this.deadline,
+      //       StatusID: 0,
+      //       StatusName: 'Chờ xử lý',
+      //       Source: '',
+      //       Destination: '',
+      //       TaskTypeCode: 'NĐB',
+      //       TaskTypeName: 'Nhận để biết',
+      //       TypeCode: 'CXL',
+      //       TypeName: 'Chuyển xử lý',
+      //       Content: this.content,
+      //       IndexStep: this.IndexStep + 1,
+      //       Compendium: this.itemDoc.compendium
+      //     });
+      //   });
+      // }
 

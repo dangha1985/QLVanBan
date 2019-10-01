@@ -34,8 +34,9 @@ import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
 import {DocumentAddComponent, RotiniPanel} from './documents/document-to/components/document-add.component'
-import {DocumentDetailComponent, ModalContentComponent} from './documents/document-to/components/document-detail.component'
+import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
 import { DocumentWaitingComponent, ChecklistDatabase} from './documents/document-to/components/document-waiting.component'
+import { ReportComponent} from './documents/document-to/components/report.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -90,12 +91,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentWaitingComponent,
     // ChecklistDatabase,
     RotiniPanel,
-    ModalContentComponent,
+    ReportComponent,
   ],
   providers: [StockMarketService, UserService, ChecklistDatabase],
   entryComponents: [
     RotiniPanel,
-    ModalContentComponent,
     ],
 })
 export class ExamplesModule {

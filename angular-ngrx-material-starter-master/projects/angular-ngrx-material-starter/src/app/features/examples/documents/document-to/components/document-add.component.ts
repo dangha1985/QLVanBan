@@ -516,7 +516,7 @@ export class DocumentAddComponent implements OnInit {
       UserApproverId: this.userApproverId,
       Deadline: dataForm.deadline,
       StatusID: 0,
-      StatusName: 'Đang xử lý',
+      StatusName: 'Chờ xử lý',
       Source: sourceT === undefined ? '' : sourceT.title,
       Destination: '',
       TaskTypeCode: 'XLC',

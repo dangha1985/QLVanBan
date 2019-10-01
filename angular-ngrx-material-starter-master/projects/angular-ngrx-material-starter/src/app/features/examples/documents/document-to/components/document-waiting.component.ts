@@ -120,7 +120,7 @@ export class DocumentWaitingComponent implements OnInit {
 
   listTitle = "ListProcessRequestTo";
   inDocs$: IncomingTicket[]= [];
-  displayedColumns: string[] = ['numberTo', 'created', 'userRequest', 'userApprover', 'deadline','compendium', 'content']; //'select'
+  displayedColumns: string[] = ['numberTo', 'created', 'userRequest', 'deadline','compendium', 'content']; //'select', 'userApprover'
   dataSource = new MatTableDataSource<IncomingTicket>();
   selection = new SelectionModel<IncomingTicket>(true, []);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -176,7 +176,8 @@ export class DocumentWaitingComponent implements OnInit {
           indexStep: element.IndexStep,
           created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
           numberTo: element.Title,
-          link: this.getLinkItemByRole(element.TaskTypeCode, element.ID, element.IndexStep),
+          link: this.getLinkItemByRole(element.TaskTypeCode, element.NoteBookID, element.IndexStep),
+          stsClass: ''
         })
       })
       this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
