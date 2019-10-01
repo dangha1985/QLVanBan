@@ -24,10 +24,11 @@ import {
 import { selectFormState } from '../../../examples/form/form.selectors';
 import { ResApiService } from '../../services/res-api.service'
 import { DocumentGoService } from './document-go.service';
-import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser } from './../models/document-go';
+import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser, DocumentGoTicket, AttachmentsObject, UserProfilePropertiesObject } from './../models/document-go';
 import {ErrorStateMatcher} from '@angular/material/core';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
+
 @Component({
   selector: 'anms-document-go',
   templateUrl: './document-go.component.html',
@@ -84,7 +85,7 @@ export class DocumentGoComponent implements OnInit {
     public viewContainerRef: ViewContainerRef
   ) { }
 
-  displayedColumns: string[] = ['ID', 'DocTypeName', 'Compendium', 'UserCreateName', 'DateCreated', 'UserOfHandle', 'Deadline', 'StatusName'];
+  displayedColumns: string[] = ['ID', 'DocTypeName', 'Compendium', 'UserCreateName', 'DateCreated', 'UserOfHandle', 'Deadline', 'StatusName','Edit','Delete'];
   listTitle = "ListDocumentGo";
   dataSource = new MatTableDataSource<ItemDocumentGo>();
   // selection = new SelectionModel<PeriodicElement>(true, []);
@@ -117,6 +118,10 @@ export class DocumentGoComponent implements OnInit {
   displayFile = ''; 
   buffer;
   overlayRef;
+  IdEdit = 0;
+  itemDoc: ItemDocumentGo;
+  ItemAttachments: AttachmentsObject[] = [];
+  urlAttachment;
   ngOnInit() {
 
     //lấy tham số truyền vào qua url
@@ -363,6 +368,7 @@ export class DocumentGoComponent implements OnInit {
     try {
       const dataForm = this.form.getRawValue();
       if (this.form.valid) {
+        this.OpenDocumentGoPanel();
         let itemBookType = this.docServices.FindItemByCode(this.ListBookType, this.form.get('BookType').value);
         let itemDocType = this.docServices.FindItemById(this.ListDocType, this.form.get('DocType').value);
         let itemRecipientsIn = this.docServices.FindItemById(this.ListDepartment, this.form.get('RecipientsIn').value);
@@ -381,12 +387,6 @@ export class DocumentGoComponent implements OnInit {
         let UserOfCombinate = (dataForm.UserOfCombinate == null || dataForm.UserOfCombinate == 0) ? null : dataForm.UserOfCombinate.split("|")[0];
         let UserOfKnow = (dataForm.UserOfKnow == null || dataForm.UserOfKnow == 0) ? null : dataForm.UserOfKnow.split("|")[0];
         let Signer = (dataForm.Signer == null || dataForm.Signer == 0) ? null : dataForm.Signer.split("|")[0];
-
-        // BookTypeCode:,BookTypeName:,NumberGo:Number,NumberSymbol:,DocTypeID:Number,DocTypeName:,Compendium:Note,SecretLevelID:Number,SecretLevelName:,
-        // UrgentLevelID:Number,UrgentLevelName:,Deadline:DateTime,NumOfPaper:Number,NumOfElectronic:Number,UserOfHandle:User,UserOfCombinate:UserMulti,
-        // UserOfKnow:UserMulti,StatusCode:,StatusName:,RecipientsInName:,RecipientsInID:Number,RecipientsOutID:Number,RecipientsOutName:,Signer:User,DateCreated:DateTime,
-        // DateIssued:DateTime,UnitCreateID:Number,UnitCreateName:,UserCreate:User,MethodSendID:Number,MethodSendName:Text,isRespinse:Number,isSendMail:Number
-
         const data = {
           __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
           Title: 'Văn bản đi',
@@ -426,8 +426,6 @@ export class DocumentGoComponent implements OnInit {
         }
         console.log('data=' + data);
         // console.log('DocTypeID:'+this.form.get('DocType').value);
-        // console.log('DocTypeID:'+this.form.get('DocType'));
-        // console.log('NumberGo:'+ this.form.get('NumberGo').value),
         this.services.AddItemToList(this.listTitle, data).subscribe(
           item => {
             this.DocumentID = item['d'].Id;
@@ -440,10 +438,11 @@ export class DocumentGoComponent implements OnInit {
           () => {
             console.log("Add item of approval user to list " + this.listTitle + " successfully!");
             if(isChuyenXL === 1) {//chuyển xử lý
-              this.AddListTicket();
-            } else {
+              this.AddHistoryStep();
+            } 
+            //else {
               this.saveItemAttachment(0, this.DocumentID)
-            }
+           // }
           });
         // this.docServices.createDocumentGo(data).subscribe(
         //   item => {
@@ -466,11 +465,6 @@ export class DocumentGoComponent implements OnInit {
       console.log("error add:" + error);
     }
   }
-  // ChuyenXuLy(isChuyenXL) {
-  //   this.save(isChuyenXL);
-  //   this.notificationService.info('Chuyển xử lý');
-  // }
- 
   //  /** Whether the number of selected elements matches the total number of rows. */
   //  isAllSelected() {
   //   const numSelected = this.selection.selected.length;
@@ -494,12 +488,67 @@ export class DocumentGoComponent implements OnInit {
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+ //lưu lịch sử duyệt
+  AddHistoryStep() {
+    const dataForm = this.form.getRawValue();
+    const data = {
+      __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
+      Title: dataForm.NumberSymbol,
+      DateCreated: new Date(),
+      DocumentGoID: this.DocumentID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.userApproverId,
+      Deadline: dataForm.Deadline,
+      StatusID: 0,
+      StatusName: 'Chờ xử lý',
+      Content: dataForm.Note,
+      IndexStep: 1,
+      Compendium: dataForm.Compendium,
+      StatusApproval: "1_0"
+    };
+    this.services.AddItemToList('ListHistoryRequestGo', data).subscribe(
+      item => {},
+      error => {
+        this.CloseDocumentGoPanel();
+        console.log(
+          'error when add item to list ListHistoryRequestTo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Thêm phiếu xử lý thất bại');
+      },
+      () => {
+        console.log(
+          'Add item of approval user to list ListHistoryRequestGo successfully!'
+        );
+        this.AddListTicket();
+      }
+    );
+  }
   AddListTicket() {
     const dataForm = this.form.getRawValue();
     let DocTypeName = this.docServices.FindItemById(this.ListDocType, dataForm.DocType);
-  // DocumentGoID:Number,DateCreated:DateTime,UserRequest:User,UserApprover:User,TaskTypeID:Number,TaskTypeName:
-  // ,Deadline:DateTime,Content:Note,TypeCode:,TypeName:,StatusID:Number,StatusName:,Compendium:Note
+ //phiếu xử lý cho người tạo
     const data = {
+      __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+      Title:dataForm.NumberSymbol,
+      DocTypeName: DocTypeName==undefined?'':DocTypeName.Title,
+      DateCreated: new Date(),
+      DocumentGoID: this.DocumentID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.currentUserId,
+      Deadline: dataForm.Deadline,
+      StatusID: 1,
+      StatusName: "Đã xử lý",
+      TaskTypeCode: 'XLC',
+      TaskTypeName: 'Xử lý chính',
+      TypeCode: 'CXL',
+      TypeName: 'Chuyển xử lý',
+      Content: dataForm.Note,
+      IndexStep: 1,
+      Compendium: dataForm.Compendium,
+    }
+    //phiếu cho người xử lý tiếp theo
+    const data1 = {
       __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
       Title:dataForm.NumberSymbol,
       DocTypeName: DocTypeName==undefined?'':DocTypeName.Title,
@@ -510,8 +559,6 @@ export class DocumentGoComponent implements OnInit {
       Deadline: dataForm.Deadline,
       StatusID: 0,
       StatusName: "Chờ xử lý",
-     // Source: sourceT === undefined ? '' : sourceT.Title,
-     //Destination: '',
       TaskTypeCode: 'XLC',
       TaskTypeName: 'Xử lý chính',
       TypeCode: 'CXL',
@@ -529,8 +576,118 @@ export class DocumentGoComponent implements OnInit {
       },
       () => {
         console.log("Add item of approval user to list ListProcessRequestGo successfully!");
-        this.saveItemAttachment(0, this.DocumentID);
+       // this.saveItemAttachment(0, this.DocumentID);
+        this.services.AddItemToList('ListProcessRequestGo', data1).subscribe(
+          item => {},
+          error => {
+            this.CloseDocumentGoPanel();
+            console.log("error when add item to list ListProcessRequestGo: "+ error.error.error.message.value),
+            this.notificationService.error('Thêm phiếu xử lý thất bại');
+          },
+          () => {
+           // this.CloseDocumentGoPanel();
+            this.callbackfunc();
+            console.log("Add item of approval user to list ListProcessRequestGo successfully!");
+          });
       });
+  }
+  DeleteItem(id){
+    if(id > 0) {
+      this.OpenDocumentGoPanel();
+      const data = {
+        __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
+      }
+      this.services.DeleteItemById(this.listTitle, data, id).subscribe(item => {},
+      error => {
+        this.CloseDocumentGoPanel();
+        console.log(
+          'error when delete item to list DocumentTo: ' + error
+        ),
+        this.notificationService.error('Xóa văn bản thất bại');
+      },
+      () => {
+        console.log(
+          'Delete item in list DocumentTo successfully!'
+        );
+        this.notificationService.success('Xóa văn bản thành công');
+        let index = this.ListDocumentGo.findIndex(i => i.ID === id);
+        if(index >= 0) {
+          this.ListDocumentGo.splice(index, 1);
+        }
+        this.dataSource = new MatTableDataSource<ItemDocumentGo>(this.ListDocumentGo);
+        this.ref.detectChanges();
+        this.dataSource.paginator = this.paginator;
+        this.CloseDocumentGoPanel();
+      })
+    }
+  }
+
+  EditItem(id){
+    this.OpenDocumentGoPanel();
+    this.IdEdit = id;
+    // this.addNew = !this.addNew; 
+    // this.showList = !this.showList;
+    // this.services.getListDocByID(id).subscribe(items => {
+    //   console.log('items: ' + items);
+    //   let itemList = items["value"] as Array<any>;
+       
+    //     if (itemList[0].AttachmentFiles.length > 0) {
+    //       itemList[0].AttachmentFiles.forEach(element => {
+    //         this.ItemAttachments.push({
+    //           name: element.FileName,
+    //           urlFile: this.urlAttachment + element.ServerRelativeUrl
+    //         })
+    //       });
+    //     }
+
+    //     this.itemDoc = {
+    //       ID: itemList[0].ID,
+    //       NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo,
+    //       //  NumberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
+    //       DocTypeName: this.docServices.checkNull(itemList[0].DocTypeName),
+    //       NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
+    //       Compendium: this.docServices.checkNull(itemList[0].Compendium),
+    //       UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
+    //       DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
+    //       UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Title,
+
+    //       Deadline: this.docServices.formatDateTime(itemList[0].Deadline),
+    //       StatusName: this.docServices.checkNull(itemList[0].StatusName),
+    //       BookTypeName: itemList[0].BookTypeName,
+    //       UnitCreateName: itemList[0].UnitCreateName,
+    //       RecipientsInName: itemList[0].RecipientsInName,
+    //       RecipientsOutName: itemList[0].RecipientsOutName,
+    //       SecretLevelName: itemList[0].SecretLevelName,
+    //       UrgentLevelName: itemList[0].UrgentLevelName,
+    //       MethodSendName: itemList[0].MethodSendName,
+    //       DateIssued: this.docServices.formatDateTime(itemList[0].DateIssued),
+    //       SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Title,
+    //       NumOfPaper: itemList[0].NumOfPaper,
+    //       Note: itemList[0].Note,
+    //     };
+    //     this.IncomingDocform.patchValue({
+    //       numberTo: this.docTo.formatNumberTo(this.itemDocEdit.numberTo),
+    //       numberToSub: this.itemDocEdit.numberToSub,
+    //       numberOfSymbol: this.docTo.formatNumberTo(this.itemDocEdit.numberTo) + '/VBĐ',
+    //       source: this.itemDocEdit.source + '',
+    //       docType: this.itemDocEdit.docType + '',
+    //       promulgatedDate: this.itemDocEdit.promulgatedDate,
+    //       dateTo: this.itemDocEdit.dateTo,
+    //       compendium: this.itemDocEdit.compendium,
+    //       secretLevel: this.itemDocEdit.secretLevel + '',
+    //       urgentLevel: this.itemDocEdit.urgentLevel + '',
+    //       deadline: this.itemDocEdit.deadline,
+    //       numberOfCopies: this.itemDocEdit.numberOfCopies,
+    //       methodReceipt: this.itemDocEdit.methodReceipt + '',
+    //       userHandle: this.itemDocEdit.userHandle + '',
+    //       note: this.itemDocEdit.note,
+    //       isResponse: this.itemDocEdit.isResponse === 0 ? false : true,
+    //       isRetrieve: this.itemDocEdit.isRetrieve === 0 ? false : true,
+    //       signer: this.itemDocEdit.signer
+    //     });
+    //   this.ref.detectChanges();
+    //   this.CloseDocumentGoPanel();
+    // });
   }
 
   reset() {
