@@ -10,7 +10,10 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { Router } from '@angular/router';
-
+import {
+  ROUTE_ANIMATIONS_ELEMENTS,
+  NotificationService
+} from '../../../../core/core.module';
 @Component({
   selector: 'anms-comment',
   templateUrl: './comment.component.html',
@@ -28,12 +31,16 @@ export class CommentComponent implements OnInit {
   overlayRef; buffer;
   currentUserId = null;
   currentUserName = null;
+  currentUserEmail;
   indexComment = null;
-  idItemProcess;
+  idItemProcess; listDepCode;
+  ArrayUserPofile;
+  pictureCurrent;
+  
   constructor(
     public dialogRef: MatDialogRef<CommentComponent>,
     private restService: SharedService,
-    private routes: Router,
+    private routes: Router,private readonly notificationService: NotificationService,
     public overlay: Overlay, public viewContainerRef: ViewContainerRef,
     @Inject(MAT_DIALOG_DATA) public data: ItemDocumentGo[]) {
   }
@@ -47,6 +54,7 @@ export class CommentComponent implements OnInit {
       itemValue => {
         this.currentUserId = itemValue["Id"];
         this.currentUserName = itemValue["Title"];
+        this.currentUserEmail = itemValue["Email"];
       },
       error => {
         console.log("error: " + error);
@@ -54,9 +62,34 @@ export class CommentComponent implements OnInit {
       },
       () => {
         console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName);
-        //   this.getListDocumentGo();
+           this.getUserPofile(this.currentUserEmail);
       }
     );
+  }
+  //lấy đường dẫn ảnh trên sharepoint
+  getUserPofile(loginName) {
+    try {
+      this.restService.getUserInfo('i:0%23.f|membership|' + loginName).subscribe(
+        itemss => {
+          this.ArrayUserPofile = [];
+          let kU = itemss['UserProfileProperties'] as Array<any>;
+          kU.forEach(element => {
+            this.ArrayUserPofile.push(
+              { Key: element.Key, Value: element.Value }
+            )
+          })
+        },
+        error => console.log(error),
+        () => {
+          if (this.ArrayUserPofile.length > 0) {
+            let pick = this.ArrayUserPofile.find(x => x.Key == "PictureURL");
+            this.pictureCurrent = pick.Value
+          }
+        }
+      )
+    } catch (error) {
+      console.log('getUsr error: ' + error.message);
+    }
   }
   //lấy ds người dùng trong bảng ListMapEmployee
   getListUser() {
@@ -64,11 +97,29 @@ export class CommentComponent implements OnInit {
       const str = `?$select=ID,Title,DepartmentCode,DepartmentName,Email,User/Name,User/Title,User/Id&$expand=User`;
       this.restService.getItemList('ListMapEmployee', str).subscribe(
         item => {
+          this.listDepCode=[];
           this.listUser = [];
+          let lst=[];
           let UserItem = item["value"] as Array<any>;
           UserItem.forEach(element => {
-            this.listUser.push({ Id: element.ID, DepartmentCode: element.DepartmentCode, DepartmentName: element.DepartmentName, UserName: element.User.Title, UserId: element.User.Id, UserEmail: element.Email });
+            this.listUser.push({ 
+              Id: element.ID,
+              DepartmentCode: element.DepartmentCode,
+              DepartmentName: element.DepartmentName, 
+              UserName: element.User.Title, 
+              UserId: element.User.Id, 
+              UserEmail: element.User.Name.split('|')[2] ,
+              RoleCode: element.RoleCode,
+              RoleName: element.RoleName
+            });
+            if(this.listDepCode.indexOf(element.DepartmentCode)<0){
+              this.listDepCode.push(element.DepartmentCode);
+            }
           });
+//           this.listDepCode.forEach(DepCode=>{
+// let dep=this.listUser.find(a=>a.DepartmentCode==DepCode);
+// if (dep)
+         // })
         },
         error => console.log(error),
         () => {
@@ -87,10 +138,16 @@ export class CommentComponent implements OnInit {
         this.listUserIdSelect.push(id);
 
         this.openCommentPanel();
-        this.saveItemListProcess(0);
+        //lưu attach file vào văn bản
+        if (this.outputFile.length > 0) {
+          this.saveItemAttachment(0, this.data[0].ID, 'ListDocumentGo',null);
+        }
+        //lưu phiếu xin ý kiến và lưu comment
+       for(let i=0;i<this.listUserIdSelect.length;i++){
+        this.saveItemListProcess(i);
+       }
       }
       else {
-        this.closeCommentPanel();
         alert("Bạn chưa nhập nội dung xin ý kiến");
       }
     } catch (error) {
@@ -122,15 +179,8 @@ export class CommentComponent implements OnInit {
         },
         error => console.log(error),
         () => {
-          //lưu attach file vào văn bản
-          if (this.outputFile.length > 0) {
-            this.saveItemAttachment(0, this.data[0].ID, 'ListDocumentGo');
-          }
-
-          else {
-            this.saveListComment(0);
+            this.saveListComment(index);
           //  this.closeModal();
-          }
         }
       )
     } catch (error) {
@@ -140,13 +190,17 @@ export class CommentComponent implements OnInit {
 
   saveListComment(index) {
     try {
-      this.openCommentPanel();
+    //  this.openCommentPanel();
       const dataComment = {
         __metadata: { type: 'SP.Data.ListCommentsListItem' },
         Title: "ListDocumentGo_" + this.data[0].ID,
         Chat_Comments: this.content,
         KeyList: "ListDocumentGo_" + this.data[0].ID,
-        ProcessID:this.idItemProcess
+        ProcessID:this.idItemProcess,
+        UserApproverId: this.listUserIdSelect[index],
+      }
+      if (this.isNotNull(this.pictureCurrent)) {
+        Object.assign(dataComment, { userPicture: this.pictureCurrent });
       }
       this.restService.insertItemList('ListComments', dataComment).subscribe(
         itemComment => {
@@ -155,17 +209,20 @@ export class CommentComponent implements OnInit {
         error => console.log(error),
         () => {
           if (this.outputFile.length > 0) {
-            this.saveItemAttachment(0, this.indexComment, 'ListComments');
+            this.saveItemAttachment(0, this.indexComment, 'ListComments',index);
           }
           else {
             this.closeCommentPanel();
-            console.log('Bạn gửi bình luận thành công');
-            this.closeModal();
-           // this.callbackfunc();
+            console.log('Bạn gửi xin ý kiến thành công');
+            //kt nếu lưu đến người cuối cùng rồi thì đóng modal
+            if(index==this.listUserIdSelect.length-1){
+              this.notificationService.success('Bạn gửi xin ý kiến thành công');
+              this.closeModal();
+            }
+            
           }
         }
       )
-
     } catch (error) {
       console.log("saveListComment error: " + error);
     }
@@ -200,7 +257,7 @@ export class CommentComponent implements OnInit {
     }
   }
 
-  saveItemAttachment(index, idItem, listName) {
+  saveItemAttachment(index, idItem, listName,indexUser) {
     try {
       this.buffer = this.getFileBuffer(this.outputFile[index]);
       this.buffer.onload = (e: any) => {
@@ -210,29 +267,22 @@ export class CommentComponent implements OnInit {
           itemAttach => {
             console.log('inserAttachmentFile success');
           },
-          error => console.log(error),
+          error =>{
+            this.notificationService.error('Bạn gửi xin ý kiến thất bại');
+            console.log(error);
+          } ,
           () => {
             console.log('inserAttachmentFile successfully');
             if (Number(index) < (this.outputFile.length - 1)) {
-              this.saveItemAttachment((Number(index) + 1), idItem, listName);
+              this.saveItemAttachment((Number(index) + 1), idItem, listName,indexUser);
             }
-            // else if (listName == 'ListComments') {
-            //   //gọi lưu ListProcess
-            //   if (Number(index) < (this.listUserIdSelect.length - 1)) {
-            //     this.saveItemListProcess(Number(index) + 1);
-            //   }
-            // }
-            // else if (listName == 'ListComments') {
-            //   //gọi lưu ListComment
-            //   if (Number(index) < (this.listUserIdSelect.length - 1)) {
-            //     this.saveListComment(Number(index) + 1);
-            //   }
-            // }
             else {
-              this.closeCommentPanel();
               console.log('attachfile success');
-              this.closeModal();
-              this.callbackfunc()
+             if (listName == 'ListComments'&& indexUser==this.listUserIdSelect.length-1) {
+              this.notificationService.success('Bạn gửi xin ý kiến thành công');
+              this.closeCommentPanel();
+                this.closeModal();
+              }
             }
           }
         )
@@ -262,8 +312,8 @@ export class CommentComponent implements OnInit {
   }
 
   closeModal(): void {
-    // console.log(this.data);
     this.dialogRef.close();
+  //  this.callbackfunc();
   }
 
 

@@ -517,7 +517,7 @@ export class DocumentGoComponent implements OnInit {
       TypeCode: 'CXL',
       TypeName: 'Chuyển xử lý',
       Content: dataForm.Note,
-      IndexStep: 1,
+      IndexStep: 2,
       Compendium: dataForm.Compendium,
     }
     this.services.AddItemToList('ListProcessRequestGo', data).subscribe(

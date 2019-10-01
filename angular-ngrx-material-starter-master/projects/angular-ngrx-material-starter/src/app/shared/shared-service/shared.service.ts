@@ -19,7 +19,7 @@ export class SharedService {
     headers: new HttpHeaders({
       'accept': 'application/json;odata=verbose',
       'Content-Type': 'application/json;odata=verbose',
-      "x-requestdigest": window['__frmSPDigest']
+     // "x-requestdigest": window['__frmSPDigest']
     })
   }
   opUpdate = {
@@ -56,7 +56,7 @@ export class SharedService {
       headers: new HttpHeaders({
         'accept': 'application/json;odata=verbose',
         'Content-Type': 'application/json;odata=verbose',
-        "x-requestdigest": window['__frmSPDigest']
+       // "x-requestdigest": window['__frmSPDigest']
       })
     }
     this.opUpdate = {

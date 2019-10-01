@@ -98,7 +98,7 @@ export class DocumentGoDetailComponent implements OnInit {
       }
     );
   }
-
+//lấy đường dẫn ảnh trên sharepoint
   getUserPofile(loginName) {
     try {
       this.resService.getUserInfo('i:0%23.f|membership|' + loginName).subscribe(
@@ -124,6 +124,7 @@ export class DocumentGoDetailComponent implements OnInit {
     }
   }
   GetItemDetail() {
+    this.ItemAttachments=[];
     this.route.paramMap.subscribe(parames => {
       this.ItemId = parames.get('id');
       this.docServices.getListDocByID(this.ItemId).subscribe(items => {
@@ -194,8 +195,9 @@ export class DocumentGoDetailComponent implements OnInit {
         })
       })
       this.dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>(this.ListItem);
-      this.ref.detectChanges();
       this.dataSource_Ticket.paginator = this.paginator;
+      this.ref.detectChanges();
+     
     });
   }
 
@@ -211,6 +213,10 @@ export class DocumentGoDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
+      //Lấy lại thông tin sau khi đóng diglog
+      this.GetItemDetail();
+      this.GetHistory();
+      this.getComment();
       // this.callbackfunc();
     });
 
@@ -320,7 +326,10 @@ export class DocumentGoDetailComponent implements OnInit {
           itemComment => {
             this.indexComment = itemComment['d'].Id;
           },
-          error => console.log(error),
+          error =>  {
+            console.log(error);
+            this.notificationService.error('Bạn gửi bình luận thất bại');
+          },
           () => {
             this.Comments = null;
             if (this.outputFile.length > 0) {
@@ -328,7 +337,7 @@ export class DocumentGoDetailComponent implements OnInit {
             }
             else {
               this.closeCommentPanel();
-              alert('Bạn gửi bình luận thành công');
+              this.notificationService.success('Bạn gửi bình luận thành công');
               this.getComment();
             }
           }
@@ -368,14 +377,17 @@ export class DocumentGoDetailComponent implements OnInit {
           itemComment => {
             this.indexComment = itemComment['d'].Id;
           },
-          error => console.log(error),
+          error => {
+            console.log(error);
+            this.notificationService.error('Bạn gửi trả lời thất bại');
+          },
           () => {
             // if (this.outputFile.length > 0) {
             //   this.saveItemAttachment(0, this.indexComment);
             // }
             // else {
             this.closeCommentPanel();
-            alert('Bạn gửi trả lời thành công');
+            this.notificationService.success('Bạn gửi trả lời thành công');
             //update lại trạng thái cho phiếu xin ý kiến
             if (this.isNotNull(this.listCommentParent[i].ProcessID)) {
               this.updateProcess(this.listCommentParent[i].ProcessID);
@@ -424,8 +436,8 @@ export class DocumentGoDetailComponent implements OnInit {
   listCommentParent = [];
   listCommentChild = [];
   getComment(): void {
-    const strComent = `?$select=ID,Chat_Comments,Created,userPicture,ParentID,ProcessID,Author/Title,AttachmentFiles`
-      + `&$expand=Author/Id,AttachmentFiles&$filter=KeyList eq 'ListDocumentGo_` + this.ItemId + `'&$orderby=Created desc`
+    const strComent = `?$select=ID,Chat_Comments,Created,userPicture,ParentID,ProcessID,Author/Title,UserApprover/Id,UserApprover/Title,AttachmentFiles`
+      + `&$expand=Author/Id,UserApprover,AttachmentFiles&$filter=KeyList eq 'ListDocumentGo_` + this.ItemId + `'&$orderby=Created desc`
     this.docServices.getItem("ListComments", strComent).subscribe(itemValue => {
       this.listComment = [];
       this.listCommentParent = [];
@@ -449,10 +461,12 @@ export class DocumentGoDetailComponent implements OnInit {
         }
         this.listComment.push({
           ID: element.ID,
-          Author: element.Author.Title,
+          Author:element.Author.Title,//element.UserApprover!=null? (element.Author.Title +'<span> xin ý kiến </span>'+ element.UserApprover.Title):
           Chat_Comments: element.Chat_Comments,
           Created: moment(element.Created).format('DD/MM/YYYY HH:mm:ss'),
           userPicture: picture,
+          UserApprover:element.UserApprover!=null?element.UserApprover.Title:'',
+          XinYKien:' xin ý kiến ',
           ParentID: element.ParentID,
           ProcessID: element.ProcessID,
           itemAttach: this.AttachmentsComment,

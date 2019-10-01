@@ -187,10 +187,10 @@
                         <td mat-cell *matCellDef="let element">{{element.taskType}}</td>
                     </ng-container>
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)">
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;">
                     </tr>
                 </table>
-                <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+                <mat-paginator [pageSizeOptions]="[5, 10, 25,50, 100]" showFirstLastButtons></mat-paginator>
             </div>
             <!-- </div>
             </div> -->
@@ -214,7 +214,7 @@
                         </mat-form-field>
                         <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
                             <div fxFlex="120px" fxFlex.xs="auto">
-                                <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
+                                <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
                                 <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
                             </div>
                             <div fxFlex="auto">
@@ -233,7 +233,7 @@
                                 <img src="{{item.userPicture}}">
                             </div>
                             <div class="cmt-content">
-                                <h3 id="cmt-author">{{item.Author}} <span id="cmt-date">{{item.Created}}</span></h3>
+                                <h3 id="cmt-author">{{item.Author}} <span *ngIf="item.UserApprover!=''"> xin ý kiến </span> {{item.UserApprover}} <span id="cmt-date">{{item.Created}}</span></h3>
                                 <button mat-stroked-button color="primary" type="button" (click)="Reply(i)">Trả lời</button>
                                 <p id="cmt-title">{{item.Chat_Comments}}</p>
                                 <div fxLayout="column">
