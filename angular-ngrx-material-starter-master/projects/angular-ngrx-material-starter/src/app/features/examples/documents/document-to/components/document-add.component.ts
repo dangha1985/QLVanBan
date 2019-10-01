@@ -225,6 +225,22 @@ export class DocumentAddComponent implements OnInit {
     );
   }
 
+  FormatNumberTo() {
+    const dataForm = this.IncomingDocform.getRawValue();
+    let numer = dataForm.numberTo;
+    this.IncomingDocform.controls['numberTo'].setValue(
+      this.docTo.formatNumberTo(numer)
+    );
+  }
+
+  ChangeNumberTo() {
+    const dataForm = this.IncomingDocform.getRawValue();
+    let numer = dataForm.numberTo;
+    this.IncomingDocform.controls['numberOfSymbol'].setValue(
+      numer + '/VBĐ'
+    );
+  }
+
   OpenRotiniPanel() {
     let config = new OverlayConfig();
     config.positionStrategy = this.overlay
@@ -294,7 +310,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getBookType() {
-    this.services.getListBookType().subscribe((itemValue: any[]) => {
+    this.services.getList('ListBookType').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListBookType.push({
@@ -307,7 +323,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getDocType() {
-    this.services.getListDocType().subscribe((itemValue: any[]) => {
+    this.services.getList('ListDocType').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListDocType.push({
@@ -320,7 +336,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getSecretLevel() {
-    this.services.getListSecret().subscribe((itemValue: any[]) => {
+    this.services.getList('ListSecret').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListSecret.push({
@@ -333,7 +349,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getUrgentLevel() {
-    this.services.getListUrgent().subscribe((itemValue: any[]) => {
+    this.services.getList('ListUrgent').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListUrgent.push({
@@ -346,7 +362,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getMethodReceipt() {
-    this.services.getListMethodSend().subscribe((itemValue: any[]) => {
+    this.services.getList('ListMethodSend').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListMethodReceipt.push({
@@ -359,7 +375,7 @@ export class DocumentAddComponent implements OnInit {
   }
 
   getSourceAddress() {
-    this.services.getListSourceAddress().subscribe((itemValue: any[]) => {
+    this.services.getList('ListSourceAddress').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListSource.push({
@@ -390,9 +406,12 @@ export class DocumentAddComponent implements OnInit {
   }
 
   AddNewItem(sts) {
+    const dataForm = this.IncomingDocform.getRawValue();
+    if(this.docTo.CheckNullSetZero(dataForm.numberTo) < this.currentNumberTo) {
+      this.notificationService.warn('Số đến không hợp lệ! Vui lòng kiểm tra lại');
+    }
     if (this.IncomingDocform.valid) {
-      this.OpenRotiniPanel();
-      const dataForm = this.IncomingDocform.getRawValue();
+      this.OpenRotiniPanel();      
       let bookT = this.docTo.FindItemByCode(
         this.ListBookType,
         dataForm.bookType

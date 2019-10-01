@@ -78,6 +78,7 @@ export class DocumentDetailComponent implements OnInit {
   itemDoc: IncomingDoc;
   isDisplay: boolean = false;
   isExecution: boolean = false;
+  isFinish: boolean = false;
   isReturn: boolean = false;
   ArrayItemId = []; IncomingDocID;
   IndexStep = 0;
@@ -105,6 +106,7 @@ export class DocumentDetailComponent implements OnInit {
   historyId = 0;
   buffer;
   index = 0;
+  totalStep = 0;
   overlayRef;
   selectedKnower = []; selectedCombiner = []; selectedApprover;
   ReasonReturn;
@@ -142,8 +144,7 @@ export class DocumentDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.GetItemDetail();
-    this.GetHistory();
+    this.GetTotalStep();
     this.GetAllUser();
     this.getCurrentUser();
   }
@@ -166,13 +167,40 @@ export class DocumentDetailComponent implements OnInit {
     this.overlayRef.dispose();
   }
 
-  GetItemDetail() {
+  GetTotalStep() {
     this.route.paramMap.subscribe(parames => {
       this.IncomingDocID = parseInt(parames.get('id'));
       this.IndexStep = parseInt(parames.get('step'));
+      this.GetHistory();
+      this.services.getListTotalStep('DT').subscribe(items => {
+        let itemList = items['value'] as Array<any>;
+        if(itemList.length > 0){
+          this.totalStep = itemList[0].TotalStep;
+        }
+      },
+      error => {
+        console.log("Load total step error: " + error);
+        this.CloseRotiniPanel();
+      },
+      () => {
+        this.GetItemDetail();
+      }
+      )
+    })
+  }
+
+  GetItemDetail() {
+    this.route.paramMap.subscribe(parames => {
       if(this.IndexStep > 0) {
         this.isExecution = true;
         this.isReturn = true;
+        if(this.IndexStep >= this.totalStep) {
+          this.isExecution = false;
+          this.isFinish = true;
+        } else {
+          this.isExecution = true;
+          this.isFinish = false;
+        }
       }
       this.OpenRotiniPanel();       
       // Load thong tin van ban
@@ -227,6 +255,7 @@ export class DocumentDetailComponent implements OnInit {
           };
         }
         this.ref.detectChanges();
+        this.CloseRotiniPanel();
       });
 
       // Load list config by step
@@ -259,7 +288,12 @@ export class DocumentDetailComponent implements OnInit {
       // } else {
       //   this.getCurrentUser();
       // }
-    }
+    },
+    error => {
+      console.log("Load item detail : " + error);
+      this.CloseRotiniPanel();
+    },
+    () => {}
     );
   }
 
@@ -331,15 +365,13 @@ export class DocumentDetailComponent implements OnInit {
           console.log("Load history id item: " + error);
           this.CloseRotiniPanel();
         })
-
-        this.CloseRotiniPanel();
       }
       );
   }
 
   // Load all user approval
   GetAllUser() {
-    this.services.getListDepartment().subscribe((itemValue: any[]) => {
+    this.services.getList('ListDepartment').subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;
       this.ListDepartment = [];
       item.forEach(element => {
@@ -889,6 +921,47 @@ export class DocumentDetailComponent implements OnInit {
     );
   }
 
+  FinishRequest() {
+    this.OpenRotiniPanel();
+    const data = {
+      __metadata: { type: 'SP.Data.ListDocumentToListItem' },
+      StatusID: 1, StatusName: "Đã xử lý",
+    };
+    this.services.updateListById('ListDocumentTo', data, this.IncomingDocID).subscribe(
+      item => {},
+      error => {
+        this.CloseRotiniPanel();
+        console.log(
+          'error when update item to list ListDocumentTo: ' +
+            error.error.error.message.value
+        );
+      },
+      () => {
+        if(this.historyId > 0) {
+          const dataTicket = {
+            __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+            StatusID: 1, StatusName: "Đã xử lý",
+          };
+          this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+            item => {},
+            error => {
+              this.CloseRotiniPanel();
+              console.log(
+                'error when update item to list ListHistoryRequestTo: ' +
+                  error.error.error.message.value
+              );
+            },
+            () => {
+              this.UpdateStatus(0);
+            }
+          );
+        } else {
+          this.UpdateStatus(0);
+        }
+      }
+    );
+  }
+
   callbackFunc(id) {
     if (this.outputFileHandle.length > 0) {
       this.saveItemAttachment(0, id, this.outputFileHandle);
@@ -900,6 +973,7 @@ export class DocumentDetailComponent implements OnInit {
       this.saveItemAttachment(0, id, this.outputFileReturn);
     }
     else {
+      this.CloseRotiniPanel();
       this.routes.navigate(['examples/doc-detail/' + id]);
     }
   }
@@ -1083,6 +1157,7 @@ export class DocumentDetailComponent implements OnInit {
               // this.outputFile = [];
               // this.CloseRotiniPanel();
               arr = [];
+              this.CloseRotiniPanel();
               this.routes.navigate(['examples/doc-detail/' + idItem]);
             }
           }

@@ -24,7 +24,7 @@
                     </mat-form-field>
                     <mat-form-field fxFlex="50">
                         <mat-label>Số đến <span class="required-field">*</span></mat-label>
-                        <input matInput formControlName="numberTo" [disabled]="true">
+                        <input matInput formControlName="numberTo" (change)="ChangeNumberTo()" (keyup)="FormatNumberTo()">
                         <mat-error *ngIf="IncomingDocform.get('numberTo').hasError('required')">Nhập số đến của văn bản</mat-error>
                     </mat-form-field>
                 </div>

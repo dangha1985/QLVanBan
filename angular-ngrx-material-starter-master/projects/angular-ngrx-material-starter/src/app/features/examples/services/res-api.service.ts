@@ -66,6 +66,10 @@ export class ResApiService {
     // loginName = 'i:0%23.f|membership|tuyen.nguyen@tsg.net.vn';
     return this.http.get(`${this.restUrl}${this.urlUserInfo}` + `'` + loginName + `'`);
   }
+  getList(listName) : Observable<any> {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items`);
+  }
+
   getListDepartment() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListDepartment')/items`);
   }
@@ -102,8 +106,8 @@ export class ResApiService {
   getListMapEmployee() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListMapEmployee')/items`);
   }
-  getListTotalStep() : Observable<any> {
-    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListTotalStep')/items`);
+  getListTotalStep(code) : Observable<any> {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListTotalStep')/items?$select=*&$filter=BookTypeCode eq '` + code + `'`);
   }
 
   AddItemToList(listName, data){

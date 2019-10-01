@@ -69,22 +69,22 @@ export class ReportComponent implements OnInit {
 
       if(this.docTo.CheckNull(this.deadlineFrom) !== '') {
         this.deadlineFrom = moment(this.deadlineFrom).hours(0).minutes(0).seconds(0).toDate();
-        this.strFilter += ` and (Deadline ge '` + this.ISODateStringUTC(this.deadlineFrom) + `')`;
+        this.strFilter += ` and (Deadline ge '` + this.ISODateStringUTC(this.deadlineFrom) + `' or Deadline eq null)`;
       }
 
       if(this.docTo.CheckNull(this.deadlineTo) !== '') {
         this.deadlineTo = moment(this.deadlineTo).hours(23).minutes(59).seconds(59).toDate();
-        this.strFilter += ` and (Deadline le '` + this.ISODateStringUTC(this.deadlineTo) + `')`
+        this.strFilter += ` and (Deadline le '` + this.ISODateStringUTC(this.deadlineTo) + `' or Deadline eq null)`
       }
 
       if(this.docTo.CheckNull(this.dateFrom) !== '') {
         this.dateFrom = moment(this.dateFrom).hours(0).minutes(0).seconds(0).toDate();
-        this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `')`;
+        this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `' or DateTo eq null)`;
       }
 
       if(this.docTo.CheckNull(this.dateTo) !== '') {
         this.dateTo = moment(this.dateTo).hours(23).minutes(59).seconds(59).toDate();
-        this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `')`;
+        this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `' or DateTo eq null)`;
       }
 
       this.docTo.getAllDocumentTo(this.strFilter).subscribe((itemValue: any[]) => {
