@@ -185,6 +185,23 @@ table {
         width: 60% !important;
         max-width: 70% !important;
     }
+    td.mat-cell,
+    td.mat-footer-cell,
+    th.mat-header-cell {
+        padding: 4px !important;
+    }
+}
+
+.dev {
+    padding-left: 20px;
+    border: 1px solid #0000001f;
+    border-right: none;
+}
+
+.user-choice {
+    padding-left: 36px;
+    border: 1px solid #0000001f;
+    border-right: none;
 }
 
 .title-handle {

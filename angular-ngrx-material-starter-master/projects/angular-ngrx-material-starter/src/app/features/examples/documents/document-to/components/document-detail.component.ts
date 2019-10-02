@@ -124,7 +124,7 @@ export class DocumentDetailComponent implements OnInit {
     '_content',
     'type'
   ]; //'select'
-  ListItem: IncomingTicket[] = [];
+  ListItem = [];
   dataSource = new MatTableDataSource<IncomingTicket>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
@@ -346,6 +346,7 @@ export class DocumentDetailComponent implements OnInit {
             numberTo: element.Title,
             link: '',
             stsClass: element.StatusID === 0? 'Ongoing' : 'Approved',
+            stsTypeCode: element.TypeCode,
           });
         });
         this.dataSource = new MatTableDataSource<IncomingTicket>(this.ListItem);
@@ -588,15 +589,15 @@ export class DocumentDetailComponent implements OnInit {
 
   validation() {
     if (this.docTo.CheckNull(this.selectedApprover) === '') {
-      alert("Bạn chưa chọn Người xử lý chính! Vui lòng kiểm tra lại");
+      this.notificationService.warn("Bạn chưa chọn Người xử lý chính! Vui lòng kiểm tra lại");
       return false;
     }
     else if (this.docTo.CheckNull(this.content) === '') {
-      alert("Bạn chưa nhập Nội dung xử lý! Vui lòng kiểm tra lại");
+      this.notificationService.warn("Bạn chưa nhập Nội dung xử lý! Vui lòng kiểm tra lại");
       return false;
     }
     else if (this.docTo.CheckNull(this.deadline) === '') {
-      alert("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
+      this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
       return false;
     } else {
       return true;
@@ -606,7 +607,7 @@ export class DocumentDetailComponent implements OnInit {
   AddTicketReturn() {
     try {
       if (this.docTo.CheckNull(this.ReasonReturn) === '') {
-        alert("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
+        this.notificationService.warn("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
         return;
       }
       this.bsModalRef.hide();
@@ -681,67 +682,67 @@ export class DocumentDetailComponent implements OnInit {
   // Add phiếu xử lý
   AddListTicket() {
     try {
-      if(!this.validation) {
-        return;
-      }
-      this.bsModalRef.hide();
-      this.OpenRotiniPanel();
-      //let data: Array<any> = [];
-      const data = {
-        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-        Title: this.itemDoc.numberTo,
-        DateCreated: new Date(),
-        NoteBookID: this.IncomingDocID,
-        UserRequestId: this.currentUserId,
-        UserApproverId: this.selectedApprover.split('|')[0],
-        Deadline: this.deadline,
-        StatusID: 0,
-        StatusName: 'Chờ xử lý',
-        Source: '',
-        Destination: '',
-        TaskTypeCode: 'XLC',
-        TaskTypeName: 'Xử lý chính',
-        TypeCode: 'CXL',
-        TypeName: 'Chuyển xử lý',
-        Content: this.content,
-        IndexStep: this.IndexStep + 1,
-        Compendium: this.itemDoc.compendium
-      };
-     
-      this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
-        item => {},
-        error => {
-          this.CloseRotiniPanel();
-          console.log(
-            'error when add item to list ListProcessRequestTo: ' +
-              error.error.error.message.value
-          ),
-            this.notificationService.error('Thêm phiếu xử lý thất bại');
-        },
-        () => {
-          console.log(
-            'Add item of approval user to list ListHistoryRequestTo successfully!'
-          );
-          if(this.historyId > 0) {
-            const dataTicket = {
-              __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
-              StatusID: 1, StatusName: "Đã xử lý",
-            };
-            this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
-              item => {},
-              error => {
-                this.CloseRotiniPanel();
-                console.log(
-                  'error when update item to list ListHistoryRequestTo: ' +
-                    error.error.error.message.value
-                );
-              },
-              () => {}
+      if(this.validation()) {
+      
+        this.bsModalRef.hide();
+        this.OpenRotiniPanel();
+        //let data: Array<any> = [];
+        const data = {
+          __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+          Title: this.itemDoc.numberTo,
+          DateCreated: new Date(),
+          NoteBookID: this.IncomingDocID,
+          UserRequestId: this.currentUserId,
+          UserApproverId: this.selectedApprover.split('|')[0],
+          Deadline: this.deadline,
+          StatusID: 0,
+          StatusName: 'Chờ xử lý',
+          Source: '',
+          Destination: '',
+          TaskTypeCode: 'XLC',
+          TaskTypeName: 'Xử lý chính',
+          TypeCode: 'CXL',
+          TypeName: 'Chuyển xử lý',
+          Content: this.content,
+          IndexStep: this.IndexStep + 1,
+          Compendium: this.itemDoc.compendium
+        };
+      
+        this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
+          item => {},
+          error => {
+            this.CloseRotiniPanel();
+            console.log(
+              'error when add item to list ListProcessRequestTo: ' +
+                error.error.error.message.value
+            ),
+              this.notificationService.error('Thêm phiếu xử lý thất bại');
+          },
+          () => {
+            console.log(
+              'Add item of approval user to list ListHistoryRequestTo successfully!'
             );
+            if(this.historyId > 0) {
+              const dataTicket = {
+                __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+                StatusID: 1, StatusName: "Đã xử lý",
+              };
+              this.services.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+                item => {},
+                error => {
+                  this.CloseRotiniPanel();
+                  console.log(
+                    'error when update item to list ListHistoryRequestTo: ' +
+                      error.error.error.message.value
+                  );
+                },
+                () => {}
+              );
+            }
+            this.UpdateStatus(1);
           }
-          this.UpdateStatus(1);
-        }
-      );
+        );
+      }
     } catch(err) {
       console.log("try catch AddListTicket error: " + err.message);
       this.CloseRotiniPanel();
@@ -1275,7 +1276,7 @@ SendComment() {
     }
     else {
       this.CloseRotiniPanel();
-      alert("Bạn chưa nhập nội dung bình luận");
+      this.notificationService.warn("Bạn chưa nhập nội dung bình luận");
     }
   } catch (error) {
     console.log("SendComment error: " + error);
@@ -1329,7 +1330,7 @@ saveCommentReply(i, j) {
     }
     else {
       this.CloseRotiniPanel();
-      alert("Bạn chưa nhập nội dung trả lời");
+      this.notificationService.warn("Bạn chưa nhập nội dung trả lời");
     }
   } catch (error) {
     console.log("saveCommentReply error: " + error);
@@ -1353,7 +1354,7 @@ updateProcess(id) {
         // }
         // else {
         // this.closeCommentPanel();
-        // alert('Bạn gửi trả lời thành công');
+        // this.notificationService.warn('Bạn gửi trả lời thành công');
         this.GetHistory();
         // }
       }

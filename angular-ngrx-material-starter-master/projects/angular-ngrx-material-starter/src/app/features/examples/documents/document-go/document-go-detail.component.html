@@ -182,11 +182,23 @@
                     </ng-container>
                     <ng-container matColumnDef="status">
                         <th mat-header-cell *matHeaderCellDef> Trạng thái</th>
-                        <td mat-cell *matCellDef="let element">{{element.status}}</td>
+                        <td mat-cell *matCellDef="let element">
+                            <p class="{{element.stsClass}}">{{element.status}}</p>
+                        </td>
                     </ng-container>
                     <ng-container matColumnDef="taskType">
                         <th mat-header-cell *matHeaderCellDef> Loại xử lý </th>
                         <td mat-cell *matCellDef="let element">{{element.taskType}}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef> Loại phiếu </th>
+                        <td mat-cell *matCellDef="let element">
+                            <p class="{{element.stsTypeCode}}">{{element.typeCode}}</p>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="_content">
+                        <th mat-header-cell *matHeaderCellDef> Nội dung xử lý </th>
+                        <td mat-cell *matCellDef="let element">{{element.content}}</td>
                     </ng-container>
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;">
@@ -219,11 +231,11 @@
                         <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
                             <div fxFlex="120px" fxFlex.xs="auto">
                                 <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
-                                <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
+                                <input hidden (change)="addAttachmentFile(0)" #fileInput type="file" id="fileAttachment">
                             </div>
                             <div fxFlex="auto">
                                 <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                                    <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                                    <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items, 0)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
                                 </div>
                             </div>
                         </div>
@@ -326,32 +338,6 @@
             <div fxLayout="row" fxLayoutGap="20px">
                 <div fxFlex="auto" fxLayout="column" fxLayoutGap="10px">
                     <div class="example-container mat-elevation-z8">
-                        <!-- <table id="tableOnsiteCost">
-                            <thead>
-                                <tr style="background-color: beige; padding-bottom: 12px; padding-top: 12px; text-align: left">
-                                    <td>Tên đơn vị, cá nhân</td>
-                                    <td style="width: 100px;" class="role-name">Vai trò</td>
-                                    <td style="width: 100px;" class="input-checkox">Xử lý chính</td>
-                                    <td style="width: 100px;" class="input-checkox">Phối hợp xử lý</td>
-                                    <td style="width: 100px;" class="input-checkox">Nhận để biết</td>
-                                </tr>
-                            </thead>
-                            <tbody id="bodyEquipment">
-                                <tr *ngFor="let item of dataSource2">
-                                    <td>{{item.Name}}</td>
-                                    <td>{{item.Role}}</td>
-                                    <td>
-                                        <mat-checkbox [(ngModel)]="element.IsHandle" (change)="CheckUserHandle(element.Code, element.IsHandle)"></mat-checkbox>
-                                    </td>
-                                    <td>
-                                        <mat-checkbox [(ngModel)]="element.IsCombine" (change)="CheckUserNotHandle1(element.Code, element.IsCombine)"></mat-checkbox>
-                                    </td>
-                                    <td>
-                                        <mat-checkbox [(ngModel)]="element.IsKnow" (change)="CheckUserNotHandle2(element.Code, element.IsKnow)"></mat-checkbox>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table> -->
                         <table mat-table [dataSource]="dataSource2">
                             <!-- Position Column -->
                             <ng-container matColumnDef="person">

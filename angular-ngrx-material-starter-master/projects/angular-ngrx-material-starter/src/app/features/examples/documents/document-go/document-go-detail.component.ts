@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ViewContainerRef, TemplateRef, Input } from '@angular/core';
 //import { IncomingDoc, AttachmentsObject, IncomingDocService, IncomingTicket} from '../incoming-doc.service';
 import { environment } from '../../../../../environments/environment';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material';
 import * as moment from 'moment';
@@ -15,6 +15,7 @@ import {
   actionFormUpdate
 } from '../../../examples/form/form.actions';
 import { selectFormState } from '../../../examples/form/form.selectors';
+import {SelectionModel} from '@angular/cdk/collections';
 import { ResApiService } from '../../services/res-api.service'
 import { DocumentGoService } from './document-go.service';
 import { DocumentGoPanel } from './document-go.component';
@@ -26,6 +27,29 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { CommentComponent } from './comment.component';
 export interface Comment { UserId: Number; Content: string, AttachFile: FileAttachment[] };
 export interface FileAttachment { name?: string; urlFile?: string }
+
+export class UserOfDepartment {
+  IsDepartment: boolean;
+  Code: string;
+  Name: string;
+  Role: string;
+  IsHandle: boolean;
+  IsCombine: boolean;
+  IsKnow : boolean;
+  Icon: string;
+  Class: string;
+}
+
+export class UserChoice {
+  Id: Number;
+  Email: string;
+  DisplayName: string;
+  DeCode: string;
+  DeName: string;
+  RoleCode: string;
+  RoleName: string;
+}
+
 @Component({
   selector: 'anms-document-go-detail',
   templateUrl: './document-go-detail.component.html',
@@ -47,10 +71,13 @@ export class DocumentGoDetailComponent implements OnInit {
   historyId = 0;
   ItemAttachments: AttachmentsObject[] = [];
   urlAttachment = environment.proxyUrl.split("/sites/", 1)
-  listName = 'ListDocumentTo';
+  listName = 'ListDocumentGo';
   outputFile = [];
+  outputFileHandle = [];
+  outputFileReturn = [];
   displayFile = '';
   buffer;
+  content;deadline;
   strFilter = '';
   indexComment;
   Comments = null;
@@ -59,23 +86,37 @@ export class DocumentGoDetailComponent implements OnInit {
   overlayRef;
   assetFolder = environment.assetFolder+'/img';
   displayTime = 'none';
-  displayedColumns: string[] = ['stt', 'created', 'userRequest', 'userApprover', 'deadline', 'status', 'taskType']; //'select'
-  ListItem: DocumentGoTicket[] = [];
+  displayedColumns: string[] = ['stt', 'created', 'userRequest', 'userApprover', 'deadline', 'status', 'taskType', 'type', '_content']; //'select'
+  ListItem = [];
   currentUserId = '';
   currentUserName = '';
   currentUserEmail = '';
   ReasonReturn;
   pictureCurrent;
+  index = 0;
+  ArrayItemId = [];
+  ListDepartment = [];
+  ListUserApprover = [];
+  ListUserChoice: UserChoice[] = [];
+  ListUserOfDepartment: UserOfDepartment[] = [];
+  ListUserCombine = [];
+  ListUserKnow = [];
+  selectedKnower = []; selectedCombiner = []; selectedApprover;
   ArrayUserPofile: UserProfilePropertiesObject[] = [];
   dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   ListDocument: ItemDocumentGo[] = [];
+  displayedColumns2 = ['person', 'role', 'process', 'combine', 'know'];
+  dataSource2 = new MatTableDataSource<UserOfDepartment>();
+  selection = new SelectionModel<UserOfDepartment>(true, []);
+
   constructor(private docServices: DocumentGoService, private resService: ResApiService,
     private route: ActivatedRoute, private readonly notificationService: NotificationService,
     private ref: ChangeDetectorRef
     , public overlay: Overlay, public viewContainerRef: ViewContainerRef
     , private modalService: BsModalService
     , private dialog: MatDialog
+    , private routes: Router,
   ) {
 
   }
@@ -83,6 +124,7 @@ export class DocumentGoDetailComponent implements OnInit {
   ngOnInit() {
     this.getCurrentUser();
     this.GetTotalStep();
+    this.GetAllUser();
   }
   //Lấy người dùng hiện tại
   getCurrentUser() {
@@ -102,6 +144,88 @@ export class DocumentGoDetailComponent implements OnInit {
         this.getUserPofile(this.currentUserEmail);
       }
     );
+  }
+
+  // Load all user approval
+  GetAllUser() {
+    this.resService.getList('ListDepartment').subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      this.ListDepartment = [];
+      item.forEach(element => {
+        this.ListDepartment.push({
+          Id: element.ID,
+          Code: element.Code,
+          Name: element.Title
+        })
+      })
+    },
+    error => {
+      console.log("get list department error: " + error);
+    }, 
+    () => {
+      this.docServices.getAllUser().subscribe((itemValue: any[]) => {
+        let item = itemValue['value'] as Array<any>;
+        let ListDe = [];
+        this.ListUserChoice = [];
+        item.forEach(element => {
+          this.ListUserChoice.push({
+            Id: element.User.Id,
+            DisplayName: element.User.Title,
+            Email: element.User.Name.split('|')[2],
+            DeCode: element.DepartmentCode,
+            DeName: element.DepartmentName,
+            RoleCode: element.RoleCode,
+            RoleName: element.RoleName
+          });
+          if(ListDe.indexOf(element.DepartmentCode) < 0) {
+            ListDe.push(element.DepartmentCode);
+          }
+        })
+        console.log("array " + ListDe);
+        ListDe.forEach(element => {
+          let DeName = '';
+          let itemDe = this.ListDepartment.find(d => d.Code === element);
+          if(itemDe !== undefined) {
+            DeName = itemDe.Name;
+          }
+          this.ListUserOfDepartment.push({
+            IsDepartment: true,
+            Code: element,
+            Name: DeName,
+            Role: '',
+            IsHandle: false,
+            IsCombine: false,
+            IsKnow: false,
+            Icon: 'apartment',
+            Class: 'dev'
+          })
+          this.ListUserChoice.forEach(user => {
+            if(user.DeCode === element) {
+              this.ListUserOfDepartment.push({
+                IsDepartment: false,
+                Code: user.Id + '|' + user.Email + '|' + user.DisplayName,
+                Name: user.DisplayName,
+                Role: user.RoleName,
+                IsHandle: false,
+                IsCombine: false,
+                IsKnow: false,
+                Icon: 'person',
+                Class: 'user-choice'
+              })
+            }
+          })
+        })
+        console.log("List User " + this.ListUserOfDepartment);
+        this.dataSource2 = new MatTableDataSource<UserOfDepartment>(this.ListUserOfDepartment);
+        this.ref.detectChanges();        
+      },
+      error => {
+        console.log("Load all user error " + error);
+        this.closeCommentPanel();
+      },
+      () =>{}
+      )
+    })
   }
 
 //lấy đường dẫn ảnh trên sharepoint
@@ -226,22 +350,27 @@ export class DocumentGoDetailComponent implements OnInit {
           userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
           userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : 0,
           userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
-          deadline: this.docServices.formatDateTime(element.Deadline),
+          deadline:
+          this.docServices.checkNull(element.Deadline) === ''
+            ? ''
+            : moment(element.Deadline).format('DD/MM/YYYY'),
           status: element.StatusName,
           source: '',
           destination: '',
-          taskType: '',
-          typeCode: '',
+          taskType: element.TaskTypeCode === 'XLC'? "Xử lý chính" : element.TaskTypeCode === 'PH'? 'Phối hợp' : 'Nhận để biết',
+          typeCode: this.GetTypeCode(element.TypeCode),
           content: this.docServices.checkNull(element.Content),
           indexStep: element.IndexStep,
           created: this.docServices.formatDateTime(element.DateCreated),
-          numberTo: element.ID
+          numberTo: element.ID,
+          stsClass: element.StatusID === 0? 'Ongoing' : 'Approved',
+          stsTypeCode: element.TypeCode,
         })
       })
       this.dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>(this.ListItem);
       this.dataSource_Ticket.paginator = this.paginator;
       this.ref.detectChanges();
-     
+      this.ArrayItemId = this.ListItem.filter(e => e.indexStep === this.IndexStep);
     });
   }
 
@@ -264,7 +393,7 @@ export class DocumentGoDetailComponent implements OnInit {
   AddTicketReturn() {
     try {
       if (this.docServices.checkNull(this.ReasonReturn) === '') {
-        alert("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
+        this.notificationService.warn("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
         return;
       }
       this.bsModalRef.hide();
@@ -276,7 +405,7 @@ export class DocumentGoDetailComponent implements OnInit {
       }
 
       const data = {
-        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+        __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
         Title: this.itemDoc.NumberGo,
         DateCreated: new Date(),
         NoteBookID: this.ItemId,
@@ -296,43 +425,361 @@ export class DocumentGoDetailComponent implements OnInit {
         Compendium: this.itemDoc.Compendium,
         IndexReturn: this.IndexStep + '_' + (this.IndexStep - 1)
       };
-      this.resService.AddItemToList('ListProcessRequestTo', data).subscribe(
+      this.resService.AddItemToList('ListProcessRequestGo', data).subscribe(
         item => {},
         error => {
           this.closeCommentPanel();
           console.log(
-            'error when add item to list ListProcessRequestTo: ' +
+            'error when add item to list ListProcessRequestGo: ' +
               error.error.error.message.value
           ),
             this.notificationService.error('Thêm phiếu xử lý thất bại');
         },
         () => {
           console.log(
-            'Add item of approval user to list ListHistoryRequestTo successfully!'
+            'Add item of approval user to list ListHistoryRequestGo successfully!'
           );
           if(this.historyId > 0) {
             const dataTicket = {
-              __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+              __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
               StatusID: -1, StatusName: "Đã trả lại",
             };
-            this.resService.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+            this.resService.updateListById('ListHistoryRequestGo', dataTicket, this.historyId).subscribe(
               item => {},
               error => {
                 this.closeCommentPanel();
                 console.log(
-                  'error when update item to list ListHistoryRequestTo: ' +
+                  'error when update item to list ListHistoryRequestGo: ' +
                     error.error.error.message.value
                 );
               },
               () => {}
             );
           }
-          //this.UpdateStatus(0);
+          this.UpdateStatus(0);
         }
       );
     } catch (err) {
       console.log("try catch AddTicketReturn error: " + err.message);
       this.closeCommentPanel();
+    }
+  }
+
+  validation() {
+    if (this.docServices.checkNull(this.selectedApprover) === '') {
+      this.notificationService.warn("Bạn chưa chọn Người xử lý chính! Vui lòng kiểm tra lại");
+      return false;
+    }
+    else if (this.docServices.checkNull(this.content) === '') {
+      this.notificationService.warn("Bạn chưa nhập Nội dung xử lý! Vui lòng kiểm tra lại");
+      return false;
+    }
+    else if (this.docServices.checkNull(this.deadline) === '') {
+      this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  // Add phiếu xử lý
+  AddListTicket() {
+    try {
+      if(this.validation()) {
+        this.bsModalRef.hide();
+        this.openCommentPanel();
+        //let data: Array<any> = [];
+        const data = {
+          __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+          Title: this.itemDoc.NumberGo,
+          DateCreated: new Date(),
+          NoteBookID: this.ItemId,
+          UserRequestId: this.currentUserId,
+          UserApproverId: this.selectedApprover.split('|')[0],
+          Deadline: this.deadline,
+          StatusID: 0,
+          StatusName: 'Chờ xử lý',
+          Source: '',
+          Destination: '',
+          TaskTypeCode: 'XLC',
+          TaskTypeName: 'Xử lý chính',
+          TypeCode: 'CXL',
+          TypeName: 'Chuyển xử lý',
+          Content: this.content,
+          IndexStep: this.IndexStep + 1,
+          Compendium: this.itemDoc.Compendium
+        };
+      
+        this.resService.AddItemToList('ListProcessRequestGo', data).subscribe(
+          item => {},
+          error => {
+            this.closeCommentPanel();
+            console.log(
+              'error when add item to list ListProcessRequestGo: ' +
+                error.error.error.message.value
+            ),
+              this.notificationService.error('Thêm phiếu xử lý thất bại');
+          },
+          () => {
+            console.log(
+              'Add item of approval user to list ListHistoryRequestGo successfully!'
+            );
+            if(this.historyId > 0) {
+              const dataTicket = {
+                __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
+                StatusID: 1, StatusName: "Đã xử lý",
+              };
+              this.resService.updateListById('ListHistoryRequestGo', dataTicket, this.historyId).subscribe(
+                item => {},
+                error => {
+                  this.closeCommentPanel();
+                  console.log(
+                    'error when update item to list ListHistoryRequestGo: ' +
+                      error.error.error.message.value
+                  );
+                },
+                () => {}
+              );
+            }
+            this.UpdateStatus(1);
+          }
+        );
+      }
+    } catch(err) {
+      console.log("try catch AddListTicket error: " + err.message);
+      this.closeCommentPanel();
+    }
+  }
+
+  AddUserCombine() {
+    const data = {
+      __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+      Title: this.itemDoc.NumberGo,
+      DateCreated: new Date(),
+      NoteBookID: this.ItemId,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.selectedCombiner[this.index].split('|')[0],
+      Deadline: this.deadline,
+      StatusID: 0,
+      StatusName: 'Chờ xử lý',
+      Source: '',
+      Destination: '',
+      TaskTypeCode: 'PH',
+      TaskTypeName: 'Phối hợp',
+      TypeCode: 'CXL',
+      TypeName: 'Chuyển xử lý',
+      Content: this.content,
+      IndexStep: this.IndexStep + 1,
+      Compendium: this.itemDoc.Compendium
+    };
+    this.resService.AddItemToList('ListProcessRequestGo', data).subscribe(
+      item => {},
+      error => {
+        this.closeCommentPanel();
+        console.log(
+          'error when add item to list ListProcessRequestGo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Them phiếu xử lý thất bại');
+      },
+      () => {
+        console.log(
+          'update item ' + this.selectedCombiner[this.index] + ' of approval user to list ListProcessRequestGo successfully!'
+        );
+        this.index ++;
+        if(this.index < this.selectedCombiner.length) {
+          this.AddUserCombine();
+        }
+        else {
+          this.index = 0;
+          if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+            this.AddUserKnow();
+          } else {
+            this.callbackFunc(this.ItemId);
+          }
+        }
+      }
+    );
+  }
+
+  AddUserKnow() {
+    const data = {
+      __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+      Title: this.itemDoc.NumberGo,
+      DateCreated: new Date(),
+      NoteBookID: this.ItemId,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.selectedCombiner[this.index].split('|')[0],
+      Deadline: this.deadline,
+      StatusID: 0,
+      StatusName: 'Chờ xử lý',
+      Source: '',
+      Destination: '',
+      TaskTypeCode: 'NĐB',
+      TaskTypeName: 'Nhận để biết',
+      TypeCode: 'CXL',
+      TypeName: 'Chuyển xử lý',
+      Content: this.content,
+      IndexStep: this.IndexStep + 1,
+      Compendium: this.itemDoc.Compendium
+    };
+    this.resService.AddItemToList('ListProcessRequestGo', data).subscribe(
+      item => {},
+      error => {
+        this.closeCommentPanel();
+        console.log(
+          'error when add item to list ListProcessRequestGo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Them phiếu xử lý thất bại');
+      },
+      () => {
+        console.log(
+          'update item' + this.selectedKnower[this.index] + ' of approval user to list ListProcessRequestGo successfully!'
+        );
+        this.index ++;
+        if(this.index < this.selectedKnower.length) {
+          this.AddUserKnow();
+        }
+        else {
+          this.callbackFunc(this.ItemId);
+        }
+      }
+    );
+  }
+
+  UpdateStatus(sts) {
+    if(this.ArrayItemId !== undefined && this.ArrayItemId.length > 0) {
+      const dataTicket = {
+        __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+        StatusID: 1, StatusName: "Đã xử lý",
+      };
+      this.resService.updateListById('ListProcessRequestGo', dataTicket, this.ArrayItemId[this.index].ID).subscribe(
+        item => {},
+        error => {
+          this.closeCommentPanel();
+          console.log(
+            'error when update item to list ListProcessRequestGo: ' +
+              error.error.error.message.value
+          ),
+            this.notificationService.error('Cập nhật thông tin phiếu xử lý thất bại');
+        },
+        () => {
+          console.log(
+            'update item ' + this.ArrayItemId[this.index] + ' of approval user to list ListProcessRequestGo successfully!'
+          );
+          this.index ++;
+          if(this.index < this.ArrayItemId.length) {
+            this.UpdateStatus(sts);
+          }
+          else {
+            this.index = 0;
+            if(sts === 0) {
+              this.callbackFunc(this.ItemId);
+            } else if(sts === 1) {
+              this.AddHistoryStep();
+            }
+          }
+        }
+      );
+    }
+  }
+
+  AddHistoryStep() {
+    const data = {
+      __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
+      Title: this.itemDoc.NumberGo,
+      DateCreated: new Date(),
+      NoteBookID: this.itemDoc.ID,
+      UserRequestId: this.currentUserId,
+      UserApproverId: this.selectedApprover.split('|')[0],
+      Deadline: this.deadline,
+      StatusID: 0,
+      StatusName: 'Chờ xử lý',
+      Content: this.itemDoc.Note,
+      IndexStep: this.IndexStep + 1,
+      Compendium: this.itemDoc.Compendium,
+      StatusApproval: "1_0"
+    };
+    this.resService.AddItemToList('ListHistoryRequestGo', data).subscribe(
+      item => {},
+      error => {
+        this.closeCommentPanel();
+        console.log(
+          'error when add item to list ListHistoryRequestGo: ' +
+            error.error.error.message.value
+        ),
+          this.notificationService.error('Thêm phiếu xử lý thất bại');
+      },
+      () => {
+        console.log(
+          'Add item of approval user to list ListHistoryRequestGo successfully!'
+        );
+        if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
+          this.AddUserCombine();
+        } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
+          this.AddUserKnow();
+        } else {          
+          this.callbackFunc(this.ItemId);
+        }
+      }
+    );
+  }
+
+  FinishRequest() {
+    this.openCommentPanel();
+    const data = {
+      __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
+      StatusID: 1, StatusName: "Đã xử lý",
+    };
+    this.resService.updateListById('ListDocumentGo', data, this.ItemId).subscribe(
+      item => {},
+      error => {
+        this.closeCommentPanel();
+        console.log(
+          'error when update item to list ListDocumentGo: ' +
+            error.error.error.message.value
+        );
+      },
+      () => {
+        if(this.historyId > 0) {
+          const dataTicket = {
+            __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
+            StatusID: 1, StatusName: "Đã xử lý",
+          };
+          this.resService.updateListById('ListHistoryRequestGo', dataTicket, this.historyId).subscribe(
+            item => {},
+            error => {
+              this.closeCommentPanel();
+              console.log(
+                'error when update item to list ListHistoryRequestGo: ' +
+                  error.error.error.message.value
+              );
+            },
+            () => {
+              this.UpdateStatus(0);
+            }
+          );
+        } else {
+          this.UpdateStatus(0);
+        }
+      }
+    );
+  }
+
+  callbackFunc(id) {
+    if (this.outputFileHandle.length > 0) {
+      this.saveItemAttachment(0, this.listName, id, this.outputFileHandle, 1);
+    }
+    else if (this.outputFile.length > 0) {
+      this.saveItemAttachment(0, this.listName, id, this.outputFile, 1);
+    }
+    else if (this.outputFileReturn.length > 0) {
+      this.saveItemAttachment(0, this.listName, id, this.outputFileReturn, 1);
+    }
+    else {
+      this.closeCommentPanel();
+      this.routes.navigate(['examples/doc-detail/' + id]);
     }
   }
 
@@ -360,60 +807,105 @@ export class DocumentGoDetailComponent implements OnInit {
   // AddNewComment() {
   //   this.notificationService.info('Chờ xin ý kiến');
   // }
-
-  isNotNull(str) {
-    return (str !== null && str !== "" && str !== undefined);
-  }
-  addAttachmentFile() {
+  addAttachmentFile(sts) {
     try {
-      const inputNode: any = document.querySelector('#fileAttachment');
-      if (this.isNotNull(inputNode.files[0])) {
-        console.log(inputNode.files[0]);
-        if (this.outputFile.length > 0) {
-          if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
+      if(sts === 0) {
+        const inputNode: any = document.querySelector('#fileAttachment');
+        if (this.docServices.checkNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFile.length > 0) {
+            if (
+              this.outputFile.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFile.push(inputNode.files[0]);
+            }
+          } else {
             this.outputFile.push(inputNode.files[0]);
           }
         }
-        else {
-          this.outputFile.push(inputNode.files[0]);
+      } else if(sts === 1) {
+        const inputNode: any = document.querySelector('#fileAttachmentHandle');
+        if (this.docServices.checkNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileHandle.length > 0) {
+            if (
+              this.outputFileHandle.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileHandle.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFileHandle.push(inputNode.files[0]);
+          }
+        }
+      } else if(sts === 2) {
+        const inputNode: any = document.querySelector('#fileAttachmentReturn');
+        if (this.docServices.checkNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileReturn.length > 0) {
+            if (
+              this.outputFileReturn.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileReturn.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFileReturn.push(inputNode.files[0]);
+          }
         }
       }
     } catch (error) {
-      console.log("addAttachmentFile error: " + error);
+      console.log('addAttachmentFile error: ' + error);
     }
   }
-  removeAttachmentFile(index) {
+
+  removeAttachmentFile(index, sts) {
     try {
-      console.log(this.outputFile.indexOf(index))
-      this.outputFile.splice(this.outputFile.indexOf(index), 1);
+      if(sts === 0) {
+        console.log(this.outputFile.indexOf(index))
+        this.outputFile.splice(this.outputFile.indexOf(index), 1);
+      } else if(sts === 1) {
+        console.log(this.outputFileHandle.indexOf(index))
+        this.outputFileHandle.splice(this.outputFileHandle.indexOf(index), 1);
+      } else if(sts === 2) {
+        console.log(this.outputFileReturn.indexOf(index))
+        this.outputFileReturn.splice(this.outputFileReturn.indexOf(index), 1);
+      }
     } catch (error) {
       console.log("removeAttachmentFile error: " + error);
     }
   }
 
-  saveItemAttachment(index, idItem) {
+  saveItemAttachment(index, listName, idItem, arr, sts) {
     try {
-      this.buffer = this.getFileBuffer(this.outputFile[index]);
+      this.buffer = this.getFileBuffer(arr[index]);
       this.buffer.onload = (e: any) => {
         console.log(e.target.result);
         const dataFile = e.target.result;
-        this.resService.inserAttachmentFile(dataFile, this.outputFile[index].name, 'ListComments', idItem).subscribe(
+        this.resService.inserAttachmentFile(dataFile, arr[index].name, listName, idItem).subscribe(
           itemAttach => {
             console.log('inserAttachmentFile success');
           },
           error => console.log(error),
           () => {
             console.log('inserAttachmentFile successfully');
-            if (Number(index) < (this.outputFile.length - 1)) {
-              this.saveItemAttachment((Number(index) + 1), idItem);
+            if (Number(index) < (arr.length - 1)) {
+              this.saveItemAttachment((Number(index) + 1), listName, idItem, arr, sts);
             }
             else {
+              arr = [];
               this.closeCommentPanel();
-              this.outputFile=[];
-              this.getComment();
-            //  this.ref.detectChanges();
-              alert('Bạn gửi bình luận thành công');
-              // this.routes.navigate(['workflows/ListOnSite/detail/' + this.ItemId]);
+              if(sts === 1) {
+               this.routes.navigate(['examples/doc-detail/' + this.ItemId]);
+              } else {
+                this.closeCommentPanel();
+                this.notificationService.success('Bạn gửi bình luận thành công');
+                this.getComment();
+              }
             }
           }
         )
@@ -422,6 +914,112 @@ export class DocumentGoDetailComponent implements OnInit {
       console.log("saveItemAttachment error: " + error);
     }
   }
+
+  CheckUserHandle(code, isCheck) {
+    console.log(code);
+    if(isCheck) {
+      this.ListUserOfDepartment.forEach(element => {
+        if(element.Code !== code){
+          element.IsHandle = false;
+          // element.IsCombine = false;
+          // element.IsKnow = false;
+        } else {
+          this.selectedApprover = element.Code;
+          element.IsCombine = false;
+          element.IsKnow = false;
+
+          let index = this.selectedCombiner.indexOf(code);
+          if(index >= 0){
+            this.selectedCombiner.splice(index, 1);
+          }
+
+          let index2 = this.selectedKnower.indexOf(code);
+          if(index2 >= 0){
+            this.selectedKnower.splice(index2, 1);
+          }
+        }
+      })
+    } else {
+      this.selectedApprover = '';
+    }
+  }
+
+  CheckUserNotHandle1(code, isCheck) {
+    console.log(code);
+    if(isCheck){
+      this.ListUserOfDepartment.forEach(element => {
+        if(element.Code === code){
+          if(code.includes('|')) {
+            this.selectedCombiner.push(element.Code);
+          }
+          element.IsHandle = false;
+          element.IsKnow = false;
+
+          if(this.selectedApprover === code) {
+            this.selectedApprover = '';
+          }
+
+          let index2 = this.selectedKnower.indexOf(code);
+          if(index2 >= 0){
+            this.selectedKnower.splice(index2, 1);
+          }
+        }       
+      }) 
+    } else {
+      let index = this.selectedCombiner.indexOf(code);
+      if(index >= 0){
+        this.selectedCombiner.splice(index, 1);
+      }
+    }   
+  }
+
+  CheckUserNotHandle2(code, isCheck) {
+    console.log(code);
+    if(isCheck){
+      this.ListUserOfDepartment.forEach(element => {
+        if(element.Code === code){
+          if(code.includes('|')) {
+            this.selectedKnower.push(element.Code);
+          }
+          element.IsCombine = false;
+          element.IsHandle = false;
+
+          if(this.selectedApprover === code) {
+            this.selectedApprover = '';
+          }
+          let index = this.selectedCombiner.indexOf(code);
+          if(index >= 0){
+            this.selectedCombiner.splice(index, 1);
+          }
+        }       
+      }) 
+    } else {
+      let index = this.selectedKnower.indexOf(code);
+      if(index >= 0){
+        this.selectedKnower.splice(index, 1);
+      }
+    }
+  }
+
+  GetTypeCode(code) {
+    if(this.docServices.checkNull(code) === '') {
+      return '';
+    }
+    else if(code === "CXL") {
+      return 'Chuyển xử lý';
+    }
+    else if(code === "TL") {
+      return 'Trả lại';
+    }
+    else if(code === "XYK") {
+      return 'Xin ý kiến';
+    }
+  }
+
+  isNotNull(str) {
+    return (str !== null && str !== "" && str !== undefined);
+  }
+ 
   getFileBuffer(file) {
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
@@ -461,7 +1059,7 @@ export class DocumentGoDetailComponent implements OnInit {
           () => {
             this.Comments = null;
             if (this.outputFile.length > 0) {
-              this.saveItemAttachment(0, this.indexComment);
+              this.saveItemAttachment(0, 'ListComments', this.indexComment, this.outputFile, 0);
             }
             else {
               this.closeCommentPanel();
@@ -473,7 +1071,7 @@ export class DocumentGoDetailComponent implements OnInit {
       }
       else {
         this.closeCommentPanel();
-        alert("Bạn chưa nhập nội dung bình luận");
+        this.notificationService.warn("Bạn chưa nhập nội dung bình luận");
       }
     } catch (error) {
       console.log("SendComment error: " + error);

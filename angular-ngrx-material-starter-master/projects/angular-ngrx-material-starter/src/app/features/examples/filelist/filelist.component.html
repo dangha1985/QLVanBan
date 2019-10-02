@@ -1,0 +1,14 @@
+<div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="5px">
+    <div fxFlex="10"><button mat-icon-button color="primary" [matMenuTriggerFor]="evaattachment" type="button">
+                     <mat-icon>more_vert</mat-icon>
+                   </button>
+        <mat-menu #evaattachment="matMenu">
+            <button type="button" mat-menu-item (click)="onSPOpenFile(fileAttachment.urlFile, 1)">Mở trên trình duyệt</button>
+            <button type="button" mat-menu-item (click)="onSPOpenFile(fileAttachment.urlFile)">Tải về</button>
+        </mat-menu>
+    </div>
+    <div fxFlex="68">
+        <span class="attFld">
+         <span class="attFldValue"><a href="{{fileAttachment.urlFile}}" target="_blank">{{fileAttachment.name}}</a></span></span>
+    </div>
+</div>

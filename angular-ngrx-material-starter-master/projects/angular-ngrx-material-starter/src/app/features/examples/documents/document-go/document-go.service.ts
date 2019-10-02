@@ -188,4 +188,10 @@ export class DocumentGoService {
     
   //   return this.http.get(`${this.restUrl}${this.getHistoryStepAPI}`  + strFilter + `&$orderby=DateRequest desc`);
   // }
+
+  getAllUser() {
+    return this.http.get(
+      `${this.restUrl}` + `/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Name,User/Title,User/Id&$expand=User`
+    );
+  }
 }
