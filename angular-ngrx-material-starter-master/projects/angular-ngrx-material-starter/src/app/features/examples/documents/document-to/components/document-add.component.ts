@@ -407,8 +407,9 @@ export class DocumentAddComponent implements OnInit {
 
   AddNewItem(sts) {
     const dataForm = this.IncomingDocform.getRawValue();
-    if(this.docTo.CheckNullSetZero(dataForm.numberTo) < this.currentNumberTo) {
+    if(this.IdEdit <= 0 && this.docTo.CheckNullSetZero(dataForm.numberTo) < this.currentNumberTo) {
       this.notificationService.warn('Số đến không hợp lệ! Vui lòng kiểm tra lại');
+      return;
     }
     if (this.IncomingDocform.valid) {
       this.OpenRotiniPanel();      
@@ -759,9 +760,11 @@ export class DocumentAddComponent implements OnInit {
     // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
     this.CloseRotiniPanel();
     this.notificationService.success('Thêm văn bản đến thành công');
+    this.currentNumberTo += 1;
     this.getAllListDocument();
     this.addNew = !this.addNew;
     this.showList = !this.showList;
+    this.reset();
   }
 
   DeleteItem(id){

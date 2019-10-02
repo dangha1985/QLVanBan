@@ -171,3 +171,36 @@ table {
     display: none;
     outline: none;
 }
+
+::ng-deep {
+    .cdk-global-overlay-wrapper,
+    .cdk-overlay-container {
+        z-index: 9999!important;
+    }
+    .modal-lg {
+        width: 90% !important;
+        max-width: 97% !important;
+    }
+    .modal-md {
+        width: 60% !important;
+        max-width: 70% !important;
+    }
+}
+
+.title-handle {
+    font-size: 16px;
+    font-weight: 500;
+    color: #d84545;
+}
+
+.title-combine {
+    font-size: 16px;
+    font-weight: 500;
+    color: #4c9df5;
+}
+
+.title-know {
+    font-size: 16px;
+    font-weight: 500;
+    color: #578a57;
+}

@@ -194,12 +194,6 @@ table {
     border-right: none;
 }
 
-.dev {
-    padding-left: 20px;
-    border: 1px solid #0000001f;
-    border-right: none;
-}
-
 .title-handle {
     font-size: 16px;
     font-weight: 500;
@@ -218,8 +212,10 @@ table {
     color: #578a57;
 }
 
-.required-field {
-    color: red;
+.dev {
+    padding-left: 20px;
+    border: 1px solid #0000001f;
+    border-right: none;
 }
 
 #tableOnsiteCost {

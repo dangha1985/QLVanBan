@@ -1,6 +1,7 @@
 <div fxLayout="column" fxFlexFill class="route-container form-main">
     <div fxFlexFil class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo1 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="ViewHistory(viewHistory)"><i class="material-icons">share</i>&nbsp; <span class="Submit1">Xem luồng</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
@@ -225,6 +226,7 @@
     </div>
     <div fxFlexFil class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="ViewHistory(viewHistory)"><i class="material-icons">share</i>&nbsp; <span class="Submit1">Xem luồng</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
@@ -424,6 +426,51 @@
         </div>
         <div class="modal-footer" fxLayoutAlign="center center">
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddTicketReturn()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
+        </div>
+    </ng-template>
+
+    <ng-template #viewHistory>
+        <div class="modal-header">
+            <h4 class="modal-title pull-left">Chọn người xử lý</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+        </div>
+        <div class="modal-body" fxLayout="row">
+            <div fxLayout="row" fxLayoutGap="20px" style="width: 100% !important">
+                <div class="mt-element-step" fxFlex="100">
+                    <div class="row step-line">
+                        <!-- <div *ngFor="let itemStep of StatusStepLine" class="mt-step-col {{itemStep.stepClass}}" [ngStyle]="{'width': styleExp}">
+                                <div class="mt-step-number bg-white">{{itemStep.stepNumber}}</div>
+                                <div class="mt-step-title uppercase font-grey-cascade">{{itemStep.stepTitle}}</div>
+                                <div class="mt-step-content font-grey-cascade" id="Approver_0">{{itemStep.stepContent}}</div>
+                            </div> -->
+                        <div class="mt-step-col first done" style="float:left; width:33%">
+                            <div class="mt-step-number bg-white" style="visibility: hidden"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px;"></div>
+                            <div class="mt-step-number bg-white"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px"></div>
+                            <div class="mt-step-title uppercase font-grey-cascade">Người yêu cầu</div>
+                            <div class="mt-step-content font-grey-cascade" id="Approver_0">Ha Thanh Loan</div>
+                        </div>
+                        <div class="mt-step-col active" style="float:left; width:33%">
+                            <div class="mt-step-number bg-white"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px"></div>
+                            <div class="mt-step-number bg-white"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px"></div>
+                            <div class="mt-step-number bg-white"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px"></div>
+                            <div class="mt-step-title uppercase font-grey-cascade">T.BP</div>
+                            <div class="mt-step-content font-grey-cascade" id="Approver_1">Demo Account</div>
+                        </div>
+                        <div class="mt-step-col last" style="float:left; width:33%">
+                            <div class="mt-step-number bg-white" style="visibility: hidden"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px;"></div>
+                            <div class="mt-step-number bg-white"><img src="{{imgUserDefault}}" style="width: 75px; height: 75px"></div>
+                            <div class="mt-step-title uppercase font-grey-cascade">P.HCNS</div>
+                            <div class="mt-step-content font-grey-cascade" id="Approver_2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" fxLayoutAlign="center center">
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddListTicket()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
         </div>
     </ng-template>

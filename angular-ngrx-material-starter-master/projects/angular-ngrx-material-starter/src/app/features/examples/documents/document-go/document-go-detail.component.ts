@@ -38,7 +38,13 @@ export class DocumentGoDetailComponent implements OnInit {
   bsModalRef: BsModalRef;
   itemDoc: ItemDocumentGo;
   isDisplay: boolean = false;
+  isExecution: boolean = false;
+  isFinish: boolean = false;
+  isReturn: boolean = false;
   ItemId;
+  IndexStep = 0;
+  totalStep = 0;
+  historyId = 0;
   ItemAttachments: AttachmentsObject[] = [];
   urlAttachment = environment.proxyUrl.split("/sites/", 1)
   listName = 'ListDocumentTo';
@@ -58,6 +64,7 @@ export class DocumentGoDetailComponent implements OnInit {
   currentUserId = '';
   currentUserName = '';
   currentUserEmail = '';
+  ReasonReturn;
   pictureCurrent;
   ArrayUserPofile: UserProfilePropertiesObject[] = [];
   dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>();
@@ -75,8 +82,7 @@ export class DocumentGoDetailComponent implements OnInit {
 
   ngOnInit() {
     this.getCurrentUser();
-    this.GetItemDetail();
-    this.GetHistory();
+    this.GetTotalStep();
   }
   //Lấy người dùng hiện tại
   getCurrentUser() {
@@ -97,6 +103,7 @@ export class DocumentGoDetailComponent implements OnInit {
       }
     );
   }
+
 //lấy đường dẫn ảnh trên sharepoint
   getUserPofile(loginName) {
     try {
@@ -122,10 +129,46 @@ export class DocumentGoDetailComponent implements OnInit {
       console.log('getUsr error: ' + error.message);
     }
   }
+
+  GetTotalStep() {
+    this.route.paramMap.subscribe(parames => {
+      this.ItemId = parames.get('id');
+      this.IndexStep = parseInt(parames.get('step'));
+      this.GetHistory();
+      this.resService.getListTotalStep('DG').subscribe(items => {
+        let itemList = items['value'] as Array<any>;
+        if(itemList.length > 0){
+          this.totalStep = itemList[0].TotalStep;
+        }
+      },
+      error => {
+        console.log("Load total step error: " + error);
+        this.closeCommentPanel();
+      },
+      () => {
+        this.GetItemDetail();
+      }
+      )
+    })
+  }
+
   GetItemDetail() {
     this.ItemAttachments=[];
     this.route.paramMap.subscribe(parames => {
       this.ItemId = parames.get('id');
+      this.IndexStep = parseInt(parames.get('step'));
+
+      if(this.IndexStep > 0) {
+        this.isExecution = true;
+        this.isReturn = true;
+        if(this.IndexStep >= this.totalStep) {
+          this.isExecution = false;
+          this.isFinish = true;
+        } else {
+          this.isExecution = true;
+          this.isFinish = false;
+        }
+      }
       this.docServices.getListDocByID(this.ItemId).subscribe(items => {
         console.log('items: ' + items);
         let itemList = items["value"] as Array<any>;
@@ -163,6 +206,7 @@ export class DocumentGoDetailComponent implements OnInit {
           SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Title,
           NumOfPaper: itemList[0].NumOfPaper,
           Note: itemList[0].Note,
+          link: ''
         };
         this.ref.detectChanges();
         this.getComment();
@@ -180,6 +224,7 @@ export class DocumentGoDetailComponent implements OnInit {
           documentID: element.NoteBookID,
           compendium: element.Compendium,
           userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+          userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : 0,
           userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
           deadline: this.docServices.formatDateTime(element.Deadline),
           status: element.StatusName,
@@ -198,6 +243,97 @@ export class DocumentGoDetailComponent implements OnInit {
       this.ref.detectChanges();
      
     });
+  }
+
+  NextApprval(template: TemplateRef<any>) {
+    //this.notificationService.warn('Chọn người xử lý tiếp theo');
+    this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
+  }
+
+  ReturnRequest(template: TemplateRef<any>) {
+    //this.notificationService.warn('Chọn phòng ban để trả lại');
+    this.bsModalRef = this.modalService.show(template, {class: 'modal-md'});
+  }
+
+  ViewHistory(template: TemplateRef<any>) {
+    this.notificationService.warn("Xem luồng có ở bản verson 2");
+    // this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
+  }
+
+  // Tra lai
+  AddTicketReturn() {
+    try {
+      if (this.docServices.checkNull(this.ReasonReturn) === '') {
+        alert("Bạn chưa nhập Lý do trả lại! Vui lòng kiểm tra lại");
+        return;
+      }
+      this.bsModalRef.hide();
+      this.openCommentPanel();
+      let item  = this.ListItem.find(i => i.indexStep === this.IndexStep);
+      let approver;
+      if(item !== undefined) {
+        approver = item.userRequestId;
+      }
+
+      const data = {
+        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+        Title: this.itemDoc.NumberGo,
+        DateCreated: new Date(),
+        NoteBookID: this.ItemId,
+        UserRequestId: this.currentUserId,
+        UserApproverId: approver,
+        // Deadline: this.deadline,
+        StatusID: 0,
+        StatusName: 'Chờ xử lý',
+        Source: '',
+        Destination: '',
+        TaskTypeCode: 'XLC',
+        TaskTypeName: 'Xử lý chính',
+        TypeCode: 'TL',
+        TypeName: 'Trả lại',
+        Content: this.ReasonReturn,
+        IndexStep: this.IndexStep - 1,
+        Compendium: this.itemDoc.Compendium,
+        IndexReturn: this.IndexStep + '_' + (this.IndexStep - 1)
+      };
+      this.resService.AddItemToList('ListProcessRequestTo', data).subscribe(
+        item => {},
+        error => {
+          this.closeCommentPanel();
+          console.log(
+            'error when add item to list ListProcessRequestTo: ' +
+              error.error.error.message.value
+          ),
+            this.notificationService.error('Thêm phiếu xử lý thất bại');
+        },
+        () => {
+          console.log(
+            'Add item of approval user to list ListHistoryRequestTo successfully!'
+          );
+          if(this.historyId > 0) {
+            const dataTicket = {
+              __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
+              StatusID: -1, StatusName: "Đã trả lại",
+            };
+            this.resService.updateListById('ListHistoryRequestTo', dataTicket, this.historyId).subscribe(
+              item => {},
+              error => {
+                this.closeCommentPanel();
+                console.log(
+                  'error when update item to list ListHistoryRequestTo: ' +
+                    error.error.error.message.value
+                );
+              },
+              () => {}
+            );
+          }
+          //this.UpdateStatus(0);
+        }
+      );
+    } catch (err) {
+      console.log("try catch AddTicketReturn error: " + err.message);
+      this.closeCommentPanel();
+    }
   }
 
   gotoBack() {
@@ -225,13 +361,6 @@ export class DocumentGoDetailComponent implements OnInit {
   //   this.notificationService.info('Chờ xin ý kiến');
   // }
 
-  NextApprval() {
-    this.notificationService.warn('Chọn người xử lý tiếp theo');
-  }
-
-  ReturnRequest() {
-    this.notificationService.warn('Chọn phòng ban để trả lại');
-  }
   isNotNull(str) {
     return (str !== null && str !== "" && str !== undefined);
   }

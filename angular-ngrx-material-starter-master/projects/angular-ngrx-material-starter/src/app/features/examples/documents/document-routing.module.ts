@@ -61,6 +61,11 @@ const routes: Routes = [
         component: DocumentGoDetailComponent,
         data: { title: 'Xem chi tiết' }
       },
+      {
+        path: 'documentgo-detail/:id/:step',
+        component: DocumentGoDetailComponent,
+        data: { title: 'Xử lý' }
+      },
       // {
       //   path: 'documentgo-comment',
       //   component: CommentComponent,

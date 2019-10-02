@@ -11,7 +11,6 @@ export interface ItemDocumentGo {
   UserCreateName: string;
   UserOfHandleName: string;
   StatusName: string;
-
   BookTypeName: string;
   UnitCreateName: string;
   RecipientsInName: string;
@@ -20,9 +19,10 @@ export interface ItemDocumentGo {
   UrgentLevelName: string;
   MethodSendName: string;
   DateIssued: string;
-  SignerName: string,
-  Note: string,
-  NumOfPaper: string,
+  SignerName: string;
+  Note: string;
+  NumOfPaper: string;
+  link: string;
 }
 export interface IncomingDoc {
   bookType: string;
@@ -50,6 +50,7 @@ export interface DocumentGoTicket {
   compendium: string;
   documentID: number;
   userRequest: number;
+  userRequestId: Number;
   userApprover: string;
   deadline: string;
   status: string;

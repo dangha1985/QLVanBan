@@ -126,7 +126,7 @@
                     </div>
                     <div fxFlex="auto">
                         <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                            <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                            <div *ngFor="let items of ItemAttachments"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
                         </div>
                     </div>
                 </div>

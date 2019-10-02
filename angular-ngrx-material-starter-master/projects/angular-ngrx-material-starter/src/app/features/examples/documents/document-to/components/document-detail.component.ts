@@ -91,6 +91,7 @@ export class DocumentDetailComponent implements OnInit {
   ListUserCombine = [];
   ListUserKnow = [];
   currentUserId = 0;
+  assetFolder = environment.assetFolder;
   currentUserName = '';
   RoleApprover = [];
   RoleCombine = [];
@@ -103,6 +104,7 @@ export class DocumentDetailComponent implements OnInit {
   outputFileReturn = [];
   displayFile = '';
   closeResult = '';
+  imgUserDefault = '../../../../' + this.assetFolder + '/img/profile.jpg'
   historyId = 0;
   buffer;
   index = 0;
@@ -500,6 +502,11 @@ export class DocumentDetailComponent implements OnInit {
   ReturnRequest(template: TemplateRef<any>) {
     //this.notificationService.warn('Chọn phòng ban để trả lại');
     this.bsModalRef = this.modalService.show(template, {class: 'modal-md'});
+  }
+
+  ViewHistory(template: TemplateRef<any>) {
+    this.notificationService.warn("Xem luồng có ở bản verson 2");
+    // this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
   }
 
   GetUserApprover() {

@@ -176,9 +176,10 @@ export class DocumentGoWaitingComponent implements OnInit {
             UrgentLevelName: '',
             MethodSendName: '',
             DateIssued:'',
-              SignerName: '',
-              Note:'',
-             NumOfPaper :'',
+            SignerName: '',
+            Note:'',
+            NumOfPaper :'',
+            link: this.getLinkItemByRole(this.id, element.TaskTypeCode, element.DocumentGoID, element.IndexStep)
           })
         })
       },
@@ -216,5 +217,19 @@ export class DocumentGoWaitingComponent implements OnInit {
   // }
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  getLinkItemByRole(type, taskType, id, step) {
+    let link = '';
+    if(type === "1") {
+      if(taskType === 'XLC' || taskType === 'TL') {
+        link = '../../documentgo-detail/' + id + '/' + step;
+      } else {
+        link = '../../documentgo-detail/' + id;
+      }
+    } else {
+      link = '../../documentgo-detail/' + id;
+    }
+    return link;
   }
 }
