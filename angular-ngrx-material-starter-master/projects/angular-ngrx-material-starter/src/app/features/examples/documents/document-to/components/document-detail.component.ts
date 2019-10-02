@@ -174,6 +174,7 @@ export class DocumentDetailComponent implements OnInit {
       this.IncomingDocID = parseInt(parames.get('id'));
       this.IndexStep = parseInt(parames.get('step'));
       this.GetHistory();
+      this.getComment();
       this.services.getListTotalStep('DT').subscribe(items => {
         let itemList = items['value'] as Array<any>;
         if(itemList.length > 0){
@@ -971,13 +972,13 @@ export class DocumentDetailComponent implements OnInit {
 
   callbackFunc(id) {
     if (this.outputFileHandle.length > 0) {
-      this.saveItemAttachment(0, id, this.outputFileHandle);
+      this.saveItemAttachment(0, id, this.outputFileHandle,'ListDocumentTo');
     }
     else if (this.outputFile.length > 0) {
-      this.saveItemAttachment(0, id, this.outputFile);
+      this.saveItemAttachment(0, id, this.outputFile,'ListDocumentTo');
     }
     else if (this.outputFileReturn.length > 0) {
-      this.saveItemAttachment(0, id, this.outputFileReturn);
+      this.saveItemAttachment(0, id, this.outputFileReturn,'ListDocumentTo');
     }
     else {
       this.CloseRotiniPanel();
@@ -1122,6 +1123,23 @@ export class DocumentDetailComponent implements OnInit {
           }
         }
       }
+      else if(sts === 3) {
+        const inputNode: any = document.querySelector('#fileAttachmentComment');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileComment.length > 0) {
+            if (
+              this.outputFileComment.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileComment.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFileComment.push(inputNode.files[0]);
+          }
+        }
+      }
     } catch (error) {
       console.log('addAttachmentFile error: ' + error);
     }
@@ -1139,18 +1157,22 @@ export class DocumentDetailComponent implements OnInit {
         console.log(this.outputFileReturn.indexOf(index))
         this.outputFileReturn.splice(this.outputFileReturn.indexOf(index), 1);
       }
+      else if(sts === 3) {
+        console.log(this.outputFileComment.indexOf(index))
+        this.outputFileComment.splice(this.outputFileComment.indexOf(index), 1);
+      }
     } catch (error) {
       console.log("removeAttachmentFile error: " + error);
     }
   }
 
-  saveItemAttachment(index, idItem, arr) {
+  saveItemAttachment(index, idItem, arr,listName) {
     try {
       this.buffer = this.getFileBuffer(arr[index]);
       this.buffer.onload = (e: any) => {
         console.log(e.target.result);
         const dataFile = e.target.result;
-        this.services.inserAttachmentFile(dataFile, arr[index].name, 'ListDocumentTo', idItem).subscribe(
+        this.services.inserAttachmentFile(dataFile, arr[index].name, listName, idItem).subscribe(
           itemAttach => {
             console.log('inserAttachmentFile success');
           },
@@ -1158,14 +1180,22 @@ export class DocumentDetailComponent implements OnInit {
           () => {
             console.log('inserAttachmentFile successfully');
             if (Number(index) < (arr.length - 1)) {
-              this.saveItemAttachment((Number(index) + 1), idItem, arr);
+              this.saveItemAttachment((Number(index) + 1), idItem, arr,listName);
             }
             else {
               // this.outputFile = [];
               // this.CloseRotiniPanel();
+              if(listName=='ListComments'){
+                this.CloseRotiniPanel();
+                this.outputFileComment=[];
+                this.getComment();
+                this.notificationService.success('Bạn gửi bình luận thành công');
+              }
+              else{
               arr = [];
               this.CloseRotiniPanel();
               this.routes.navigate(['examples/doc-detail/' + idItem]);
+            }
             }
           }
         )
@@ -1195,7 +1225,200 @@ export class DocumentDetailComponent implements OnInit {
       return 'Xin ý kiến';
     }
   }
+//comment
+Reply(i, j) {
+  if (j == undefined) {
+    this.listCommentParent[i].DisplayReply = "flex";
+  }
+  else {
+
+    this.listCommentParent[i].children[j].DisplayReply = "flex";
+  }
 }
+isNotNull(str) {
+  return (str !== null && str !== "" && str !== undefined);
+}
+//luu comment
+SendComment() {
+  try {
+    this.OpenRotiniPanel();
+    if (this.isNotNull(this.Comments)) {
+      const dataComment = {
+        __metadata: { type: 'SP.Data.ListCommentsListItem' },
+        Title: "ListDocumentTo_" + this.IncomingDocID,
+        Chat_Comments: this.Comments,
+        KeyList: "ListDocumentTo_" + this.IncomingDocID
+      }
+      if (this.isNotNull(this.pictureCurrent)) {
+        Object.assign(dataComment, { userPicture: this.pictureCurrent });
+      }
+      this.services.AddItemToList('ListComments', dataComment).subscribe(
+        itemComment => {
+          this.indexComment = itemComment['d'].Id;
+        },
+        error =>  {
+          console.log(error);
+          this.notificationService.error('Bạn gửi bình luận thất bại');
+        },
+        () => {
+          this.Comments = null;
+          if (this.outputFileComment.length > 0) {
+            this.saveItemAttachment(0, this.indexComment,this.outputFileComment,'ListComments');
+          }
+          else {
+            this.CloseRotiniPanel();
+            this.notificationService.success('Bạn gửi bình luận thành công');
+            this.getComment();
+          }
+        }
+      )
+    }
+    else {
+      this.CloseRotiniPanel();
+      alert("Bạn chưa nhập nội dung bình luận");
+    }
+  } catch (error) {
+    console.log("SendComment error: " + error);
+  }
+}
+//lưu comment trả lời
+saveCommentReply(i, j) {
+  try {
+    this.OpenRotiniPanel();
+    let content = '';
+    if (j == undefined) {
+      content = this.listCommentParent[i].Content;
+    }
+    else {
+      content = this.listCommentParent[i].children[j].Content;
+    }
+    if (this.isNotNull(content)) {
+      const dataComment = {
+        __metadata: { type: 'SP.Data.ListCommentsListItem' },
+        Title: "ListDocumentTo_" + this.IncomingDocID,
+        Chat_Comments: content,
+        KeyList: "ListDocumentTo_" + this.IncomingDocID,
+        ParentID: this.listCommentParent[i].ParentID == null ? this.listCommentParent[i].ID : this.listCommentParent[i].ParentID,
+      }
+      if (this.isNotNull(this.pictureCurrent)) {
+        Object.assign(dataComment, { userPicture: this.pictureCurrent });
+      }
+      this.services.AddItemToList('ListComments', dataComment).subscribe(
+        itemComment => {
+          this.indexComment = itemComment['d'].Id;
+        },
+        error => {
+          console.log(error);
+          this.notificationService.error('Bạn gửi trả lời thất bại');
+        },
+        () => {
+          // if (this.outputFile.length > 0) {
+          //   this.saveItemAttachment(0, this.indexComment);
+          // }
+          // else {
+          this.CloseRotiniPanel();
+          this.notificationService.success('Bạn gửi trả lời thành công');
+          //update lại trạng thái cho phiếu xin ý kiến
+          if (this.isNotNull(this.listCommentParent[i].ProcessID)) {
+            this.updateProcess(this.listCommentParent[i].ProcessID);
+          }
+          this.getComment();
+          // }
+        }
+      )
+    }
+    else {
+      this.CloseRotiniPanel();
+      alert("Bạn chưa nhập nội dung trả lời");
+    }
+  } catch (error) {
+    console.log("saveCommentReply error: " + error);
+  }
+}
+updateProcess(id) {
+  try {
+    const dataProcess = {
+      __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+      StatusID: 1,
+      StatusName: "Đã cho ý kiến",
+    }
+    this.services.updateListById('ListProcessRequestTo', dataProcess, id).subscribe(
+      itemComment => {
+        //  this.indexComment = itemComment['d'].Id;
+      },
+      error => console.log(error),
+      () => {
+        // if (this.outputFile.length > 0) {
+        //   this.saveItemAttachment(0, this.indexComment);
+        // }
+        // else {
+        // this.closeCommentPanel();
+        // alert('Bạn gửi trả lời thành công');
+        this.GetHistory();
+        // }
+      }
+    )
+
+  } catch (error) {
+    console.log("saveCommentReply error: " + error);
+  }
+}
+listCommentParent = [];outputFileComment:AttachmentsObject[]=[];listComment=[];AttachmentsComment:AttachmentsObject[]=[];
+Comments;pictureCurrent;indexComment;
+getComment(): void {
+  const strComent = `?$select=ID,Chat_Comments,Created,userPicture,ParentID,ProcessID,Author/Title,UserApprover/Id,UserApprover/Title,AttachmentFiles`
+    + `&$expand=Author/Id,UserApprover,AttachmentFiles&$filter=KeyList eq 'ListDocumentTo_` + this.IncomingDocID + `'&$orderby=Created desc`
+  this.services.getItem("ListComments", strComent).subscribe(itemValue => {
+    this.listComment = [];
+    this.listCommentParent = [];
+    let itemList = itemValue["value"] as Array<any>;
+    itemList.forEach(element => {
+      let picture;
+      if (element.userPicture !== null && element.userPicture !== '' && element.userPicture !== undefined) {
+        picture = element.userPicture;
+      }
+      else {
+        picture = '../../../../' + this.assetFolder + '/img/default-user-image.png';
+      }
+      if (this.isNotNull(element.AttachmentFiles)) {
+        this.AttachmentsComment = [];
+        element.AttachmentFiles.forEach(elementss => {
+          this.AttachmentsComment.push({
+            name: elementss.FileName,
+            urlFile: this.urlAttachment + elementss.ServerRelativeUrl
+          })
+        });
+      }
+      this.listComment.push({
+        ID: element.ID,
+        Author:element.Author.Title,
+        Chat_Comments: element.Chat_Comments,
+        Created: moment(element.Created).format('DD/MM/YYYY HH:mm:ss'),
+        userPicture: picture,
+        UserApprover:element.UserApprover!=null?element.UserApprover.Title:'',
+        XinYKien:' xin ý kiến ',
+        ParentID: element.ParentID,
+        ProcessID: element.ProcessID,
+        itemAttach: this.AttachmentsComment,
+        Content: '',
+        DisplayReply: "none",
+      })
+    })
+    this.listComment.forEach(item => {
+      if (item.ParentID == null) {
+        let lstChild = this.listComment.filter(element => element.ParentID == item.ID);
+        if (lstChild == undefined) {
+          lstChild = [];
+        }
+        item.children = lstChild;
+        this.listCommentParent.push(item);
+      }
+    });
+    this.ref.detectChanges();
+  })
+}
+}
+
 
 
  // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {

@@ -69,7 +69,9 @@ export class ResApiService {
   getList(listName) : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items`);
   }
-
+  getItem(listName, select) {
+    return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('` + listName + `')/items` + select);
+  }
   getListDepartment() : Observable<any> {
     return this.http.get(`${this.restUrl}/_api/web/lists/getbytitle('ListDepartment')/items`);
   }
