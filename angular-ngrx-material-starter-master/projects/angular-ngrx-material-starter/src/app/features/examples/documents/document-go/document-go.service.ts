@@ -105,8 +105,8 @@ export class DocumentGoService {
   private getDocumentGoAPI = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=ID,NumberGo,DocTypeName,NumberSymbol,Compendium,DateCreated,Deadline,StatusName,UserCreate/Title,UserOfHandle/Title&$expand=UserCreate/Id,UserOfHandle/Id";
   private getProcessRequestGo= "/_api/web/lists/getbytitle('ListProcessRequestGo')/items?$select=*,UserRequest/Title,UserRequest/Id,Author/Id,Author/Title,Author/Name,UserApprover/Id,UserApprover/Title&$expand=Author/Id,UserApprover/Id,UserRequest";
   private  urlGroupApprover = "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=User/Name,User/Title,User/Id&$expand=User"
-  private urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,"
-  + "AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$filter=ID eq ";
+  private urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,UserOfHandle/Name,"
+  + "Signer/Id,Signer/Title,Signer/Name,AttachmentFiles&$expand=UserOfHandle,Author,Signer,AttachmentFiles&$filter=ID eq ";
  
    // format định dạng ngày    
    formatDateTime(date: Date): string {

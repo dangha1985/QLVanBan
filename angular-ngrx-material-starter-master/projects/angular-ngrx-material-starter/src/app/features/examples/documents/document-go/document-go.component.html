@@ -1,25 +1,22 @@
 <div class="" rtl #formNew *ngIf="addNew">
     <div class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="save(0)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="save(1)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+        <button mat-stroked-button color="primary" type="submit" class="MR5" (click)="save(0)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+        <button mat-stroked-button color="primary" type="submit" class="MR5" (click)="save(1)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
         <button mat-stroked-button color="warn" type="reset" class="MR5" (click)="reset()"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Nhập lại</span></button>
     </div>
     <div class="caption" fxFlexFill>
         <span class="d-flex justify-content-between align-items-baseline uppercase portlet_title_tsg_2">
-                      <h3>Thêm mới dự thảo</h3>
+                      <h3>Thông tin văn bản</h3>
                     </span>
     </div>
-    <!-- <div class="row">
-        <div class="col">
-            <h1 class="main-heading">THÊM MỚI VĂN BẢN ĐI</h1>
-        </div>
-    </div> -->
 
     <!-- <ng-container *ngIf="formValueChanges$ | async as updatedForm">
         {{update(updatedForm)}}
-    </ng-container> -->
-    <form [formGroup]="form" (ngSubmit)="submit()">
+    </ng-container> 
+     <form [formGroup]="form" (ngSubmit)="submit()">
+-->
+    <form [formGroup]="form">
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <mat-card>
@@ -205,8 +202,8 @@
     </div>
     <div class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="save(0)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="save(1)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
+        <button mat-stroked-button color="primary" type="submit" class="MR5" (click)="save(0)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
+        <button mat-stroked-button color="primary" type="submit" class="MR5" (click)="save(1)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Lưu và gửi</span></button>
         <button mat-stroked-button color="warn" type="reset" class="MR5" (click)="reset()"><i class="material-icons">cached</i>&nbsp; <span class="Reset1">Nhập lại</span></button>
     </div>
 </div>

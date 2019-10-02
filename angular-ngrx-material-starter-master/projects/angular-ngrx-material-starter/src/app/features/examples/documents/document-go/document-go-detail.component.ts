@@ -24,7 +24,6 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommentComponent } from './comment.component';
-//import{}from '../../../../../assets/img/'
 export interface Comment { UserId: Number; Content: string, AttachFile: FileAttachment[] };
 export interface FileAttachment { name?: string; urlFile?: string }
 @Component({
@@ -52,7 +51,7 @@ export class DocumentGoDetailComponent implements OnInit {
   listComment = [];
   AttachmentsComment: AttachmentsObject[] = [];
   overlayRef;
-  assetFolder = environment.assetFolder;
+  assetFolder = environment.assetFolder+'/img';
   displayTime = 'none';
   displayedColumns: string[] = ['stt', 'created', 'userRequest', 'userApprover', 'deadline', 'status', 'taskType']; //'select'
   ListItem: DocumentGoTicket[] = [];

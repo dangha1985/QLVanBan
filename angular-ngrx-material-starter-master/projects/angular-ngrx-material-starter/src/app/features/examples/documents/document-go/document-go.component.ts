@@ -38,9 +38,6 @@ import { ComponentPortal } from '@angular/cdk/portal';
 
 export class DocumentGoComponent implements OnInit {
   form = this.fb.group({
-    // NumSymbol: ['', [Validators.required]],
-    // password: ['', [Validators.required]],
-    // email: ['', [Validators.required, Validators.email]],
     Compendium: [
       '',
       [
@@ -444,21 +441,7 @@ export class DocumentGoComponent implements OnInit {
               this.saveItemAttachment(0, this.DocumentID)
            // }
           });
-        // this.docServices.createDocumentGo(data).subscribe(
-        //   item => {
-        //     console.log("add success !");
-        //     this.notificationService.success('Thêm mới thành công!');
-        //   },
-        //   error => {
-        //     console.log("error add:" + error);
-        //     this.notificationService.error("Thêm mới thất bại.");
-        //   },
-        //   () => {
-        //     //load lại ds văn bản
-        //     this.getListDocumentGo();
-        //     this.reset();
-        //   }
-        // );
+       
       }
     }
     catch (error) {
@@ -615,8 +598,8 @@ export class DocumentGoComponent implements OnInit {
           this.ListDocumentGo.splice(index, 1);
         }
         this.dataSource = new MatTableDataSource<ItemDocumentGo>(this.ListDocumentGo);
-        this.ref.detectChanges();
         this.dataSource.paginator = this.paginator;
+        this.ref.detectChanges();
         this.CloseDocumentGoPanel();
       })
     }
@@ -625,69 +608,85 @@ export class DocumentGoComponent implements OnInit {
   EditItem(id){
     this.OpenDocumentGoPanel();
     this.IdEdit = id;
-    // this.addNew = !this.addNew; 
-    // this.showList = !this.showList;
-    // this.services.getListDocByID(id).subscribe(items => {
-    //   console.log('items: ' + items);
-    //   let itemList = items["value"] as Array<any>;
+    this.addNew = !this.addNew; 
+    this.showList = !this.showList;
+    this.docServices.getListDocByID(id).subscribe(items => {
+      console.log('items: ' + items);
+      let itemList = items["value"] as Array<any>;
        
-    //     if (itemList[0].AttachmentFiles.length > 0) {
-    //       itemList[0].AttachmentFiles.forEach(element => {
-    //         this.ItemAttachments.push({
-    //           name: element.FileName,
-    //           urlFile: this.urlAttachment + element.ServerRelativeUrl
-    //         })
-    //       });
-    //     }
+        if (itemList[0].AttachmentFiles.length > 0) {
+          itemList[0].AttachmentFiles.forEach(element => {
+            this.ItemAttachments.push({
+              name: element.FileName,
+              urlFile: this.urlAttachment + element.ServerRelativeUrl
+            })
+          });
+        }
 
-    //     this.itemDoc = {
-    //       ID: itemList[0].ID,
-    //       NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo,
-    //       //  NumberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
-    //       DocTypeName: this.docServices.checkNull(itemList[0].DocTypeName),
-    //       NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
-    //       Compendium: this.docServices.checkNull(itemList[0].Compendium),
-    //       UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
-    //       DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
-    //       UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Title,
+        this.itemDoc = {
+          ID: itemList[0].ID,
+          NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo,
+          DocTypeName: this.docServices.checkNull(itemList[0].DocTypeID),
+          NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
+          Compendium: this.docServices.checkNull(itemList[0].Compendium),
+          UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
+          DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
+          UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Id + '_' + itemList[0].UserOfHandle.Name.split('|')[2],
+          Deadline: itemList[0].Deadline,
+          
+          StatusName: this.docServices.checkNull(itemList[0].StatusName),
+         BookTypeName: itemList[0].BookTypeName,
+         UnitCreateName: itemList[0].UnitCreateName,
 
-    //       Deadline: this.docServices.formatDateTime(itemList[0].Deadline),
-    //       StatusName: this.docServices.checkNull(itemList[0].StatusName),
-    //       BookTypeName: itemList[0].BookTypeName,
-    //       UnitCreateName: itemList[0].UnitCreateName,
-    //       RecipientsInName: itemList[0].RecipientsInName,
-    //       RecipientsOutName: itemList[0].RecipientsOutName,
-    //       SecretLevelName: itemList[0].SecretLevelName,
-    //       UrgentLevelName: itemList[0].UrgentLevelName,
-    //       MethodSendName: itemList[0].MethodSendName,
-    //       DateIssued: this.docServices.formatDateTime(itemList[0].DateIssued),
-    //       SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Title,
-    //       NumOfPaper: itemList[0].NumOfPaper,
-    //       Note: itemList[0].Note,
-    //     };
-    //     this.IncomingDocform.patchValue({
-    //       numberTo: this.docTo.formatNumberTo(this.itemDocEdit.numberTo),
-    //       numberToSub: this.itemDocEdit.numberToSub,
-    //       numberOfSymbol: this.docTo.formatNumberTo(this.itemDocEdit.numberTo) + '/VBĐ',
-    //       source: this.itemDocEdit.source + '',
-    //       docType: this.itemDocEdit.docType + '',
-    //       promulgatedDate: this.itemDocEdit.promulgatedDate,
-    //       dateTo: this.itemDocEdit.dateTo,
-    //       compendium: this.itemDocEdit.compendium,
-    //       secretLevel: this.itemDocEdit.secretLevel + '',
-    //       urgentLevel: this.itemDocEdit.urgentLevel + '',
-    //       deadline: this.itemDocEdit.deadline,
-    //       numberOfCopies: this.itemDocEdit.numberOfCopies,
-    //       methodReceipt: this.itemDocEdit.methodReceipt + '',
-    //       userHandle: this.itemDocEdit.userHandle + '',
-    //       note: this.itemDocEdit.note,
-    //       isResponse: this.itemDocEdit.isResponse === 0 ? false : true,
-    //       isRetrieve: this.itemDocEdit.isRetrieve === 0 ? false : true,
-    //       signer: this.itemDocEdit.signer
-    //     });
-    //   this.ref.detectChanges();
-    //   this.CloseDocumentGoPanel();
-    // });
+          RecipientsInName: itemList[0].RecipientsInID,
+          RecipientsOutName: itemList[0].RecipientsOutID,
+          SecretLevelName: itemList[0].SecretLevelID,
+          UrgentLevelName: itemList[0].UrgentLevelID,
+          MethodSendName: itemList[0].MethodSendID,
+          DateIssued: itemList[0].DateIssued,
+          SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Id+'_'+itemList[0].Signer.Name.split('|')[2],
+          NumOfPaper: itemList[0].NumOfPaper,
+          Note: itemList[0].Note,
+        };
+        this.form.patchValue({
+          NumberSymbol: this.itemDoc.NumberSymbol,
+          DocType: this.itemDoc.DocTypeName,
+          Compendium: this.itemDoc.Compendium,
+          RecipientsIn: this.itemDoc.RecipientsInName,
+          RecipientsOut: this.itemDoc.RecipientsOutName,
+          UserOfHandle: this.itemDoc.UserOfHandleName,
+          UserOfCombinate: null,
+          UserOfKnow: null,
+          SecretLevel: this.itemDoc.SecretLevelName,
+          UrgentLevel: this.itemDoc.UrgentLevelName,
+          MethodSend: this.itemDoc.MethodSendName,
+          Signer: this.itemDoc.SignerName,
+          Note: this.itemDoc.Note,
+          NumOfPaper: this.itemDoc.NumOfPaper,
+          Deadline: this.itemDoc.Deadline,
+          DateIssued: this.itemDoc.DateIssued,
+          // numberTo: this.docTo.formatNumberTo(this.itemDocEdit.numberTo),
+          // numberToSub: this.itemDocEdit.numberToSub,
+          // numberOfSymbol: this.docTo.formatNumberTo(this.itemDocEdit.numberTo) + '/VBĐ',
+          // source: this.itemDocEdit.source + '',
+          // docType: this.itemDocEdit.docType + '',
+          // promulgatedDate: this.itemDocEdit.promulgatedDate,
+          // dateTo: this.itemDocEdit.dateTo,
+          // compendium: this.itemDocEdit.compendium,
+          // secretLevel: this.itemDocEdit.secretLevel + '',
+          // urgentLevel: this.itemDocEdit.urgentLevel + '',
+          // deadline: this.itemDocEdit.deadline,
+          // numberOfCopies: this.itemDocEdit.numberOfCopies,
+          // methodReceipt: this.itemDocEdit.methodReceipt + '',
+          // userHandle: this.itemDocEdit.userHandle + '',
+          // note: this.itemDocEdit.note,
+          // isResponse: this.itemDocEdit.isResponse === 0 ? false : true,
+          // isRetrieve: this.itemDocEdit.isRetrieve === 0 ? false : true,
+          // signer: this.itemDocEdit.signer
+        });
+      this.ref.detectChanges();
+      this.CloseDocumentGoPanel();
+    });
   }
 
   reset() {
