@@ -213,6 +213,7 @@ export class DocumentGoComponent implements OnInit {
             SignerName: '',
             Note:'',
            NumOfPaper :'',
+           link:''
           })
         })
       },
@@ -664,7 +665,7 @@ export class DocumentGoComponent implements OnInit {
           DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
           UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Id + '|' + itemList[0].UserOfHandle.Name.split('|')[2],
           Deadline: itemList[0].Deadline,
-          
+          link:'',
          StatusName: this.docServices.checkNull(itemList[0].StatusName),
          BookTypeName: itemList[0].BookTypeName,
          UnitCreateName: itemList[0].UnitCreateName,
@@ -712,25 +713,8 @@ export class DocumentGoComponent implements OnInit {
     // this.form.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
   }
 
-  // addAttachmentFile() {
-  //   try {
-  //     const inputNode: any = document.querySelector('#fileAttachment');
-  //     if (this.isNotNull(inputNode.files[0])) {
-  //       console.log(inputNode.files[0]);
-  //       if (this.outputFile.length > 0) {
-  //         if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
-  //           this.outputFile.push(inputNode.files[0]);
-  //         }
-  //       }
-  //       else {
-  //         this.outputFile.push(inputNode.files[0]);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.log("addAttachmentFile error: " + error);
-  //   }
-  // }
-  addAttachmentFile(sts) {
+ 
+  addAttachmentFile() {
     try {
       const inputNode: any = document.querySelector('#fileAttachment');
       if (this.isNotNull(inputNode.files[0])) {
@@ -753,14 +737,7 @@ export class DocumentGoComponent implements OnInit {
       console.log('addAttachmentFile error: ' + error);
     }
   }
-  // removeAttachmentFile(index) {
-  //   try {
-  //     console.log(this.outputFile.indexOf(index))
-  //     this.outputFile.splice(this.outputFile.indexOf(index), 1);
-  //   } catch (error) {
-  //     console.log("removeAttachmentFile error: " + error);
-  //   }
-  // }
+ 
   removeAttachmentFile(index) {
     try {
       let indexNew = this.outputFile.indexOf(index);
