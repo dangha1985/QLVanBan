@@ -278,63 +278,58 @@ export class DocumentGoDetailComponent implements OnInit {
 
   GetItemDetail() {
     this.ItemAttachments=[];
-    this.route.paramMap.subscribe(parames => {
-      this.ItemId = parames.get('id');
-      this.IndexStep = parseInt(parames.get('step'));
-
-      if(this.IndexStep > 0) {
+    if(this.IndexStep > 0) {
+      this.isExecution = true;
+      this.isReturn = true;
+      if(this.IndexStep >= this.totalStep) {
+        this.isExecution = false;
+        this.isFinish = true;
+      } else {
         this.isExecution = true;
-        this.isReturn = true;
-        if(this.IndexStep >= this.totalStep) {
-          this.isExecution = false;
-          this.isFinish = true;
-        } else {
-          this.isExecution = true;
-          this.isFinish = false;
-        }
+        this.isFinish = false;
       }
-      this.docServices.getListDocByID(this.ItemId).subscribe(items => {
-        console.log('items: ' + items);
-        let itemList = items["value"] as Array<any>;
-        this.isDisplay = true;
-        if (itemList[0].AttachmentFiles.length > 0) {
-          itemList[0].AttachmentFiles.forEach(element => {
-            this.ItemAttachments.push({
-              name: element.FileName,
-              urlFile: this.urlAttachment + element.ServerRelativeUrl
-            })
-          });
-        }
+    }
+    this.docServices.getListDocByID(this.ItemId).subscribe(items => {
+      console.log('items: ' + items);
+      let itemList = items["value"] as Array<any>;
+      this.isDisplay = true;
+      if (itemList[0].AttachmentFiles.length > 0) {
+        itemList[0].AttachmentFiles.forEach(element => {
+          this.ItemAttachments.push({
+            name: element.FileName,
+            urlFile: this.urlAttachment + element.ServerRelativeUrl
+          })
+        });
+      }
 
-        this.itemDoc = {
-          ID: itemList[0].ID,
-          NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo,
-          //  NumberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
-          DocTypeName: this.docServices.checkNull(itemList[0].DocTypeName),
-          NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
-          Compendium: this.docServices.checkNull(itemList[0].Compendium),
-          UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
-          DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
-          UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Title,
+      this.itemDoc = {
+        ID: itemList[0].ID,
+        NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo,
+        //  NumberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
+        DocTypeName: this.docServices.checkNull(itemList[0].DocTypeName),
+        NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
+        Compendium: this.docServices.checkNull(itemList[0].Compendium),
+        UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
+        DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
+        UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Title,
 
-          Deadline: this.docServices.formatDateTime(itemList[0].Deadline),
-          StatusName: this.docServices.checkNull(itemList[0].StatusName),
-          BookTypeName: itemList[0].BookTypeName,
-          UnitCreateName: itemList[0].UnitCreateName,
-          RecipientsInName: itemList[0].RecipientsInName,
-          RecipientsOutName: itemList[0].RecipientsOutName,
-          SecretLevelName: itemList[0].SecretLevelName,
-          UrgentLevelName: itemList[0].UrgentLevelName,
-          MethodSendName: itemList[0].MethodSendName,
-          DateIssued: this.docServices.formatDateTime(itemList[0].DateIssued),
-          SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Title,
-          NumOfPaper: itemList[0].NumOfPaper,
-          Note: itemList[0].Note,
-          link: ''
-        };
-        this.ref.detectChanges();
-        this.getComment();
-      })
+        Deadline: this.docServices.formatDateTime(itemList[0].Deadline),
+        StatusName: this.docServices.checkNull(itemList[0].StatusName),
+        BookTypeName: itemList[0].BookTypeName,
+        UnitCreateName: itemList[0].UnitCreateName,
+        RecipientsInName: itemList[0].RecipientsInName,
+        RecipientsOutName: itemList[0].RecipientsOutName,
+        SecretLevelName: itemList[0].SecretLevelName,
+        UrgentLevelName: itemList[0].UrgentLevelName,
+        MethodSendName: itemList[0].MethodSendName,
+        DateIssued: this.docServices.formatDateTime(itemList[0].DateIssued),
+        SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Title,
+        NumOfPaper: itemList[0].NumOfPaper,
+        Note: itemList[0].Note,
+        link: ''
+      };
+      this.ref.detectChanges();
+      this.getComment();
     })
   }
 
@@ -345,7 +340,8 @@ export class DocumentGoDetailComponent implements OnInit {
       this.ListItem = [];
       item.forEach(element => {
         this.ListItem.push({
-          documentID: element.NoteBookID,
+          ID: element.ID,
+          documentID: element.DocumentGoID,
           compendium: element.Compendium,
           userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
           userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : 0,
@@ -408,7 +404,7 @@ export class DocumentGoDetailComponent implements OnInit {
         __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
         Title: this.itemDoc.NumberGo,
         DateCreated: new Date(),
-        NoteBookID: this.ItemId,
+        DocumentGoID: this.ItemId,
         UserRequestId: this.currentUserId,
         UserApproverId: approver,
         // Deadline: this.deadline,
@@ -493,7 +489,7 @@ export class DocumentGoDetailComponent implements OnInit {
           __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
           Title: this.itemDoc.NumberGo,
           DateCreated: new Date(),
-          NoteBookID: this.ItemId,
+          DocumentGoID: this.ItemId,
           UserRequestId: this.currentUserId,
           UserApproverId: this.selectedApprover.split('|')[0],
           Deadline: this.deadline,
@@ -556,7 +552,7 @@ export class DocumentGoDetailComponent implements OnInit {
       __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
       Title: this.itemDoc.NumberGo,
       DateCreated: new Date(),
-      NoteBookID: this.ItemId,
+      DocumentGoID: this.ItemId,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
       Deadline: this.deadline,
@@ -607,7 +603,7 @@ export class DocumentGoDetailComponent implements OnInit {
       __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
       Title: this.itemDoc.NumberGo,
       DateCreated: new Date(),
-      NoteBookID: this.ItemId,
+      DocumentGoID: this.ItemId,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
       Deadline: this.deadline,
@@ -779,7 +775,7 @@ export class DocumentGoDetailComponent implements OnInit {
     }
     else {
       this.closeCommentPanel();
-      this.routes.navigate(['examples/doc-detail/' + id]);
+      this.routes.navigate(['/OutGoingDocs/documentgo-detail/' + id]);
     }
   }
 
@@ -949,7 +945,7 @@ export class DocumentGoDetailComponent implements OnInit {
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code === code){
-          if(code.includes('|')) {
+          if(code.includes('|') && this.selectedCombiner.indexOf(code) < 0) {
             this.selectedCombiner.push(element.Code);
           }
           element.IsHandle = false;
@@ -978,7 +974,7 @@ export class DocumentGoDetailComponent implements OnInit {
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code === code){
-          if(code.includes('|')) {
+          if(code.includes('|') && this.selectedKnower.indexOf(code)) {
             this.selectedKnower.push(element.Code);
           }
           element.IsCombine = false;

@@ -144,7 +144,7 @@
                             <p fxFlex="25" class="form-label">Tài liệu đính kèm:</p>
                             <div fxFlex="auto">
                                 <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                                    <a *ngFor="let item of ItemAttachments" href="item.urlFile" target="_blank">{{item.name}}</a>
+                                    <a *ngFor="let item of ItemAttachments" href="item.urlFile" target="_blank" class="urlFile">{{item.name}}</a>
                                 </div>
                             </div>
                         </div>
@@ -253,7 +253,7 @@
                                 <button mat-stroked-button color="primary" type="button" (click)="Reply(i)">Trả lời</button>
                                 <p id="cmt-title">{{item.Chat_Comments}}</p>
                                 <div fxLayout="column">
-                                    <a *ngFor="let itemAtt of item.itemAttach" href="{{itemAtt.urlFile}}" target="_blank">{{itemAtt.name}}</a>
+                                    <a *ngFor="let itemAtt of item.itemAttach" href="{{itemAtt.urlFile}}" target="_blank" class="urlFile">{{itemAtt.name}}</a>
                                 </div>
                                 <div fxLayout="column" class="content-side" [style.display]="item.DisplayReply">
                                     <div class="row">
@@ -285,7 +285,7 @@
                                         <button mat-stroked-button color="primary" type="button" (click)="Reply(i,j)">Trả lời</button>
                                         <p id="cmt-title">{{itemChild.Chat_Comments}}</p>
                                         <div fxLayout="column">
-                                            <a *ngFor="let itemAttChild of itemChild.itemAttach" href="{{itemAttChild.urlFile}}" target="_blank">{{itemAttChild.name}}</a>
+                                            <a *ngFor="let itemAttChild of itemChild.itemAttach" href="{{itemAttChild.urlFile}}" target="_blank" class="urlFile">{{itemAttChild.name}}</a>
                                         </div>
                                         <div fxLayout="column" class="content-side" [style.display]="itemChild.DisplayReply">
                                             <div class="row">

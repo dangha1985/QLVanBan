@@ -1021,7 +1021,7 @@ export class DocumentDetailComponent implements OnInit {
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code === code){
-          if(code.includes('|')) {
+          if(code.includes('|') && this.selectedCombiner.indexOf(code)) {
             this.selectedCombiner.push(element.Code);
           }
           element.IsHandle = false;
@@ -1050,7 +1050,7 @@ export class DocumentDetailComponent implements OnInit {
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
         if(element.Code === code){
-          if(code.includes('|')) {
+          if(code.includes('|') && this.selectedKnower.indexOf(code)) {
             this.selectedKnower.push(element.Code);
           }
           element.IsCombine = false;
