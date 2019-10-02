@@ -410,7 +410,7 @@ export class DocumentGoComponent implements OnInit {
           UrgentLevelName: itemUrgentLevel == undefined ? '' : itemUrgentLevel.Title,
           MethodSendName: itemMethodSend == undefined ? '' : itemMethodSend.Title,
           UnitCreateName: itemUnitCreate == undefined ? '' : itemUnitCreate.Title,
-
+          Note:this.form.get('Note').value,
           UnitCreateID: this.form.get('UnitCreate').value,
           NumOfPaper: this.form.get('NumOfPaper').value,
           DateCreated: this.date.value,
@@ -422,7 +422,7 @@ export class DocumentGoComponent implements OnInit {
           StatusName: isChuyenXL==0?'Dự thảo':'Chờ xử lý',
         }
         console.log('data=' + data);
-        // console.log('DocTypeID:'+this.form.get('DocType').value);
+        if(this.IdEdit==0){
         this.services.AddItemToList(this.listTitle, data).subscribe(
           item => {
             this.DocumentID = item['d'].Id;
@@ -438,10 +438,39 @@ export class DocumentGoComponent implements OnInit {
               this.AddHistoryStep();
             } 
             //else {
-              this.saveItemAttachment(0, this.DocumentID)
+              this.saveItemAttachment(0, this.DocumentID);
+              this.callbackfunc();
            // }
           });
-       
+        } else {
+          this.services.updateListById(this.listTitle, data, this.IdEdit).subscribe(
+            item => {
+              this.DocumentID = this.IdEdit;
+            },
+            error => {
+              this.CloseDocumentGoPanel();
+              console.log(
+                'error when update item to list ' +
+                  this.listTitle +
+                  ': ' +
+                  error
+              ),
+                this.notificationService.error('Sửa văn bản đến thất bại');
+            },
+            () => {
+              console.log(
+                'update item of approval user to list ' +
+                  this.listTitle +
+                  ' successfully!'
+              );
+              if (isChuyenXL === 1) {
+                this.AddHistoryStep();
+              } 
+                this.saveItemAttachment(0, this.DocumentID);
+                this.callbackfunc();
+            }
+          );
+        }
       }
     }
     catch (error) {
@@ -569,7 +598,7 @@ export class DocumentGoComponent implements OnInit {
           },
           () => {
            // this.CloseDocumentGoPanel();
-            this.callbackfunc();
+          //  this.callbackfunc();
             console.log("Add item of approval user to list ListProcessRequestGo successfully!");
           });
       });
@@ -613,7 +642,8 @@ export class DocumentGoComponent implements OnInit {
     this.docServices.getListDocByID(id).subscribe(items => {
       console.log('items: ' + items);
       let itemList = items["value"] as Array<any>;
-       
+      this.ItemAttachments=[];
+      this.outputFile=[];
         if (itemList[0].AttachmentFiles.length > 0) {
           itemList[0].AttachmentFiles.forEach(element => {
             this.ItemAttachments.push({
@@ -621,6 +651,7 @@ export class DocumentGoComponent implements OnInit {
               urlFile: this.urlAttachment + element.ServerRelativeUrl
             })
           });
+         // this.outputFile=this.ItemAttachments;
         }
 
         this.itemDoc = {
@@ -631,58 +662,40 @@ export class DocumentGoComponent implements OnInit {
           Compendium: this.docServices.checkNull(itemList[0].Compendium),
           UserCreateName: itemList[0].Author == undefined ? '' : itemList[0].Author.Title,
           DateCreated: this.docServices.formatDateTime(itemList[0].DateCreated),
-          UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Id + '_' + itemList[0].UserOfHandle.Name.split('|')[2],
+          UserOfHandleName: itemList[0].UserOfHandle == undefined ? '' : itemList[0].UserOfHandle.Id + '|' + itemList[0].UserOfHandle.Name.split('|')[2],
           Deadline: itemList[0].Deadline,
           
-          StatusName: this.docServices.checkNull(itemList[0].StatusName),
+         StatusName: this.docServices.checkNull(itemList[0].StatusName),
          BookTypeName: itemList[0].BookTypeName,
          UnitCreateName: itemList[0].UnitCreateName,
 
-          RecipientsInName: itemList[0].RecipientsInID,
-          RecipientsOutName: itemList[0].RecipientsOutID,
-          SecretLevelName: itemList[0].SecretLevelID,
-          UrgentLevelName: itemList[0].UrgentLevelID,
-          MethodSendName: itemList[0].MethodSendID,
+          RecipientsInName: this.docServices.checkNull(itemList[0].RecipientsInID),
+          RecipientsOutName: this.docServices.checkNull(itemList[0].RecipientsOutID),
+          SecretLevelName: this.docServices.checkNull(itemList[0].SecretLevelID),
+          UrgentLevelName: this.docServices.checkNull(itemList[0].UrgentLevelID),
+          MethodSendName: this.docServices.checkNull(itemList[0].MethodSendID),
           DateIssued: itemList[0].DateIssued,
-          SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Id+'_'+itemList[0].Signer.Name.split('|')[2],
+          SignerName: itemList[0].Signer == undefined ? '' : itemList[0].Signer.Id+'|'+itemList[0].Signer.Name.split('|')[2],
           NumOfPaper: itemList[0].NumOfPaper,
           Note: itemList[0].Note,
         };
         this.form.patchValue({
           NumberSymbol: this.itemDoc.NumberSymbol,
-          DocType: this.itemDoc.DocTypeName,
+          DocType: this.itemDoc.DocTypeName==''?null:Number(this.itemDoc.DocTypeName)+'',
           Compendium: this.itemDoc.Compendium,
-          RecipientsIn: this.itemDoc.RecipientsInName,
-          RecipientsOut: this.itemDoc.RecipientsOutName,
+          RecipientsIn: this.itemDoc.RecipientsInName==''?null:Number(this.itemDoc.RecipientsInName)+'',
+          RecipientsOut: this.itemDoc.RecipientsOutName==''?null:Number(this.itemDoc.RecipientsOutName)+'',
           UserOfHandle: this.itemDoc.UserOfHandleName,
           UserOfCombinate: null,
           UserOfKnow: null,
-          SecretLevel: this.itemDoc.SecretLevelName,
-          UrgentLevel: this.itemDoc.UrgentLevelName,
-          MethodSend: this.itemDoc.MethodSendName,
+          SecretLevel: this.itemDoc.SecretLevelName==''?null:Number(this.itemDoc.SecretLevelName)+'',
+          UrgentLevel: this.itemDoc.UrgentLevelName==''?null:Number(this.itemDoc.UrgentLevelName)+'',
+          MethodSend: this.itemDoc.MethodSendName==''?null:Number(this.itemDoc.MethodSendName)+'',
           Signer: this.itemDoc.SignerName,
           Note: this.itemDoc.Note,
           NumOfPaper: this.itemDoc.NumOfPaper,
           Deadline: this.itemDoc.Deadline,
           DateIssued: this.itemDoc.DateIssued,
-          // numberTo: this.docTo.formatNumberTo(this.itemDocEdit.numberTo),
-          // numberToSub: this.itemDocEdit.numberToSub,
-          // numberOfSymbol: this.docTo.formatNumberTo(this.itemDocEdit.numberTo) + '/VBĐ',
-          // source: this.itemDocEdit.source + '',
-          // docType: this.itemDocEdit.docType + '',
-          // promulgatedDate: this.itemDocEdit.promulgatedDate,
-          // dateTo: this.itemDocEdit.dateTo,
-          // compendium: this.itemDocEdit.compendium,
-          // secretLevel: this.itemDocEdit.secretLevel + '',
-          // urgentLevel: this.itemDocEdit.urgentLevel + '',
-          // deadline: this.itemDocEdit.deadline,
-          // numberOfCopies: this.itemDocEdit.numberOfCopies,
-          // methodReceipt: this.itemDocEdit.methodReceipt + '',
-          // userHandle: this.itemDocEdit.userHandle + '',
-          // note: this.itemDocEdit.note,
-          // isResponse: this.itemDocEdit.isResponse === 0 ? false : true,
-          // isRetrieve: this.itemDocEdit.isRetrieve === 0 ? false : true,
-          // signer: this.itemDocEdit.signer
         });
       this.ref.detectChanges();
       this.CloseDocumentGoPanel();
@@ -693,44 +706,96 @@ export class DocumentGoComponent implements OnInit {
     this.form.reset();
     this.form.clearValidators();
     this.form.clearAsyncValidators();
-    this.form.controls['bookType'].setValue('GT');
+    //this.form.controls['bookType'].setValue('GT');
+    this.ItemAttachments=[];
     // this.form.controls['numberTo'].setValue(this.docTo.formatNumberTo(this.currentNumberTo));
     // this.form.controls['numberOfSymbol'].setValue(this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ');
   }
 
-  addAttachmentFile() {
+  // addAttachmentFile() {
+  //   try {
+  //     const inputNode: any = document.querySelector('#fileAttachment');
+  //     if (this.isNotNull(inputNode.files[0])) {
+  //       console.log(inputNode.files[0]);
+  //       if (this.outputFile.length > 0) {
+  //         if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
+  //           this.outputFile.push(inputNode.files[0]);
+  //         }
+  //       }
+  //       else {
+  //         this.outputFile.push(inputNode.files[0]);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log("addAttachmentFile error: " + error);
+  //   }
+  // }
+  addAttachmentFile(sts) {
     try {
       const inputNode: any = document.querySelector('#fileAttachment');
       if (this.isNotNull(inputNode.files[0])) {
         console.log(inputNode.files[0]);
         if (this.outputFile.length > 0) {
-          if (this.outputFile.findIndex(index => index.name === inputNode.files[0].name) === -1) {
+          if (
+            this.outputFile.findIndex(
+              index => index.name === inputNode.files[0].name
+            ) === -1
+          ) {
             this.outputFile.push(inputNode.files[0]);
+            this.ItemAttachments.push(inputNode.files[0]);
           }
-        }
-        else {
+        } else {
           this.outputFile.push(inputNode.files[0]);
+          this.ItemAttachments.push(inputNode.files[0]);
         }
       }
     } catch (error) {
-      console.log("addAttachmentFile error: " + error);
+      console.log('addAttachmentFile error: ' + error);
     }
   }
+  // removeAttachmentFile(index) {
+  //   try {
+  //     console.log(this.outputFile.indexOf(index))
+  //     this.outputFile.splice(this.outputFile.indexOf(index), 1);
+  //   } catch (error) {
+  //     console.log("removeAttachmentFile error: " + error);
+  //   }
+  // }
   removeAttachmentFile(index) {
     try {
-      console.log(this.outputFile.indexOf(index))
-      this.outputFile.splice(this.outputFile.indexOf(index), 1);
+      let indexNew = this.outputFile.indexOf(index);
+      if(indexNew >= 0) {
+        console.log(indexNew);
+        this.outputFile.splice(indexNew, 1);
+      } else {
+        const data = {
+          __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
+        }
+        this.services.DeleteAttachmentById('ListDocumentGo', data, this.IdEdit, index.name).subscribe(item => {},
+          error => {
+            console.log(
+              'error when delete attachment item to list DocumentTo: ' + error
+            )
+          },
+          () => {}
+        );
+      }  
+      let indexOld = this.ItemAttachments.findIndex(i => i.name === index.name);
+      if(indexOld >= 0) {
+        this.ItemAttachments.splice(indexOld, 1);   
+      }
     } catch (error) {
-      console.log("removeAttachmentFile error: " + error);
+      console.log('removeAttachmentFile error: ' + error);
+      this.CloseDocumentGoPanel();
     }
   }
-
   isNotNull(str) {
     return (str !== null && str !== "" && str !== undefined);
   }
 
   saveItemAttachment(index, idItem){
     try {
+      if(this.outputFile.length>0){
       this.buffer = this.getFileBuffer(this.outputFile[index]);
       this.buffer.onload = (e: any) => {
         console.log(e.target.result);
@@ -750,11 +815,12 @@ export class DocumentGoComponent implements OnInit {
             }
             else{
               //alert("Save request successfully");
-              this.callbackfunc();
+             // this.callbackfunc();
             }
           }
         )
       }
+    }
     } catch (error) {
       console.log("saveItemAttachment error: "+error);
     }
