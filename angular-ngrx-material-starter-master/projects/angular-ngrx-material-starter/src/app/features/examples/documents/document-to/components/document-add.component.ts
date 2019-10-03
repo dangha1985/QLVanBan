@@ -218,7 +218,7 @@ export class DocumentAddComponent implements OnInit {
           this.docTo.formatNumberTo(++this.currentNumberTo)
         );
         this.IncomingDocform.controls['numberOfSymbol'].setValue(
-          this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ'
+          this.docTo.formatNumberTo(this.currentNumberTo) + '/Văn bản đến'
         );
         this.CloseRotiniPanel();
       }
@@ -237,7 +237,7 @@ export class DocumentAddComponent implements OnInit {
     const dataForm = this.IncomingDocform.getRawValue();
     let numer = dataForm.numberTo;
     this.IncomingDocform.controls['numberOfSymbol'].setValue(
-      numer + '/VBĐ'
+      numer + '/Văn bản đến'
     );
   }
 
@@ -646,7 +646,10 @@ export class DocumentAddComponent implements OnInit {
       this.docTo.formatNumberTo(this.currentNumberTo)
     );
     this.IncomingDocform.controls['numberOfSymbol'].setValue(
-      this.docTo.formatNumberTo(this.currentNumberTo) + '/VBĐ'
+      this.docTo.formatNumberTo(this.currentNumberTo) + '/Văn bản đến'
+    );
+    this.IncomingDocform.controls['dateTo'].setValue(
+      new Date()
     );
   }
 
@@ -853,7 +856,7 @@ export class DocumentAddComponent implements OnInit {
         this.IncomingDocform.patchValue({
           numberTo: this.docTo.formatNumberTo(this.itemDocEdit.numberTo),
           numberToSub: this.itemDocEdit.numberToSub,
-          numberOfSymbol: this.docTo.formatNumberTo(this.itemDocEdit.numberTo) + '/VBĐ',
+          numberOfSymbol: this.docTo.formatNumberTo(this.itemDocEdit.numberTo) + '/Văn bản đến',
           source: this.itemDocEdit.source + '',
           docType: this.itemDocEdit.docType + '',
           promulgatedDate: this.itemDocEdit.promulgatedDate,

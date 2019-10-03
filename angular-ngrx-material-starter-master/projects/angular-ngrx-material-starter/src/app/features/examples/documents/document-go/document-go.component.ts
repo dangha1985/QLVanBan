@@ -182,7 +182,7 @@ export class DocumentGoComponent implements OnInit {
   getListDocumentGo() {
     this.strFilter = `&$filter=Author/Id eq '`+ this.currentUserId+`'`;
   //  if (this.idStatus == '1') {//chờ xử lý
-      this.strFilter += `and StatusCode eq 'VBDT'`;
+      this.strFilter += `and StatusID eq '-1'`;
   //  }
     try {
       this.ListDocumentGo = [];
@@ -419,8 +419,8 @@ export class DocumentGoComponent implements OnInit {
           DateIssued: this.form.get('DateIssued').value,
           isRespinse: this.form.get('isRespinse').value == true ? 1 : 0,
           isSendMail: this.form.get('isSendMail').value == true ? 1 : 0,
-          StatusCode:  isChuyenXL==0?'VBDT':'VBCXL',
-          StatusName: isChuyenXL==0?'Dự thảo':'Chờ xử lý',
+          StatusID:  isChuyenXL,
+          StatusName: isChuyenXL === 0?'Chờ xử lý' : 'Dự thảo',
         }
         console.log('data=' + data);
         if(this.IdEdit==0){
@@ -435,7 +435,7 @@ export class DocumentGoComponent implements OnInit {
             },
           () => {
             console.log("Add item of approval user to list " + this.listTitle + " successfully!");
-            if(isChuyenXL === 1) {//chuyển xử lý
+            if(isChuyenXL === 0) {//chuyển xử lý
               this.AddHistoryStep();
             } 
             //else {
@@ -464,7 +464,7 @@ export class DocumentGoComponent implements OnInit {
                   this.listTitle +
                   ' successfully!'
               );
-              if (isChuyenXL === 1) {
+              if (isChuyenXL === 0) {
                 this.AddHistoryStep();
               } 
                 this.saveItemAttachment(0, this.DocumentID);

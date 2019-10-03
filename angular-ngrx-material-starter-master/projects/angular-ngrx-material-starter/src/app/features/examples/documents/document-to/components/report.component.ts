@@ -58,7 +58,7 @@ export class ReportComponent implements OnInit {
   getAllListRequest() {
     try{
       this.OpenRotiniPanel();
-      this.strFilter = `&$filter=ID ne '0'`;
+      this.strFilter = `&$filter=StatusID ne '-1'`;
       if(this.docTo.CheckNull(this.numberTo) !== '') {
         this.strFilter += ` and(NumberTo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `' or substringof('` + this.numberTo + `',NumberOfSymbol))`;
       }

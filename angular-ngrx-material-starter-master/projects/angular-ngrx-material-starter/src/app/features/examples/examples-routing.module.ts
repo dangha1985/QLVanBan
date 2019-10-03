@@ -35,7 +35,7 @@ const routes: Routes = [
         data: { title: 'Tiếp nhận văn bản' }
       },
       {
-        path: 'doc-list',
+        path: 'doc-list/:id',
         component: DocumentWaitingComponent,
         data: { title: 'Chờ xử lý' }
       },

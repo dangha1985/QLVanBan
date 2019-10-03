@@ -41,7 +41,7 @@ export class DocumentGoWaitingComponent implements OnInit {
     private store: Store<State>,
     private translate: TranslateService,
     private notificationService: NotificationService,
-   // private docServices: DocumentGoService,
+    private docServices: DocumentGoService,
     private resServices: SharedService,
     private route: ActivatedRoute,
     private ref: ChangeDetectorRef,
@@ -55,7 +55,7 @@ export class DocumentGoWaitingComponent implements OnInit {
   date = new FormControl(new Date());
   addNew = false;
   showList = true;
-   ListDocumentGo: ItemDocumentGo[] = [];
+  ListDocumentGo: ItemDocumentGo[] = [];
   // ListBookType: ItemSeletedCode[] = [];
   // ListDocType: ItemSeleted[] = [];
   // ListSecret: ItemSeleted[] = [];
@@ -127,60 +127,65 @@ export class DocumentGoWaitingComponent implements OnInit {
   getListDocumentGo_Wait() {
     let idStatus;
     let TypeCode='';
+    let strSelect = '';
     //chờ xử lý
-    if(this.id=='1'){
+    if(this.id=='1') {
       idStatus=0;
       TypeCode='CXL' ;
+      strSelect = ` and (TypeCode eq 'CXL' or TypeCode eq 'TL') and StatusID eq '0'`;
     }
     //Đã xử lý
-    else  if(this.id=='2'){
+    else  if(this.id=='2') {
       idStatus=1;
       TypeCode='CXL' ;
+      strSelect = ` and (TypeCode eq 'CXL' or TypeCode eq 'TL') and StatusID eq '1'`;
     }
     //Chờ xin ý kiến
-    else  if(this.id=='3'){
+    else  if(this.id=='3') {
       idStatus=0;
       TypeCode='XYK' ;
+      strSelect = ` and TypeCode eq 'XYK' and StatusID eq '0'`;
     }
       //Đã cho ý kiến
-    else  if(this.id=='4'){
+    else  if(this.id=='4' ){
       idStatus=1;
       TypeCode='XYK';
+      strSelect = ` and TypeCode eq 'XYK' and StatusID eq '1'`;
     }
-      let strSelect = `?$select=*,Author/Id,Author/Title,UserApprover/Id,UserApprover/Title&$expand=Author,UserApprover`
-     +`&$filter=TypeCode eq '`+TypeCode+`'and StatusID eq '`+idStatus+ `'and UserApprover/Id eq '`+this.currentUserId+`'&$orderby=Created desc`;
+      let strFilter = `?$select=*,Author/Id,Author/Title,UserApprover/Id,UserApprover/Title&$expand=Author,UserApprover`
+     +`&$filter=UserApprover/Id eq '`+this.currentUserId+`'` + strSelect + `&$orderby=Created desc`;
      console.log('strSelect='+strSelect);
     try {
       this.ListDocumentGo = [];
-      this.resServices.getItemList('ListProcessRequestGo',strSelect).subscribe(itemValue => {
+      this.resServices.getItemList('ListProcessRequestGo',strFilter).subscribe(itemValue => {
         let item = itemValue["value"] as Array<any>;
         item.forEach(element => {
-          // console.log('UserCreate:'+ element.UserCreate.Title);
-          // console.log('UserOfHandle:'+ element.UserOfHandle.Title);
-          this.ListDocumentGo.push({
-            ID: element.DocumentGoID,
-            NumberGo:'',// this.docServices.checkNull(element.NumberGo),
-            DocTypeName: this.CheckNull(element.DocTypeName),
-            NumberSymbol:this.CheckNull(element.Title),
-            Compendium: this.CheckNull(element.Compendium),
-            UserCreateName: element.Author == undefined ? '' : element.Author.Title,
-            DateCreated: this.formatDateTime(element.DateCreated),
-            UserOfHandleName: element.UserApprover == undefined ? '' : element.UserApprover.Title,
-            Deadline: this.formatDateTime(element.Deadline),
-            StatusName: this.CheckNull(element.StatusName),
-            BookTypeName: '',
-            UnitCreateName: '',
-            RecipientsInName: '',
-            RecipientsOutName: '',
-            SecretLevelName: '',
-            UrgentLevelName: '',
-            MethodSendName: '',
-            DateIssued:'',
-            SignerName: '',
-            Note:'',
-            NumOfPaper :'',
-            link: this.getLinkItemByRole(this.id, element.TaskTypeCode, element.DocumentGoID, element.IndexStep)
-          })
+          if(this.ListDocumentGo.findIndex(e => e.ID === element.DocumentGoID) < 0) {
+            this.ListDocumentGo.push({
+              ID: element.DocumentGoID,
+              NumberGo: this.docServices.formatNumberGo(element.NumberGo),
+              DocTypeName: this.CheckNull(element.DocTypeName),
+              NumberSymbol:this.CheckNull(element.Title),
+              Compendium: this.CheckNull(element.Compendium),
+              UserCreateName: element.Author == undefined ? '' : element.Author.Title,
+              DateCreated: this.formatDateTime(element.DateCreated),
+              UserOfHandleName: element.UserApprover == undefined ? '' : element.UserApprover.Title,
+              Deadline: this.formatDateTime(element.Deadline),
+              StatusName: this.CheckNull(element.StatusName),
+              BookTypeName: '',
+              UnitCreateName: '',
+              RecipientsInName: '',
+              RecipientsOutName: '',
+              SecretLevelName: '',
+              UrgentLevelName: '',
+              MethodSendName: '',
+              DateIssued:'',
+              SignerName: '',
+              Note:'',
+              NumOfPaper :'',
+              link: this.getLinkItemByRole(this.id, element.TaskTypeCode, element.DocumentGoID, element.IndexStep)
+            })
+          }
         })
       },
         error => console.log(error),

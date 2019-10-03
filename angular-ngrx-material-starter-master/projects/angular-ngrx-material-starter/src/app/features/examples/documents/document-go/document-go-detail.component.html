@@ -294,16 +294,16 @@
                                                 </mat-form-field>
                                             </div>
                                             <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
-                                            <div fxFlex="120px" fxFlex.xs="auto">
-                                                <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
-                                                <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
-                                            </div>
-                                            <div fxFlex="auto">
-                                                <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                                                    <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
-                                                </div>
-                                            </div>
-                                        </div> -->
+                                                    <div fxFlex="120px" fxFlex.xs="auto">
+                                                        <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
+                                                        <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
+                                                    </div>
+                                                    <div fxFlex="auto">
+                                                        <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                                            <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
                                             <div class="actions">
                                                 <button mat-stroked-button color="primary" type="button" class="MR5" (click)="saveCommentReply(i,j)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Gửi</span></button>
                                             </div>
@@ -382,6 +382,16 @@
 
                     <div style="margin-top: 60px"></div>
                     <mat-card fxLayout="column">
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px" *ngIf="isDisplay">
+                            <mat-form-field fxFlex="50">
+                                <mat-label>Số đi <span class="required-field">*</span></mat-label>
+                                <input matInput [(ngModel)]="numberGo" (change)="ChangeNumberGo()" (keyup)="FormatNumberGo()">
+                            </mat-form-field>
+                            <mat-form-field fxFlex="50">
+                                <mat-label>Số / Ký hiệu <span class="required-field">*</span></mat-label>
+                                <input matInput [(ngModel)]="numberOfSymbol">
+                            </mat-form-field>
+                        </div>
                         <mat-form-field fxFlex="100">
                             <mat-label>Nội dung xử lý <span class="required-field">*</span></mat-label>
                             <textarea matInput [(ngModel)]="content"></textarea>
@@ -426,30 +436,6 @@
                     </mat-list>
                 </mat-card>
             </div>
-
-            <!-- <mat-form-field fxFlex="100">
-                                <mat-label>Người xử lý</mat-label>
-                <mat-select [(ngModel)]="selectedApprover">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let item of ListUserApprover" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-
-            <mat-form-field fxFlex="100">
-                <mat-label>Người phối hợp</mat-label>
-                <mat-select multiple [(ngModel)]="selectedCombiner">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let item of ListUserCombine" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-
-            <mat-form-field fxFlex="100">
-                <mat-label>Nhận để biết</mat-label>
-                <mat-select multiple [(ngModel)]="selectedKnower">
-                    <mat-option>None</mat-option>
-                    <mat-option *ngFor="let item of ListUserKnow" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
-                </mat-select>
-            </mat-form-field> -->
         </div>
         <div class="modal-footer" fxLayoutAlign="center center">
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddListTicket()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>

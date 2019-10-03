@@ -108,6 +108,20 @@ export class DocumentGoService {
   private urlDetailLeave = "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=* ,Author/Id,Author/Title,Author/Name,UserOfHandle/Id,UserOfHandle/Title,UserOfHandle/Name,"
   + "Signer/Id,Signer/Title,Signer/Name,AttachmentFiles&$expand=UserOfHandle,Author,Signer,AttachmentFiles&$filter=ID eq ";
  
+  getHistoryStep(noteBookID, step) {
+    return this.http.get(
+      `${this.restUrl}` + `/_api/web/lists/getbytitle('ListHistoryRequestGo')/items?$select=*,UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$expand=UserRequest,UserApprover&$filter=DocumentGoID eq '` + noteBookID + `' and IndexStep eq '` + step + `'`
+    );
+  }
+
+  urlDocumentGoMax =
+    "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id&$expand=UserOfHandle,Author&$top=1&$orderby=ID desc";
+  getDocumentToMax(): Observable<any> {
+    return this.http.get(
+      `${this.restUrl}${this.urlDocumentGoMax}`
+    );
+  }
+
    // format định dạng ngày    
    formatDateTime(date: Date): string {
     if (!date) {
@@ -125,9 +139,6 @@ export class DocumentGoService {
       + pad(d.getMinutes()) + ':'
       + pad(d.getSeconds()) + 'Z'
   }
-  formatNumberTo(value) {
-    return ('0000000' + value).slice(-4);
-  }
    //    
    checkNull(value): string {
     if (!value) {
@@ -135,6 +146,21 @@ export class DocumentGoService {
     }
     return value;
   }
+  
+  CheckNullSetZero(value) {
+    if (value === undefined || value === null) {
+      return 0;
+    } else if (isNaN(value)) {
+      return 0;
+    } else {
+      return Number(value);
+    }
+  }
+
+  formatNumberGo(value) {
+    return ('0000000' + value).slice(-4);
+  }
+
   FindItemById(array, id) {
     return array.find(i => parseInt(i.ID) === parseInt(id));
   }

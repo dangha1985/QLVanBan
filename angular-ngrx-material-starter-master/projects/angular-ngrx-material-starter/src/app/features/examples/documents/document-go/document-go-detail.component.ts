@@ -102,6 +102,7 @@ export class DocumentGoDetailComponent implements OnInit {
   ListUserCombine = [];
   ListUserKnow = [];
   selectedKnower = []; selectedCombiner = []; selectedApprover;
+  numberOfSymbol; numberGo; currentNumberGo = 0;
   ArrayUserPofile: UserProfilePropertiesObject[] = [];
   dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -285,6 +286,31 @@ export class DocumentGoDetailComponent implements OnInit {
         this.isExecution = false;
         this.isFinish = true;
       } else {
+        if(this.IndexStep === this.totalStep - 1) {
+          this.isDisplay = true;
+
+          this.docServices.getDocumentToMax().subscribe(
+            (itemValue: any[]) => {
+              let item = itemValue['value'] as Array<any>;
+              if (item.length === 0) {
+                this.currentNumberGo = 0;
+              } else {
+                item.forEach(element => {
+                  this.currentNumberGo = element.NumberGo;
+                });
+              }
+            },
+            error => {
+              console.log('Load numberTo max error');
+              this.closeCommentPanel();
+            },
+            () => {
+              this.numberGo = this.docServices.formatNumberGo(this.currentNumberGo + 1);
+              this.numberOfSymbol = this.numberGo + '/Văn bản đi';
+              this.closeCommentPanel();
+            }
+          );
+        }
         this.isExecution = true;
         this.isFinish = false;
       }
@@ -292,7 +318,6 @@ export class DocumentGoDetailComponent implements OnInit {
     this.docServices.getListDocByID(this.ItemId).subscribe(items => {
       console.log('items: ' + items);
       let itemList = items["value"] as Array<any>;
-      this.isDisplay = true;
       if (itemList[0].AttachmentFiles.length > 0) {
         itemList[0].AttachmentFiles.forEach(element => {
           this.ItemAttachments.push({
@@ -304,7 +329,7 @@ export class DocumentGoDetailComponent implements OnInit {
 
       this.itemDoc = {
         ID: itemList[0].ID,
-        NumberGo: itemList[0].NumberGo === 0 ? '' : itemList[0].NumberGo,
+        NumberGo: itemList[0].NumberGo === 0 ? '' : this.docServices.formatNumberGo(itemList[0].NumberGo),
         //  NumberToSub: itemList[0].NumberToSub === 0 ? '' : itemList[0].NumberToSub , 
         DocTypeName: this.docServices.checkNull(itemList[0].DocTypeName),
         NumberSymbol: this.docServices.checkNull(itemList[0].NumberSymbol),
@@ -334,40 +359,62 @@ export class DocumentGoDetailComponent implements OnInit {
   }
 
   GetHistory() {
-    this.strFilter = `&$filter=DocumentGoID eq '` + this.ItemId + `'&$orderby=Created desc`;
-    this.docServices.getListRequestGoByDocID(this.strFilter).subscribe((itemValue: any[]) => {
-      let item = itemValue["value"] as Array<any>;
-      this.ListItem = [];
-      item.forEach(element => {
-        this.ListItem.push({
-          ID: element.ID,
-          documentID: element.DocumentGoID,
-          compendium: element.Compendium,
-          userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
-          userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : 0,
-          userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
-          deadline:
-          this.docServices.checkNull(element.Deadline) === ''
-            ? ''
-            : moment(element.Deadline).format('DD/MM/YYYY'),
-          status: element.StatusName,
-          source: '',
-          destination: '',
-          taskType: element.TaskTypeCode === 'XLC'? "Xử lý chính" : element.TaskTypeCode === 'PH'? 'Phối hợp' : 'Nhận để biết',
-          typeCode: this.GetTypeCode(element.TypeCode),
-          content: this.docServices.checkNull(element.Content),
-          indexStep: element.IndexStep,
-          created: this.docServices.formatDateTime(element.DateCreated),
-          numberTo: element.ID,
-          stsClass: element.StatusID === 0? 'Ongoing' : 'Approved',
-          stsTypeCode: element.TypeCode,
+    try {
+      this.strFilter = `&$filter=DocumentGoID eq '` + this.ItemId + `'&$orderby=Created desc`;
+      this.docServices.getListRequestGoByDocID(this.strFilter).subscribe((itemValue: any[]) => {
+        let item = itemValue["value"] as Array<any>;
+        this.ListItem = [];
+        item.forEach(element => {
+          this.ListItem.push({
+            ID: element.ID,
+            documentID: element.DocumentGoID,
+            compendium: element.Compendium,
+            userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+            userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : 0,
+            userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
+            deadline:
+            this.docServices.checkNull(element.Deadline) === ''
+              ? ''
+              : moment(element.Deadline).format('DD/MM/YYYY'),
+            status: element.StatusName,
+            source: '',
+            destination: '',
+            taskType: element.TaskTypeCode === 'XLC'? "Xử lý chính" : element.TaskTypeCode === 'PH'? 'Phối hợp' : 'Nhận để biết',
+            typeCode: this.GetTypeCode(element.TypeCode),
+            content: this.docServices.checkNull(element.Content),
+            indexStep: element.IndexStep,
+            created: this.docServices.formatDateTime(element.DateCreated),
+            numberTo: element.ID,
+            stsClass: element.StatusID === 0? 'Ongoing' : 'Approved',
+            stsTypeCode: element.TypeCode,
+          })
         })
-      })
-      this.dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>(this.ListItem);
-      this.dataSource_Ticket.paginator = this.paginator;
-      this.ref.detectChanges();
-      this.ArrayItemId = this.ListItem.filter(e => e.indexStep === this.IndexStep);
-    });
+        this.dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>(this.ListItem);
+        this.dataSource_Ticket.paginator = this.paginator;
+        this.ref.detectChanges();
+        this.ArrayItemId = this.ListItem.filter(e => e.indexStep === this.IndexStep);
+      },
+      error => {
+        console.log("Load history item: " + error);
+        this.closeCommentPanel();
+      },
+      () => {
+        this.docServices.getHistoryStep(this.ItemId, this.IndexStep).subscribe((itemValue: any[]) => {
+          let item = itemValue['value'] as Array<any>;
+          if(item.length > 0) {
+            this.historyId = item[0].ID;
+          }
+        },
+        error => {
+          console.log("Load history id item: " + error);
+          this.closeCommentPanel();
+        })
+      }
+      );
+    } catch(err) {
+      console.log("Load GetHistory try error: " + err.message);
+      this.closeCommentPanel();
+    }
   }
 
   NextApprval(template: TemplateRef<any>) {
@@ -433,8 +480,8 @@ export class DocumentGoDetailComponent implements OnInit {
         },
         () => {
           console.log(
-            'Add item of approval user to list ListHistoryRequestGo successfully!'
-          );
+            'Add item of approval user to list ListProcessRequestGo successfully!'
+          );         
           if(this.historyId > 0) {
             const dataTicket = {
               __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
@@ -473,7 +520,13 @@ export class DocumentGoDetailComponent implements OnInit {
     else if (this.docServices.checkNull(this.deadline) === '') {
       this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
       return false;
-    } else {
+    } 
+    else if (this.IndexStep === (this.totalStep -1) && (this.docServices.CheckNullSetZero(this.numberGo) === 0
+            || this.docServices.CheckNullSetZero(this.numberGo) <= this.currentNumberGo)) {
+      this.notificationService.warn("Số đi không hợp lệ ! Vui lòng kiểm tra lại");
+      return false;
+    } 
+    else {
       return true;
     }
   }
@@ -518,8 +571,25 @@ export class DocumentGoDetailComponent implements OnInit {
           },
           () => {
             console.log(
-              'Add item of approval user to list ListHistoryRequestGo successfully!'
+              'Add item of approval user to list ListProcessRequestGo successfully!'
             );
+            if(this.IndexStep === (this.totalStep - 1)) {
+              const dataTicket = {
+                __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
+                NumberGo: this.docServices.CheckNullSetZero(this.numberGo), NumberSymbol: this.numberOfSymbol,
+              };
+              this.resService.updateListById(this.listName, dataTicket, this.ItemId).subscribe(
+                item => {},
+                error => {
+                  this.closeCommentPanel();
+                  console.log(
+                    'error when update item to list ListDocumentGo: ' +
+                      error.error.error.message.value
+                  );
+                },
+                () => {}
+              );
+            }
             if(this.historyId > 0) {
               const dataTicket = {
                 __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
@@ -686,7 +756,7 @@ export class DocumentGoDetailComponent implements OnInit {
       __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
       Title: this.itemDoc.NumberGo,
       DateCreated: new Date(),
-      NoteBookID: this.itemDoc.ID,
+      DocumentGoID: this.itemDoc.ID,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedApprover.split('|')[0],
       Deadline: this.deadline,
@@ -728,7 +798,7 @@ export class DocumentGoDetailComponent implements OnInit {
       __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
       StatusID: 1, StatusName: "Đã xử lý",
     };
-    this.resService.updateListById('ListDocumentGo', data, this.ItemId).subscribe(
+    this.resService.updateListById(this.listName, data, this.ItemId).subscribe(
       item => {},
       error => {
         this.closeCommentPanel();
@@ -1224,8 +1294,19 @@ export class DocumentGoDetailComponent implements OnInit {
   }
 
   closeCommentPanel() {
-    this.overlayRef.dispose();
+    if(this.overlayRef !== undefined) {
+      this.overlayRef.dispose();
+    }
   }
+
+  FormatNumberGo() {
+    this.numberGo = this.docServices.formatNumberGo(this.numberGo);
+  }
+
+  ChangeNumberGo() {
+    this.numberOfSymbol = this.numberGo + '/Văn bản đi';
+  }
+
   // //tree
   // /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   // flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();

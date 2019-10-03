@@ -7,6 +7,7 @@ import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {BehaviorSubject} from 'rxjs';
 import * as moment from 'moment';
+import { ActivatedRoute } from '@angular/router';
 import {IncomingDoc, ItemSeleted, IncomingDocService, IncomingTicket} from '../incoming-doc.service';
 import {RotiniPanel} from './document-add.component';
 import {ResApiService} from '../../../services/res-api.service';
@@ -131,11 +132,13 @@ export class DocumentWaitingComponent implements OnInit {
   currentUserName;
   strFilter = '';
   overlayRef;
+  styleId = 1;
 
   constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
               private readonly notificationService: NotificationService,
-              public overlay: Overlay, public viewContainerRef: ViewContainerRef) {
+              public overlay: Overlay, public viewContainerRef: ViewContainerRef,
+              private route: ActivatedRoute,) {
               // private _database: ChecklistDatabase) {
 
                 // this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
@@ -149,11 +152,34 @@ export class DocumentWaitingComponent implements OnInit {
               }
 
   ngOnInit() {
+    // lấy tham số truyền vào qua url
+    this.route.paramMap.subscribe(parames => {
+      this.styleId = parseInt(parames.get('id'));
+    });
+
     this.getCurrentUser();
   }
 
   getAllListRequest() {
-    this.strFilter = `&$filter=UserApprover/Id eq ` + this.currentUserId + ` and (TypeCode eq 'CXL' or TypeCode eq 'TL') and StatusID eq '0'`;
+    let strSelect = '';
+     //chờ xử lý
+     if(this.styleId === 1) {
+       strSelect = ` and (TypeCode eq 'CXL' or TypeCode eq 'TL') and StatusID eq '0'`;
+    }
+    //Đã xử lý
+    else  if(this.styleId === 2) {
+      strSelect = ` and (TypeCode eq 'CXL' or TypeCode eq 'TL') and StatusID eq '1'`;
+    }
+    //Chờ xin ý kiến
+    else  if(this.styleId === 3) {
+      strSelect = ` and TypeCode eq 'XYK' and StatusID eq '0'`;
+    }
+      //Đã cho ý kiến
+    else  if(this.styleId === 4) {
+      strSelect = ` and TypeCode eq 'XYK' and StatusID eq '1'`;
+    }
+
+    this.strFilter = `&$filter=UserApprover/Id eq ` + this.currentUserId + strSelect;
     this.docTo.getListRequestTo(this.strFilter).subscribe((itemValue: any[]) => {
       let item = itemValue["value"] as Array<any>;     
       this.inDocs$ = []; 

@@ -21,7 +21,10 @@ export class ExamplesComponent implements OnInit {
 
   examples = [
     { link: 'doc-to', label: 'Tiếp nhận văn bản' },
-    { link: 'doc-list', label: 'Chờ xử lý' },
+    { link: 'doc-list/1', label: 'Chờ xử lý' },
+    { link: 'doc-list/2', label: 'Đã xử lý' },
+    { link: 'doc-list/3', label: 'Chờ xin ý kiến' },
+    { link: 'doc-list/4', label: 'Đã cho ý kiến' },
     { link: 'report-list', label: 'Báo cáo, thống kế' },
     // { link: 'doc-detail/:id', label: 'Xem chi tiết' },
   //   { link: 'stock-market', label: 'anms.examples.menu.stocks' },

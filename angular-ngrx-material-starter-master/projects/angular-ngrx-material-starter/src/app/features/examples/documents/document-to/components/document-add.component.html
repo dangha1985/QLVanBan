@@ -16,7 +16,7 @@
                 <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">
                     <mat-form-field fxFlex="50">
                         <mat-label>Sổ văn bản <span class="required-field">*</span></mat-label>
-                        <mat-select formControlName="bookType">
+                        <mat-select formControlName="bookType" disabled>
                             <mat-option>None</mat-option>
                             <mat-option *ngFor="let item of ListBookType" value={{item.code}}>{{item.title}}</mat-option>
                         </mat-select>
