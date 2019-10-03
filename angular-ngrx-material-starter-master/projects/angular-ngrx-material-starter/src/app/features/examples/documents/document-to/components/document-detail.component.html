@@ -2,7 +2,7 @@
     <div fxFlexFil class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo1 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="ViewHistory(viewHistory)"><i class="material-icons">share</i>&nbsp; <span class="Submit1">Xem luồng</span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment(modalAddComment)"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="FinishRequest()" *ngIf="isFinish"><i class="material-icons">done</i>&nbsp; <span class="Reset1">Hoàn thành</span></button>
@@ -254,7 +254,7 @@
                             </div>
                         </div>
                         <div fxLayout="row" fxLayoutAlign="end start" fxLayout.xs="column" fxFlexFill fxLayoutGap="5px">
-                            <button mat-stroked-button color="primary" type="button" (click)="SendComment()"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
+                            <button mat-stroked-button color="primary" type="button" (click)="saveComment(this.Comments,false,null)"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
                         </div>
                     </div>
                     <div style="height:800px ;overflow: auto;">
@@ -389,7 +389,7 @@
     <div fxFlexFil class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="ViewHistory(viewHistory)"><i class="material-icons">share</i>&nbsp; <span class="Submit1">Xem luồng</span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment(modalAddComment)"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="FinishRequest()" *ngIf="isFinish"><i class="material-icons">done</i>&nbsp; <span class="Reset1">Hoàn thành</span></button>
@@ -633,6 +633,51 @@
         </div>
         <div class="modal-footer" fxLayoutAlign="center center">
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddListTicket()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
+        </div>
+    </ng-template>
+    <ng-template #modalAddComment>
+        <div class="modal-header">
+            <h4 class="modal-title pull-left">Xin ý kiến</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+        </div>
+        <div class="modal-body" fxLayout="column">
+            <div fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex="auto" fxLayout="column" fxLayoutGap="10px">
+                    <mat-card fxLayout="column">
+                        <mat-form-field fxFlex="100">
+                            <mat-label>Chọn người xin ý kiến<span class="required-field">*</span></mat-label>
+                            <mat-select [(ngModel)]="selectedUserComment">
+                                <mat-option *ngFor="let item of ListUserChoice" value="{{item.Id}}|{{item.Email}}">{{item.DisplayName}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field fxFlex="100">
+                            <mat-label>Nội dung xin ý kiến <span class="required-field">*</span></mat-label>
+                            <textarea matInput [(ngModel)]="contentComment"></textarea>
+                        </mat-form-field>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
+                            <div fxFlex="120px" fxFlex.xs="auto">
+                                <button type="button" mat-stroked-button color="primary" (click)="fileInputAddComment.click()"> <i
+                                                    class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
+                                <input hidden (change)="addAttachmentFile(4)" #fileInputAddComment type="file" id="fileAttachmentAddComment">
+                            </div>
+                            <div fxFlex="auto">
+                                <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                    <div *ngFor="let items of outputFileAddComment"><a (click)="removeAttachmentFile(items,4)"><i
+                                                            class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" fxLayoutAlign="center center">
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="saveItem()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
         </div>
     </ng-template>
