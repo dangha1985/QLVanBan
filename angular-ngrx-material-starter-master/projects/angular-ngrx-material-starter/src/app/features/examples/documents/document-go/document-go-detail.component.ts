@@ -103,6 +103,7 @@ export class DocumentGoDetailComponent implements OnInit {
   ListUserKnow = [];
   selectedKnower = []; selectedCombiner = []; selectedApprover;
   numberOfSymbol; numberGo; currentNumberGo = 0;
+  UserAppoverName = '';
   ArrayUserPofile: UserProfilePropertiesObject[] = [];
   dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -326,7 +327,7 @@ export class DocumentGoDetailComponent implements OnInit {
           })
         });
       }
-
+      this.UserAppoverName = itemList[0].ListUserApprover;
       this.itemDoc = {
         ID: itemList[0].ID,
         NumberGo: itemList[0].NumberGo === 0 ? '' : this.docServices.formatNumberGo(itemList[0].NumberGo),
@@ -481,7 +482,29 @@ export class DocumentGoDetailComponent implements OnInit {
         () => {
           console.log(
             'Add item of approval user to list ListProcessRequestGo successfully!'
-          );         
+          );     
+          // update user approver
+          this.UserAppoverName += ';' + this.selectedApprover.split('|')[0] + '_' + this.selectedApprover.split('|')[2];
+          const data = {
+            __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
+            ListUserApprover: this.UserAppoverName
+          };
+          this.resService.updateListById('ListDocumentGo', data, this.ItemId).subscribe(
+            item => {},
+            error => {
+              this.closeCommentPanel();
+              console.log(
+                'error when update item to list ListDocumentGo: ' +
+                  error.error.error.message.value
+              );
+            },
+            () => {
+              console.log(
+                'Update user approver name successfully!'
+              );
+            }
+          )
+
           if(this.historyId > 0) {
             const dataTicket = {
               __metadata: { type: 'SP.Data.ListHistoryRequestGoListItem' },
@@ -573,6 +596,28 @@ export class DocumentGoDetailComponent implements OnInit {
             console.log(
               'Add item of approval user to list ListProcessRequestGo successfully!'
             );
+            // update user approver
+            this.UserAppoverName += ';' + this.selectedApprover.split('|')[0] + '_' + this.selectedApprover.split('|')[2];
+            const data = {
+              __metadata: { type: 'SP.Data.ListDocumentGoListItem' },
+              ListUserApprover: this.UserAppoverName
+            };
+            this.resService.updateListById('ListDocumentGo', data, this.ItemId).subscribe(
+              item => {},
+              error => {
+                this.closeCommentPanel();
+                console.log(
+                  'error when update item to list ListDocumentGo: ' +
+                    error.error.error.message.value
+                );
+              },
+              () => {
+                console.log(
+                  'Update user approver name successfully!'
+                );
+              }
+            )
+
             if(this.IndexStep === (this.totalStep - 1)) {
               const dataTicket = {
                 __metadata: { type: 'SP.Data.ListDocumentGoListItem' },

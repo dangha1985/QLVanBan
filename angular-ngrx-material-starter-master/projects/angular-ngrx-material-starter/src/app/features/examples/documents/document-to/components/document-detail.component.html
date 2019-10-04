@@ -524,7 +524,7 @@
             <!-- <mat-form-field fxFlex="100">
                                 <mat-label>Người xử lý</mat-label>
                 <mat-select [(ngModel)]="selectedApprover">
-                    <mat-option>None</mat-option>
+                    <mat-option>--- Chọn ---</mat-option>
                     <mat-option *ngFor="let item of ListUserApprover" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -532,7 +532,7 @@
             <mat-form-field fxFlex="100">
                 <mat-label>Người phối hợp</mat-label>
                 <mat-select multiple [(ngModel)]="selectedCombiner">
-                    <mat-option>None</mat-option>
+                    <mat-option>--- Chọn ---</mat-option>
                     <mat-option *ngFor="let item of ListUserCombine" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -540,7 +540,7 @@
             <mat-form-field fxFlex="100">
                 <mat-label>Nhận để biết</mat-label>
                 <mat-select multiple [(ngModel)]="selectedKnower">
-                    <mat-option>None</mat-option>
+                    <mat-option>--- Chọn ---</mat-option>
                     <mat-option *ngFor="let item of ListUserKnow" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
                 </mat-select>
             </mat-form-field> -->

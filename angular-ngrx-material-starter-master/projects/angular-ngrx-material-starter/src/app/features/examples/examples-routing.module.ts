@@ -18,7 +18,7 @@ import {DocumentAddComponent} from './documents/document-to/components/document-
 import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
 import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
 import {ReportComponent} from './documents/document-to/components/report.component'
-
+import {ReportAdvanceComponent} from './documents/document-to/components/report-advance.component'
 const routes: Routes = [
   {
     path: '',
@@ -40,9 +40,29 @@ const routes: Routes = [
         data: { title: 'Chờ xử lý' }
       },
       {
+        path: 'doc-list-approved/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Đã xử lý' }
+      },
+      {
+        path: 'doc-list-waiting-comment/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Chờ xin ý kiến' }
+      },
+      {
+        path: 'doc-list-response-comment/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Đã cho ý kiến' }
+      },
+      {
         path: 'report-list',
         component: ReportComponent,
         data: { title: 'Báo cáo, thống kê' }
+      },
+      {
+        path: 'report-advance',
+        component: ReportAdvanceComponent,
+        data: { title: 'Tra cứu văn bản' }
       },
       {
         path: 'doc-detail/:id',

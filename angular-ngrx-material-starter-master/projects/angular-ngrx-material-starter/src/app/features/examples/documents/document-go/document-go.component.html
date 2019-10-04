@@ -86,7 +86,7 @@
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
                             <mat-label>Người xử lý chính <span class="required-field">*</span></mat-label>
                             <mat-select placeholder="Người xử lý chính" formControlName="UserOfHandle">
-                                <mat-option *ngFor="let item of ListApproverStep" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
+                                <mat-option *ngFor="let item of ListApproverStep" value="{{item.UserId}}|{{item.UserEmail}}|{{item.UserName}}">{{item.UserName}}</mat-option>
                             </mat-select>
                             <mat-error *ngIf="form.get('UserOfHandle').hasError('required')">Bạn chưa nhập thông tin Người xử lý chính
                             </mat-error>
@@ -100,12 +100,12 @@
                     <div class="row">
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
                             <mat-select placeholder="Người phối hợp" formControlName="UserOfCombinate">
-                                <mat-option *ngFor="let item of ListApproverStep" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
+                                <mat-option *ngFor="let item of ListApproverStep" value="{{item.UserId}}|{{item.UserEmail}}|{{item.UserName}}">{{item.UserName}}</mat-option>
                             </mat-select>
                         </mat-form-field>
                         <mat-form-field class="col" [ngClass]="routeAnimationsElements">
                             <mat-select placeholder="Người nhận để biết" formControlName="UserOfKnow">
-                                <mat-option *ngFor="let item of ListApproverStep" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
+                                <mat-option *ngFor="let item of ListApproverStep" value="{{item.UserId}}|{{item.UserEmail}}|{{item.UserName}}">{{item.UserName}}</mat-option>
                             </mat-select>
                         </mat-form-field>
 

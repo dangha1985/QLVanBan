@@ -17,7 +17,7 @@
                     <mat-form-field fxFlex="50">
                         <mat-label>Sổ văn bản <span class="required-field">*</span></mat-label>
                         <mat-select formControlName="bookType" disabled>
-                            <mat-option>None</mat-option>
+                            <mat-option>--- Chọn ---</mat-option>
                             <mat-option *ngFor="let item of ListBookType" value={{item.code}}>{{item.title}}</mat-option>
                         </mat-select>
                         <mat-error *ngIf="IncomingDocform.get('bookType').hasError('required')">Chọn loại văn bản</mat-error>
@@ -40,14 +40,14 @@
                     <mat-form-field fxFlex="50">
                         <mat-label>Nơi gửi</mat-label>
                         <mat-select formControlName="source">
-                            <mat-option>None</mat-option>
+                            <mat-option>--- Chọn ---</mat-option>
                             <mat-option *ngFor="let item of ListSource" value={{item.id}}>{{item.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field fxFlex="50">
                         <mat-label>Loại văn bản</mat-label>
                         <mat-select formControlName="docType">
-                            <mat-option>None</mat-option>
+                            <mat-option>--- Chọn ---</mat-option>
                             <mat-option *ngFor="let item of ListDocType" value={{item.id}}>{{item.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -78,14 +78,14 @@
                 <mat-form-field fxFlex="50">
                     <mat-label>Độ mật</mat-label>
                     <mat-select formControlName="secretLevel">
-                        <mat-option>None</mat-option>
+                        <mat-option>--- Chọn ---</mat-option>
                         <mat-option *ngFor="let item of ListSecret" value={{item.id}}>{{item.title}}</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field fxFlex="50">
                     <mat-label>Độ khẩn</mat-label>
                     <mat-select formControlName="urgentLevel">
-                        <mat-option>None</mat-option>
+                        <mat-option>--- Chọn ---</mat-option>
                         <mat-option *ngFor="let item of ListUrgent" value={{item.id}}>{{item.title}}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -95,8 +95,8 @@
                 <mat-form-field fxFlex="50">
                     <mat-label>Người xử lý <span class="required-field">*</span></mat-label>
                     <mat-select formControlName="userHandle">
-                        <mat-option>None</mat-option>
-                        <mat-option *ngFor="let item of ApproverStep" value="{{item.UserId}}_{{item.UserEmail}}">{{item.UserName}}</mat-option>
+                        <mat-option>--- Chọn ---</mat-option>
+                        <mat-option *ngFor="let item of ApproverStep" value="{{item.UserId}}_{{item.UserEmail}}_{{item.UserName}}">{{item.UserName}}</mat-option>
                     </mat-select>
                     <mat-error *ngIf="IncomingDocform.get('userHandle').hasError('required')">Chọn người xử lý</mat-error>
                 </mat-form-field>
@@ -150,7 +150,7 @@
                     <mat-form-field fxFlex="25">
                         <mat-label>Phương thức nhận</mat-label>
                         <mat-select formControlName="methodReceipt">
-                            <mat-option>None</mat-option>
+                            <mat-option>--- Chọn ---</mat-option>
                             <mat-option *ngFor="let item of ListMethodReceipt" value={{item.id}}>{{item.title}}</mat-option>
                         </mat-select>
                     </mat-form-field>

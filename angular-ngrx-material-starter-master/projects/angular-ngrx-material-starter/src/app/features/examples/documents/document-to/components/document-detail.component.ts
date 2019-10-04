@@ -111,6 +111,7 @@ export class DocumentDetailComponent implements OnInit {
   totalStep = 0;
   overlayRef;
   selectedKnower = []; selectedCombiner = []; selectedApprover;
+  UserAppoverName = '';
   ReasonReturn;
   content;deadline;
   displayedColumns: string[] = [
@@ -220,6 +221,7 @@ export class DocumentDetailComponent implements OnInit {
               });
             });
           }
+          this.UserAppoverName = itemList[0].ListUserApprover;
           this.itemDoc = {
             ID: itemList[0].ID,
             bookType: itemList[0].BookTypeName,
@@ -658,6 +660,28 @@ export class DocumentDetailComponent implements OnInit {
           console.log(
             'Add item of approval user to list ListHistoryRequestTo successfully!'
           );
+          // update user approver
+          this.UserAppoverName += ';' + this.selectedApprover.split('|')[0] + '_' + this.selectedApprover.split('|')[2];
+          const data = {
+            __metadata: { type: 'SP.Data.ListDocumentToListItem' },
+            ListUserApprover: this.UserAppoverName
+          };
+          this.services.updateListById('ListDocumentTo', data, this.IncomingDocID).subscribe(
+            item => {},
+            error => {
+              this.CloseRotiniPanel();
+              console.log(
+                'error when update item to list ListDocumentTo: ' +
+                  error.error.error.message.value
+              );
+            },
+            () => {
+              console.log(
+                'Update user approver name successfully!'
+              );
+            }
+          )
+
           if(this.historyId > 0) {
             const dataTicket = {
               __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },
@@ -727,6 +751,29 @@ export class DocumentDetailComponent implements OnInit {
             console.log(
               'Add item of approval user to list ListHistoryRequestTo successfully!'
             );
+
+            // update user approver
+            this.UserAppoverName += ';' + this.selectedApprover.split('|')[0] + '_' + this.selectedApprover.split('|')[2];
+            const data = {
+              __metadata: { type: 'SP.Data.ListDocumentToListItem' },
+              ListUserApprover: this.UserAppoverName
+            };
+            this.services.updateListById('ListDocumentTo', data, this.IncomingDocID).subscribe(
+              item => {},
+              error => {
+                this.CloseRotiniPanel();
+                console.log(
+                  'error when update item to list ListDocumentTo: ' +
+                    error.error.error.message.value
+                );
+              },
+              () => {
+                console.log(
+                  'Update user approver name successfully!'
+                );
+              }
+            )
+
             if(this.historyId > 0) {
               const dataTicket = {
                 __metadata: { type: 'SP.Data.ListHistoryRequestToListItem' },

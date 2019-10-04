@@ -30,7 +30,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { environment } from '../../../../../../environments/environment';
-
+import { ActivatedRoute, Router} from '@angular/router';
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
@@ -77,8 +77,10 @@ export class DocumentAddComponent implements OnInit {
   showList = true;
   userApproverId = '';
   currentUserName = '';
+  currentUserEmail = '';
   currentUserId = '';
   userApproverEmail = '';
+  userApproverName = '';
   currentNumberTo = 0;
   IncomingDocform: FormGroup;
   ListBookType: ItemSeleted[] = [];
@@ -98,7 +100,8 @@ export class DocumentAddComponent implements OnInit {
   itemDocEdit;
   urlAttachment = environment.proxyUrl.split('/sites/', 1);
   IdEdit = 0;
-
+  Title = '';
+  EmailStepConfig;
   constructor(
     private fb: FormBuilder,
     private docTo: IncomingDocService,
@@ -106,7 +109,8 @@ export class DocumentAddComponent implements OnInit {
     private ref: ChangeDetectorRef,
     private readonly notificationService: NotificationService,
     public overlay: Overlay,
-    public viewContainerRef: ViewContainerRef
+    public viewContainerRef: ViewContainerRef,
+    private routes: Router,
   ) {}
 
   ngOnInit() {
@@ -290,6 +294,7 @@ export class DocumentAddComponent implements OnInit {
       itemValue => {
         this.currentUserId = itemValue['Id'];
         this.currentUserName = itemValue['Title'];
+        this.currentUserEmail = itemValue['Email'];
       },
       error => {
         console.log('error: ' + error);
@@ -403,6 +408,7 @@ export class DocumentAddComponent implements OnInit {
   splitDataUserApprover(value) {
     this.userApproverId = value.split('_')[0];
     this.userApproverEmail = value.split('_')[1];
+    this.userApproverName = value.split('_')[2];
   }
 
   AddNewItem(sts) {
@@ -432,6 +438,7 @@ export class DocumentAddComponent implements OnInit {
       );
       let sourceT = this.docTo.FindItemById(this.ListSource, dataForm.source);
       this.splitDataUserApprover(dataForm.userHandle);
+      this.Title =  dataForm.numberTo + '/Văn bản đến'
       const data = {
         __metadata: { type: 'SP.Data.ListDocumentToListItem' },
         Title: dataForm.bookType,
@@ -462,7 +469,8 @@ export class DocumentAddComponent implements OnInit {
         IsRetrieve: dataForm.isRetrieve ? 1 : 0,
         StatusID: sts,
         StatusName: sts === 0 ? 'Chờ xử lý' : 'Lưu tạm',
-        Signer: dataForm.signer
+        Signer: dataForm.signer,
+        ListUserApprover: this.userApproverId + '_' + this.userApproverName,
       };
       if(this.IdEdit <= 0) {
         this.services.AddItemToList(this.listTitle, data).subscribe(
@@ -635,6 +643,107 @@ export class DocumentAddComponent implements OnInit {
         this.AddListTicket();
       }
     );
+  }
+
+  addItemSendMail() {
+    try {
+      // send mail user created
+      const dataSendUser = {
+        __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+        Title: this.listTitle,
+        IndexItem: this.DocumentID,
+        Step: 1,
+        KeyList: this.listTitle +  '_' + this.DocumentID,
+        SubjectMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.NewEmailSubject),
+        BodyMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.NewEmailBody),
+        SendMailTo: this.currentUserEmail,
+      }
+      this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+        itemRoomRQ => {
+          console.log(itemRoomRQ['d']);
+        },
+        error => {
+          console.log(error);
+          this.CloseRotiniPanel();
+        },
+        () => {
+          console.log('Save item success');
+
+          // send mail user approver
+          this.EmailStepConfig.AssignmentEmailSubject = 'New request {Title}';
+          const dataSendApprover = {
+            __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+            Title: this.listTitle,
+            IndexItem: this.DocumentID,
+            Step: 1,
+            KeyList: this.listTitle +  '_' + this.DocumentID,
+            SubjectMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.AssignmentEmailSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.AssignmentEmailBody),
+            SendMailTo: this.userApproverEmail,
+            TypeEmail: 'Send to approval user'
+          }
+          this.services.AddItemToList('ListRequestSendMail', dataSendApprover).subscribe(
+            itemCarRQ => {
+              console.log(itemCarRQ['d']);
+            },
+            error => {
+              console.log(error);
+              this.CloseRotiniPanel();
+            },
+            () => {
+              console.log('Save item success');
+              this.CloseRotiniPanel();
+              alert('Bạn đã tạo yêu cầu thành công');
+              this.routes.navigate(['examples/doc-detail/' + this.DocumentID]);
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.log('addItemSendMail error: ' + error.message);
+    }
+  }
+
+  Replace_Field_Mail(FieldMail, ContentMail) {
+    try {
+      if (this.isNotNull(FieldMail) && this.isNotNull(ContentMail)) {
+        let strContent = FieldMail.split(",");
+        console.log("ContentMail before: " + ContentMail);
+        for (let i = 0; i < strContent.length; i++) {
+          switch (strContent[i]) {
+            case 'Title':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.Title);
+              break;
+            case 'Author':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'userStep':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
+              break;
+            case 'UserApproval':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
+              break;
+            case 'ItemUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/examples/doc-detail/' + this.DocumentID);
+              break;
+            case 'TaskUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/examples/doc-detail/' + this.DocumentID + "/1");
+              break;
+            case 'HomeUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/examples');
+              break;
+          }
+        }
+        console.log("ContentMail after: " + ContentMail);
+        return ContentMail;
+      }
+      else {
+        console.log("Field or Body email is null or undefined ")
+      }
+    }
+    catch (err) {
+      console.log("Replace_Field_Mail error: " + err.message);
+    }
   }
 
   reset() {

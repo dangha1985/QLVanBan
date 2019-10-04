@@ -107,6 +107,7 @@ export class DocumentGoComponent implements OnInit {
   strFilterUser = '';
   userApproverId = '';
   userApproverEmail = '';
+  userApproverName = '';
   currentUserId = '';
   currentUserName='';
   currentNumberGo = 0;
@@ -359,6 +360,7 @@ export class DocumentGoComponent implements OnInit {
   splitDataUserApprover(value) {
     this.userApproverId = value.split("|")[0];
     this.userApproverEmail = value.split("|")[1];
+    this.userApproverName = value.split("|")[2];
   }
 
   //Thêm mới văn bản đi
@@ -421,6 +423,7 @@ export class DocumentGoComponent implements OnInit {
           isSendMail: this.form.get('isSendMail').value == true ? 1 : 0,
           StatusID:  isChuyenXL,
           StatusName: isChuyenXL === 0?'Chờ xử lý' : 'Dự thảo',
+          ListUserApprover: this.userApproverId + '_' + this.userApproverName,
         }
         console.log('data=' + data);
         if(this.IdEdit==0){

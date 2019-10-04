@@ -139,6 +139,10 @@ export class DocumentWaitingComponent implements OnInit {
               private readonly notificationService: NotificationService,
               public overlay: Overlay, public viewContainerRef: ViewContainerRef,
               private route: ActivatedRoute,) {
+                // this.route.params.subscribe(params => {
+                //   this.styleId = parseInt(params.id);
+                //   this.getCurrentUser();
+                // });
               // private _database: ChecklistDatabase) {
 
                 // this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
@@ -156,7 +160,6 @@ export class DocumentWaitingComponent implements OnInit {
     this.route.paramMap.subscribe(parames => {
       this.styleId = parseInt(parames.get('id'));
     });
-
     this.getCurrentUser();
   }
 
@@ -184,33 +187,43 @@ export class DocumentWaitingComponent implements OnInit {
       let item = itemValue["value"] as Array<any>;     
       this.inDocs$ = []; 
       item.forEach(element => {
-        this.inDocs$.push({
-          STT: this.inDocs$.length + 1,
-          ID: element.ID,
-          documentID: element.NoteBookID, 
-          compendium: element.Compendium, 
-          userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
-          userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : '',
-          userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
-          deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
-          status: 'Chờ xử lý',
-          source: '',
-          destination: '',
-          taskType: '',
-          typeCode: '',
-          content: this.docTo.CheckNull(element.Content),
-          indexStep: element.IndexStep,
-          created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
-          numberTo: element.Title,
-          link: this.getLinkItemByRole(element.TaskTypeCode, element.NoteBookID, element.IndexStep),
-          stsClass: ''
-        })
+        if(this.inDocs$.findIndex(e => e.documentID === element.NoteBookID) < 0) {
+          this.inDocs$.push({
+            STT: this.inDocs$.length + 1,
+            ID: element.ID,
+            documentID: element.NoteBookID, 
+            compendium: element.Compendium, 
+            userRequest: element.UserRequest !== undefined ? element.UserRequest.Title : '',
+            userRequestId: element.UserRequest !== undefined ? element.UserRequest.Id : '',
+            userApprover: element.UserApprover !== undefined ? element.UserApprover.Title : '',
+            deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
+            status: 'Chờ xử lý',
+            source: '',
+            destination: '',
+            taskType: '',
+            typeCode: '',
+            content: this.docTo.CheckNull(element.Content),
+            indexStep: element.IndexStep,
+            created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
+            numberTo: element.Title,
+            link: this.getLinkItemByRole(element.TaskTypeCode, element.NoteBookID, element.IndexStep),
+            stsClass: ''
+          })
+        }
       })
       this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
       this.ref.detectChanges();
       this.dataSource.paginator = this.paginator;
       this.CloseRotiniPanel();
-    });   
+    },
+    error => { 
+      console.log("error: " + error);
+      this.CloseRotiniPanel();
+    },
+    () => {
+      this.CloseRotiniPanel();
+    }
+    );   
   }
 
   getCurrentUser(){
@@ -251,6 +264,8 @@ export class DocumentWaitingComponent implements OnInit {
   }
 
   CloseRotiniPanel() {
-    this.overlayRef.dispose();
+    if(this.overlayRef !== undefined) {
+      this.overlayRef.dispose();
+    }
   }
 }

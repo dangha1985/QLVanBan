@@ -7,7 +7,7 @@
             <mat-form-field fxFlex="50">
                 <mat-label>Loại văn bản</mat-label>
                 <mat-select [(ngModel)]="docType">
-                    <mat-option>None</mat-option>
+                    <mat-option>--- Chọn ---</mat-option>
                     <mat-option *ngFor="let item of ListDocType" value={{item.id}}>{{item.title}}</mat-option>
                 </mat-select>
             </mat-form-field>

@@ -108,6 +108,12 @@ export class IncomingDocService {
     );
   }
 
+  getAllDocumentReport(listName, strFilter): Observable<any>  {
+    return this.http.get(
+      `${this.restUrl}` + `/_api/web/lists/getbytitle('` + listName + `')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title&$expand=UserOfHandle,Author&$orderby=ID desc` + strFilter
+    );
+  }
+
   urlRequestTo =
     "/_api/web/lists/getbytitle('ListProcessRequestTo')/items?$select=*, UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$orderby=ID desc&$expand=UserApprover,UserRequest";
   getListRequestTo(strFilter): Observable<any> {

@@ -37,6 +37,7 @@ import {DocumentAddComponent, RotiniPanel} from './documents/document-to/compone
 import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
 import { DocumentWaitingComponent, ChecklistDatabase} from './documents/document-to/components/document-waiting.component'
 import { ReportComponent} from './documents/document-to/components/report.component'
+import { ReportAdvanceComponent} from './documents/document-to/components/report-advance.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -92,6 +93,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     // ChecklistDatabase,
     RotiniPanel,
     ReportComponent,
+    ReportAdvanceComponent,
   ],
   providers: [StockMarketService, UserService, ChecklistDatabase],
   entryComponents: [
