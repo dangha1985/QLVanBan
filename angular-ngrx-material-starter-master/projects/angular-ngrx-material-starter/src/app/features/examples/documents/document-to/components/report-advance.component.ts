@@ -43,19 +43,19 @@ export class ReportAdvanceComponent implements OnInit {
   dateFrom = moment().subtract(30,'day').toDate();
   showList = false;
   ListBookType = [
-    {id: 0, Title: 'Chưa vào sổ'},
-    {id: 1, Title: 'Văn bản đến'},
+    {id: 0, title: 'Chưa vào sổ'},
+    {id: 1, title: 'Văn bản đến'},
   ];
   ListDocType: ItemSeleted[] = [];
   ListSecret: ItemSeleted[] = [];
   ListUrgent: ItemSeleted[] = [];
   ApproverStep: ApproverObject[] = [];
   ListStatus = [
-    {id: 0, Title: 'Tất cả'},
-    {id: 1, Title: 'Chờ xử lý'},
-    {id: 2, Title: 'Đang xử lý'},
-    {id: 3, Title: 'Đã xử lý'},
-    {id: 4, Title: 'Thu hồi'},
+    {id: 0, title: 'Tất cả'},
+    {id: 1, title: 'Chờ xử lý'},
+    {id: 2, title: 'Đang xử lý'},
+    {id: 3, title: 'Đã xử lý'},
+    {id: 4, title: 'Thu hồi'},
   ];
   bookType; numberTo; docType; numberOfSymbol; singer; source; urgentLevel; secretLevel;
   statusDoc; userApprover; compendium; isAttachment = false;
@@ -67,7 +67,6 @@ export class ReportAdvanceComponent implements OnInit {
 
   ngOnInit() {
     this.getDocType();
-    this.getBookType();
     this.getUrgentLevel();
     this.getSecretLevel();
     this.getAllListRequest();
@@ -78,77 +77,62 @@ export class ReportAdvanceComponent implements OnInit {
     try{
       this.OpenRotiniPanel();
       let listName = '';
-      this.strFilter = `&$filter=ID ne ''`;
+      this.strFilter = '';
 
-      if(this.bookType === "DT") {
-        listName = 'ListDocumentTo';
-        if(this.docTo.CheckNull(this.numberTo) !== '') {
-          this.strFilter += ` and NumberTo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `'`;
-        }
-
-        if(this.docTo.CheckNull(this.numberOfSymbol) !== '') {
-          this.strFilter += ` and substringof('` + this.numberOfSymbol + `',NumberOfSymbol)`;
-        }
-  
-        if(this.docTo.CheckNullSetZero(this.docType) > 0) {
-          this.strFilter += ` and DocTypeID eq '` + this.docType +`'`;
-        }
-  
-        if(this.docTo.CheckNull(this.promulgatedFrom) !== '') {
-          this.promulgatedFrom = moment(this.promulgatedFrom).hours(0).minutes(0).seconds(0).toDate();
-          this.strFilter += ` and (PromulgatedDate ge '` + this.ISODateStringUTC(this.promulgatedFrom) + `' or PromulgatedDate eq null)`;
-        }
-  
-        if(this.docTo.CheckNull(this.promulgatedTo) !== '') {
-          this.promulgatedTo = moment(this.promulgatedTo).hours(23).minutes(59).seconds(59).toDate();
-          this.strFilter += ` and (PromulgatedDate le '` + this.ISODateStringUTC(this.promulgatedTo) + `' or PromulgatedDate eq null)`
-        }
-  
-        if(this.docTo.CheckNull(this.dateFrom) !== '') {
-          this.dateFrom = moment(this.dateFrom).hours(0).minutes(0).seconds(0).toDate();
-          this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `' or DateTo eq null)`;
-        }
-  
-        if(this.docTo.CheckNull(this.dateTo) !== '') {
-          this.dateTo = moment(this.dateTo).hours(23).minutes(59).seconds(59).toDate();
-          this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `' or DateTo eq null)`;
-        }
-      } else if(this.bookType === "DG") {
-        listName = 'ListDocumentGo';
-        
-        if(this.docTo.CheckNull(this.numberTo) !== '') {
-          this.strFilter += ` and NumberGo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `'`;
-        }
-
-        if(this.docTo.CheckNull(this.numberOfSymbol) !== '') {
-          this.strFilter += ` and substringof('` + this.numberOfSymbol + `',NumberSymbol)`;
-        }
-  
-        if(this.docTo.CheckNullSetZero(this.docType) > 0) {
-          this.strFilter += ` and DocTypeID eq '` + this.docType +`'`;
-        }
-
-        if(this.docTo.CheckNull(this.promulgatedFrom) !== '') {
-          this.promulgatedFrom = moment(this.promulgatedFrom).hours(0).minutes(0).seconds(0).toDate();
-          this.strFilter += ` and (DateIssued ge '` + this.ISODateStringUTC(this.promulgatedFrom) + `' or DateIssued eq null)`;
-        }
-
-        if(this.docTo.CheckNull(this.promulgatedTo) !== '') {
-          this.promulgatedTo = moment(this.promulgatedTo).hours(23).minutes(59).seconds(59).toDate();
-          this.strFilter += ` and (DateIssued le '` + this.ISODateStringUTC(this.promulgatedTo) + `' or DateIssued eq null)`
-        }
-
-        if(this.docTo.CheckNull(this.dateFrom) !== '') {
-          this.dateFrom = moment(this.dateFrom).hours(0).minutes(0).seconds(0).toDate();
-          this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `' or DateTo eq null)`;
-        }
-
-        if(this.docTo.CheckNull(this.dateTo) !== '') {
-          this.dateTo = moment(this.dateTo).hours(23).minutes(59).seconds(59).toDate();
-          this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `' or DateTo eq null)`;
-        }
+      if(this.bookType === "0") {
+        this.strFilter = `&$filter=StatusID eq '-1'`;
+      } else if(this.docTo.CheckNullSetZero(this.bookType) === 1){
+        this.strFilter = `&$filter=StatusID ne '-1'`;
       } else {
-        listName = '';
+        this.strFilter = `&$filter=ID gt '0'`;
+      }
+
+      if(this.docTo.CheckNull(this.numberTo) !== '') {
+        this.strFilter += ` and NumberTo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `'`;
+      }
+
+      if(this.docTo.CheckNull(this.numberOfSymbol) !== '') {
+        this.strFilter += ` and substringof('` + this.numberOfSymbol + `',NumberOfSymbol)`;
+      }
+
+      if(this.docTo.CheckNullSetZero(this.docType) > 0) {
+        this.strFilter += ` and DocTypeID eq '` + this.docType +`'`;
+      }
+
+      if(this.docTo.CheckNull(this.promulgatedFrom) !== '') {
+        this.promulgatedFrom = moment(this.promulgatedFrom).hours(0).minutes(0).seconds(0).toDate();
+        this.strFilter += ` and (PromulgatedDate ge '` + this.ISODateStringUTC(this.promulgatedFrom) + `' or PromulgatedDate eq null)`;
+      }
+
+      if(this.docTo.CheckNull(this.promulgatedTo) !== '') {
+        this.promulgatedTo = moment(this.promulgatedTo).hours(23).minutes(59).seconds(59).toDate();
+        this.strFilter += ` and (PromulgatedDate le '` + this.ISODateStringUTC(this.promulgatedTo) + `' or PromulgatedDate eq null)`
+      }
+
+      if(this.docTo.CheckNull(this.dateFrom) !== '') {
+        this.dateFrom = moment(this.dateFrom).hours(0).minutes(0).seconds(0).toDate();
+        this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `' or DateTo eq null)`;
+      }
+
+      if(this.docTo.CheckNull(this.dateTo) !== '') {
+        this.dateTo = moment(this.dateTo).hours(23).minutes(59).seconds(59).toDate();
+        this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `' or DateTo eq null)`;
+      }
+
+      if(this.docTo.CheckNull(this.singer) !== '') {
+        this.strFilter += ` and substringof('` + this.singer + `',Signer)`;
+      }
+
+      if(this.docTo.CheckNull(this.source) !== '') {
+        this.strFilter += ` and substringof('` + this.source + `',Source)`;
+      }
+
+      if(this.docTo.CheckNullSetZero(this.secretLevel) > 0) {
+        this.strFilter += ` and SecretLevelID eq '` + this.secretLevel +`'`;
+      }
+
+      if(this.docTo.CheckNullSetZero(this.urgentLevel) > 0) {
+        this.strFilter += ` and UrgentLevelID eq '` + this.urgentLevel +`'`;
       }
       
       this.docTo.getAllDocumentTo(this.strFilter).subscribe((itemValue: any[]) => {
@@ -213,19 +197,6 @@ export class ReportAdvanceComponent implements OnInit {
         console.log("Current user email is: \n" + "Current user Id is: " + this.currentUserId + "\n" + "Current user name is: " + this.currentUserName );
       }
       );
-  }
-
-  getBookType() {
-    this.services.getList('ListBookType').subscribe((itemValue: any[]) => {
-      let item = itemValue['value'] as Array<any>;
-      item.forEach(element => {
-        this.ListBookType.push({
-          id: element.ID,
-          title: element.Title,
-          code: element.Code
-        });
-      });
-    });
   }
 
   getDocType() {

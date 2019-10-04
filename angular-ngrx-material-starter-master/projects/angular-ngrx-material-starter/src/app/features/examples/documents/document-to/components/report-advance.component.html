@@ -14,7 +14,7 @@
                     <mat-label>Sổ văn bản</mat-label>
                     <mat-select [(ngModel)]="bookType">
                         <mat-option>--- Chọn ---</mat-option>
-                        <mat-option *ngFor="let item of ListBookType" value={{item.code}}>{{item.title}}</mat-option>
+                        <mat-option *ngFor="let item of ListBookType" value={{item.id}}>{{item.title}}</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field fxFlex="50">
