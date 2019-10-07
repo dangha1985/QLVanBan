@@ -89,16 +89,15 @@
                 <mat-form-field fxFlex="50">
                     <mat-label>Trạng thái</mat-label>
                     <mat-select [(ngModel)]="statusDoc">
-                        <mat-option>--- Chọn ---</mat-option>
-                        <mat-option *ngFor="let item of ListStatus" value={{item.id}}>{{item.title}}</mat-option>
+                        <!-- <mat-option>--- Chọn ---</mat-option> -->
+                        <mat-option *ngFor="let item of ListStatus" value={{item.code}}>{{item.title}}</mat-option>
                     </mat-select>
                 </mat-form-field>
                 <mat-form-field fxFlex="50">
-                    <mat-label>Người xử lý</mat-label>
-                    <mat-select [(ngModel)]="userApprover">
-                        <mat-option>--- Chọn ---</mat-option>
-                        <mat-option *ngFor="let item of ListUserApprover" value={{item.id}}>{{item.title}}</mat-option>
-                    </mat-select>
+                    <input type="text" placeholder="Người xử lý" aria-label="ListUserApprover" matInput [formControl]="userApprover" [matAutocomplete]="auto">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="onDisplayValue">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">{{option.UserName}}</mat-option>
+                    </mat-autocomplete>
                 </mat-form-field>
             </div>
             <div fxLayout="row" fxLayout.xs="column" fxFlexFill fxLayoutGap="10px">

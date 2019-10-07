@@ -5,9 +5,10 @@ import {FormControl, FormBuilder} from '@angular/forms';
 import {SelectionModel} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 import * as moment from 'moment';
-import {IncomingDoc, ItemSeleted, IncomingDocService, IncomingTicket, ApproverObject} from '../incoming-doc.service';
+import {ItemSeleted, IncomingDocService, IncomingTicket, ApproverObject} from '../incoming-doc.service';
 import {RotiniPanel} from './document-add.component';
 import {ResApiService} from '../../../services/res-api.service';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
@@ -16,6 +17,7 @@ import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
 } from '../../../../../core/core.module';
+import { any } from 'bluebird';
 
 @Component({
   selector: 'anms-report-advance',
@@ -36,12 +38,15 @@ export class ReportAdvanceComponent implements OnInit {
   currentUserId;
   currentUserName;
   strFilter = '';
+  ListUserApprover: ApproverObject[] = [];
   overlayRef;
   promulgatedFrom = moment().subtract(30,'day').toDate();
   promulgatedTo = new Date();
   dateTo = new Date();
   dateFrom = moment().subtract(30,'day').toDate();
   showList = false;
+  ListIdDoc = [];
+  isFrist = false;
   ListBookType = [
     {id: 0, title: 'Chưa vào sổ'},
     {id: 1, title: 'Văn bản đến'},
@@ -49,16 +54,17 @@ export class ReportAdvanceComponent implements OnInit {
   ListDocType: ItemSeleted[] = [];
   ListSecret: ItemSeleted[] = [];
   ListUrgent: ItemSeleted[] = [];
-  ApproverStep: ApproverObject[] = [];
   ListStatus = [
-    {id: 0, title: 'Tất cả'},
-    {id: 1, title: 'Chờ xử lý'},
-    {id: 2, title: 'Đang xử lý'},
-    {id: 3, title: 'Đã xử lý'},
-    {id: 4, title: 'Thu hồi'},
+    {id: 0, title: '--- Tất cả ---', code: 'All'},
+    // {id: 1, title: 'Chờ xử lý'},
+    // {id: 2, title: 'Đang xử lý'},
+    // {id: 3, title: 'Đã xử lý'},
+    // {id: 4, title: 'Thu hồi'},
   ];
   bookType; numberTo; docType; numberOfSymbol; singer; source; urgentLevel; secretLevel;
-  statusDoc; userApprover; compendium; isAttachment = false;
+  statusDoc; compendium; isAttachment = false;
+  userApprover = new FormControl();
+  filteredOptions: Observable<ApproverObject[]>;
 
   constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
@@ -66,19 +72,62 @@ export class ReportAdvanceComponent implements OnInit {
               public overlay: Overlay, public viewContainerRef: ViewContainerRef) { }
 
   ngOnInit() {
+    this.filteredOptions = this.userApprover.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => typeof value === 'string' ? value : value.UserName),
+        map(name  => name  ? this._filterStates(name ) : this.ListUserApprover.slice())
+      );
     this.getDocType();
+    this.getListStatus();
+    this.GetAllUser();
     this.getUrgentLevel();
     this.getSecretLevel();
     this.getAllListRequest();
     this.getCurrentUser();
   }
+
+  onDisplayValue(user?: ApproverObject): string | undefined {
+    return user ? user.UserName : undefined;
+  }
+
+  private _filterStates(value: string): ApproverObject[] {
+    const filterValue = value.toLowerCase();
+    return this.ListUserApprover.filter(item => item.UserName.toLowerCase().includes(filterValue));
+  }
+
+   // Load all user approval
+   GetAllUser() {
+      this.docTo.getAllUser().subscribe((itemValue: any[]) => {
+        let item = itemValue['value'] as Array<any>;
+        this.ListUserApprover = [];
+        item.forEach(element => {
+          if(this.ListUserApprover.findIndex(i => i.UserId === element.User.Id) < 0) {
+            this.ListUserApprover.push({
+              UserId: element.User.Id,
+              UserName: element.User.Title,
+              UserEmail: element.User.Name.split('|')[2],
+            });
+          }
+        })   
+      },
+      error => {
+        console.log("Load all user error " + error);
+        this.CloseRotiniPanel();
+      },
+      () =>{
+      })
+  }
   
   getAllListRequest() {
-    try{
+    try {
       this.OpenRotiniPanel();
       let listName = '';
       this.strFilter = '';
-
+      if(this.statusDoc !== 'All' && this.statusDoc !== 'ĐXL' && this.statusDoc !== 'BTH' && !this.isFrist) {
+        this.getTicketByStatus(this.statusDoc);
+        return;
+      }
       if(this.bookType === "0") {
         this.strFilter = `&$filter=StatusID eq '-1'`;
       } else if(this.docTo.CheckNullSetZero(this.bookType) === 1){
@@ -127,6 +176,22 @@ export class ReportAdvanceComponent implements OnInit {
         this.strFilter += ` and substringof('` + this.source + `',Source)`;
       }
 
+      if(this.docTo.CheckNull(this.statusDoc) !== '') {
+        if(this.statusDoc = 'All') {          
+        } else if(this.statusDoc = 'CVS') {
+          this.strFilter += ` and StatusID ne '-1'`;
+        }
+        else {
+          this.strFilter += ` and StatusID ne '0'`;
+          if(this.ListIdDoc.length > 0) {
+            this.ListIdDoc.forEach(item => {
+              this.strFilter += ` and (ID eq '` + item + `' or`
+            })
+            this.strFilter = this.strFilter.substr(0, this.strFilter.length-3) + `)`;
+          }
+        }
+      }
+
       if(this.docTo.CheckNullSetZero(this.secretLevel) > 0) {
         this.strFilter += ` and SecretLevelID eq '` + this.secretLevel +`'`;
       }
@@ -134,11 +199,20 @@ export class ReportAdvanceComponent implements OnInit {
       if(this.docTo.CheckNullSetZero(this.urgentLevel) > 0) {
         this.strFilter += ` and UrgentLevelID eq '` + this.urgentLevel +`'`;
       }
+
+      if(this.docTo.CheckNull(this.userApprover.value) !== '') {
+        this.strFilter += ` and UserOfHandle/Id eq '` + this.userApprover.value.UserId + `'`;
+      }
       
       this.docTo.getAllDocumentTo(this.strFilter).subscribe((itemValue: any[]) => {
         let item = itemValue["value"] as Array<any>;     
         this.inDocs$ = []; 
         item.forEach(element => {
+          if(this.docTo.CheckNull(this.compendium) !== '') { 
+            if(!this.docTo.CheckNull(element.Compendium).toLowerCase().includes(this.compendium.toLowerCase())) {
+              return;
+            }
+          }
           this.inDocs$.push({
             STT: this.inDocs$.length + 1,
             ID: element.ID,
@@ -166,7 +240,9 @@ export class ReportAdvanceComponent implements OnInit {
         console.log("error: " + error);
         this.CloseRotiniPanel();
       },
-      () => {}
+      () => {
+        this.CloseRotiniPanel();
+      }
       );   
     } catch(err) {
       console.log("Load all document to error:" + err.message);
@@ -174,13 +250,58 @@ export class ReportAdvanceComponent implements OnInit {
     }
   }
 
+  getTicketByStatus(status) {
+    let strFilter = ``;
+    if(status === "CXL") {
+      strFilter = `&$filter=StatusID eq '0' and TypeCode eq 'CXL'`;
+    }
+    if(status === "ĐAXL") {
+      strFilter = `&$filter=StatusID eq '1' and TypeCode eq 'CXL'`;
+    }
+    if(status === "NĐB") {
+      strFilter = `&$filter=TypeCode eq 'CXL' and TaskTypeCode eq 'NĐB'`;
+    }
+    if(status === "CCYK") {
+      strFilter = `&$filter=StatusID eq '0' and TypeCode eq 'XYK'`;
+    }
+    if(status === "ĐACYK") {
+      strFilter = `&$filter=StatusID eq '1' and TypeCode eq 'XYK'`;
+    }
+    this.docTo.getListRequestTo(strFilter).subscribe((itemValue: any[]) => {
+      this.ListIdDoc = [];
+      let item = itemValue['value'] as Array<any>;
+      item.forEach(element => {
+        if(this.ListIdDoc.indexOf(element.NoteBookID) < 0) {
+          this.ListIdDoc.push(element.NoteBookID);
+        }
+      });
+    },
+    error => {
+
+    },
+    () => {
+      this.isFrist = true;
+      this.getAllListRequest();
+    });
+  }
+
   resetForm() {
     this.numberTo = null;
+    this.numberOfSymbol = null;
     this.docType = null;
+    this.bookType = null;
     this.promulgatedFrom = moment().subtract(30,'day').toDate();
     this.promulgatedTo = new Date();
     this.dateTo = new Date();
     this.dateFrom = moment().subtract(30,'day').toDate();
+    this.singer = null;
+    this.source = null;
+    this.urgentLevel = null;
+    this.secretLevel = null;
+    this.statusDoc = null;
+    this.userApprover.setValue('');
+    this.compendium = null;
+    this.isAttachment = false;
   }
 
   getCurrentUser(){
@@ -209,6 +330,20 @@ export class ReportAdvanceComponent implements OnInit {
           code: ''
         });
       });
+    });
+  }
+
+  getListStatus() {
+    this.services.getList('ListStatusSearch').subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      item.forEach(element => {
+        this.ListStatus.push({
+          id: element.ID,
+          title: element.Title,
+          code: element.Code
+        });
+      });
+      this.statusDoc = 'All';
     });
   }
 
@@ -248,7 +383,9 @@ export class ReportAdvanceComponent implements OnInit {
   }
 
   CloseRotiniPanel() {
-    this.overlayRef.dispose();
+    if(this.overlayRef !== undefined){
+      this.overlayRef.dispose();
+    }
   }
 
   ISODateStringUTC(d) {

@@ -8,6 +8,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import {MatTableModule} from '@angular/material/table';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {MatTreeModule} from '@angular/material/tree'
+import {MatAutocompleteModule} from '@angular/material';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../../shared/shared.module';
 import { environment } from '../../../environments/environment';
@@ -72,6 +73,7 @@ export function HttpLoaderFactory(http: HttpClient) {
      MatTableModule,
      MatTreeModule,
      FlexLayoutModule,
+     MatAutocompleteModule,
      ModalModule.forRoot(),
   ],
   declarations: [
