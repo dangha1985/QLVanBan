@@ -92,7 +92,7 @@ export class IncomingDocService {
   }
 
   urlDocumentTo =
-    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title&$expand=UserOfHandle,Author&$orderby=ID desc";
+    "/_api/web/lists/getbytitle('ListDocumentTo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title,AttachmentFiles&$expand=UserOfHandle,Author,AttachmentFiles&$orderby=ID desc";
   getListDocumentTo(userId): Observable<any> {
     return this.http.get(
       `${this.restUrl}${this.urlDocumentTo}&$filter=Author/Id eq ` +

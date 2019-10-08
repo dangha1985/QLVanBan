@@ -126,6 +126,7 @@ export class ReportAdvanceComponent implements OnInit {
       this.strFilter = '';
       if(this.statusDoc !== 'All' && this.statusDoc !== 'ĐXL' && this.statusDoc !== 'BTH' && !this.isFrist) {
         this.getTicketByStatus(this.statusDoc);
+        this.CloseRotiniPanel();
         return;
       }
       if(this.bookType === "0") {
@@ -177,17 +178,24 @@ export class ReportAdvanceComponent implements OnInit {
       }
 
       if(this.docTo.CheckNull(this.statusDoc) !== '') {
-        if(this.statusDoc = 'All') {          
-        } else if(this.statusDoc = 'CVS') {
-          this.strFilter += ` and StatusID ne '-1'`;
+        if(this.statusDoc === 'All') {          
+        } 
+        else if(this.statusDoc === 'CVS') {
+          this.strFilter += ` and StatusID eq '-1'`;
+        }
+        else if(this.statusDoc === 'BTH') {
+          this.strFilter += ` and StatusID eq '1' and StatusName eq 'Bị thu hồi'`;
         }
         else {
-          this.strFilter += ` and StatusID ne '0'`;
+          this.strFilter += ` and StatusID eq '0'`;
           if(this.ListIdDoc.length > 0) {
+            this.strFilter += ` and (`;
             this.ListIdDoc.forEach(item => {
-              this.strFilter += ` and (ID eq '` + item + `' or`
+              this.strFilter += ` ID eq '` + item + `' or`
             })
             this.strFilter = this.strFilter.substr(0, this.strFilter.length-3) + `)`;
+          } else if(this.isFrist && this.ListIdDoc.length === 0) {
+            this.strFilter = `&$filter=ID eq '-1'`;
           }
         }
       }
@@ -201,15 +209,20 @@ export class ReportAdvanceComponent implements OnInit {
       }
 
       if(this.docTo.CheckNull(this.userApprover.value) !== '') {
-        this.strFilter += ` and UserOfHandle/Id eq '` + this.userApprover.value.UserId + `'`;
+        this.strFilter += ` and substringof('` + this.userApprover.value.UserId + `_` + this.userApprover.value.UserName + `',ListUserApprover)`;
       }
-      
+
       this.docTo.getAllDocumentTo(this.strFilter).subscribe((itemValue: any[]) => {
         let item = itemValue["value"] as Array<any>;     
         this.inDocs$ = []; 
         item.forEach(element => {
           if(this.docTo.CheckNull(this.compendium) !== '') { 
             if(!this.docTo.CheckNull(element.Compendium).toLowerCase().includes(this.compendium.toLowerCase())) {
+              return;
+            }
+          }
+          if(this.isAttachment) {
+            if(element.Attachments) {
               return;
             }
           }
@@ -234,6 +247,7 @@ export class ReportAdvanceComponent implements OnInit {
         
         this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
         this.ref.detectChanges();
+        this.isFrist = false;
         this.CloseRotiniPanel();     
       },
       error => { 
@@ -253,19 +267,19 @@ export class ReportAdvanceComponent implements OnInit {
   getTicketByStatus(status) {
     let strFilter = ``;
     if(status === "CXL") {
-      strFilter = `&$filter=StatusID eq '0' and TypeCode eq 'CXL'`;
+      strFilter = `&$filter=StatusID eq '0' and TypeCode eq 'CXL' and UserApprover/Id eq '` + this.currentUserId + `'`;
     }
-    if(status === "ĐAXL") {
-      strFilter = `&$filter=StatusID eq '1' and TypeCode eq 'CXL'`;
+    else if(status === "ĐAXL") {
+      strFilter = `&$filter=StatusID eq '1' and TypeCode eq 'CXL' and UserApprover/Id eq '` + this.currentUserId + `'`;
     }
-    if(status === "NĐB") {
-      strFilter = `&$filter=TypeCode eq 'CXL' and TaskTypeCode eq 'NĐB'`;
+    else if(status === "NĐB") {
+      strFilter = `&$filter=TypeCode eq 'CXL' and TaskTypeCode eq 'NĐB' and UserApprover/Id eq '` + this.currentUserId + `'`;
     }
-    if(status === "CCYK") {
-      strFilter = `&$filter=StatusID eq '0' and TypeCode eq 'XYK'`;
+    else if(status === "CCYK") {
+      strFilter = `&$filter=StatusID eq '0' and TypeCode eq 'XYK' and UserApprover/Id eq '` + this.currentUserId + `'`;
     }
-    if(status === "ĐACYK") {
-      strFilter = `&$filter=StatusID eq '1' and TypeCode eq 'XYK'`;
+    else if(status === "ĐACYK") {
+      strFilter = `&$filter=StatusID eq '1' and TypeCode eq 'XYK' and UserApprover/Id eq '` + this.currentUserId + `'`;
     }
     this.docTo.getListRequestTo(strFilter).subscribe((itemValue: any[]) => {
       this.ListIdDoc = [];
