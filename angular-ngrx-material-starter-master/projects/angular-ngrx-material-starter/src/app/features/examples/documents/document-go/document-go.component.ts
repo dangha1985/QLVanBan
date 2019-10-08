@@ -69,19 +69,6 @@ export class DocumentGoComponent implements OnInit {
     isSendMail: false,
   });
   formValueChanges$: Observable<ItemDocumentGo>;
-  constructor(
-    private fb: FormBuilder,
-    private store: Store<State>,
-    private translate: TranslateService,
-    private notificationService: NotificationService,
-    private docServices: DocumentGoService,
-    private services: ResApiService,
-    private route: ActivatedRoute,
-    private ref: ChangeDetectorRef,
-    public overlay: Overlay,
-    public viewContainerRef: ViewContainerRef
-  ) { }
-
   displayedColumns: string[] = ['ID', 'DocTypeName', 'Compendium', 'UserCreateName', 'DateCreated', 'UserOfHandle', 'Deadline', 'StatusName','Edit','Delete'];
   listTitle = "ListDocumentGo";
   dataSource = new MatTableDataSource<ItemDocumentGo>();
@@ -110,6 +97,7 @@ export class DocumentGoComponent implements OnInit {
   userApproverName = '';
   currentUserId = '';
   currentUserName='';
+  currentUserEmail = '';
   currentNumberGo = 0;
   DocumentID = 0;
   outputFile = []; 
@@ -120,35 +108,36 @@ export class DocumentGoComponent implements OnInit {
   itemDoc: ItemDocumentGo;
   ItemAttachments: AttachmentsObject[] = [];
   urlAttachment;
+  EmailConfig;
+
+  constructor(
+    private fb: FormBuilder,
+    private store: Store<State>,
+    private translate: TranslateService,
+    private notificationService: NotificationService,
+    private docServices: DocumentGoService,
+    private services: ResApiService,
+    private route: ActivatedRoute,
+    private ref: ChangeDetectorRef,
+    public overlay: Overlay,
+    public viewContainerRef: ViewContainerRef
+  ) { }
+
   ngOnInit() {
 
-    //lấy tham số truyền vào qua url
-    // this.route.paramMap.subscribe(parames => {
-    //   this.idStatus = parames.get('idStatus');
-    //   if (this.idStatus == '1') {//chờ xử lý
-    //     //ẩn nút thêm mới
-
-    //   }
-    //   else {
-        //hiện nút thêm mới
-
-        // danh mục
-        this.getListBookType();
-        this.getListDepartment();
-        this.getListDocType();
-        this.getListMethodSend();
-        this.getListSecret();
-        this.getListUrgent();
-        this.getSourceAddress();
-        this.getUserApproverStep();
-        this.getUserSigner();
-        this.getUserCreate();
-        
-    //  }
-      //Load ds văn bản
+      // danh mục
+      this.getListBookType();
+      this.getListDepartment();
+      this.getListDocType();
+      this.getListMethodSend();
+      this.getListSecret();
+      this.getListUrgent();
+      this.getSourceAddress();
+      this.getUserApproverStep();
+      this.getUserSigner();
+      this.getUserCreate();
+      this.getListEmailConfig();
       this.getCurrentUser();
-   //   this.getListDocumentGo();
-   // });
   }
   //Lấy người dùng hiện tại
   getCurrentUser(){
@@ -156,6 +145,7 @@ export class DocumentGoComponent implements OnInit {
       itemValue => {
           this.currentUserId = itemValue["Id"];
           this.currentUserName = itemValue["Title"];
+          this.currentUserEmail = itemValue['Email'];
         },
         error => { 
           console.log("error: " + error);
@@ -167,6 +157,7 @@ export class DocumentGoComponent implements OnInit {
         }
       );
   }
+
   OpenDocumentGoPanel() {
     let config = new OverlayConfig();
     config.positionStrategy = this.overlay.position()
@@ -179,6 +170,30 @@ export class DocumentGoComponent implements OnInit {
   CloseDocumentGoPanel() {
     this.overlayRef.dispose();
   }
+
+  getListEmailConfig() {
+    const str = `?$select=*&$filter=Title eq 'DG'&$top=1`;
+    this.EmailConfig = null;
+    this.services.getItem('ListEmailConfig', str).subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      if (item.length > 0) {
+          item.forEach(element => {
+          this.EmailConfig = {
+            FieldMail: element.FieldMail,
+            NewEmailSubject: element.NewRequestSubject,
+            NewEmailBody: element.NewRequestBody,
+            ApprovedEmailSubject: element.ApprovedRequestSubject,
+            ApprovedEmailBody: element.ApprovedRequestBody,
+            AssignEmailSubject: element.AssignRequestSubject,
+            AssignEmailBody: element.AssignRequestBody,
+            FinishEmailSubject: element.FinishRequestSubject,
+            FinishEmailBody: element.FinishRequestBody,
+          }
+      })
+      }
+    });
+  }
+
   //lấy ds văn bản
   getListDocumentGo() {
     this.strFilter = `&$filter=Author/Id eq '`+ this.currentUserId+`'`;
@@ -481,26 +496,7 @@ export class DocumentGoComponent implements OnInit {
       console.log("error add:" + error);
     }
   }
-  //  /** Whether the number of selected elements matches the total number of rows. */
-  //  isAllSelected() {
-  //   const numSelected = this.selection.selected.length;
-  //   const numRows = this.dataSource.data.length;
-  //   return numSelected === numRows;
-  // }
 
-  // /** Selects all rows if they are not all selected; otherwise clear selection. */
-  // masterToggle() {
-  //   this.isAllSelected() ?
-  //       this.selection.clear() :
-  //       this.dataSource.data.forEach(row => this.selection.select(row));
-  // }
-
-  // checkboxLabel(row?: PeriodicElement): string {
-  //   if (!row) {
-  //     return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
-  //   }
-  //   return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
-  // }
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
@@ -540,6 +536,7 @@ export class DocumentGoComponent implements OnInit {
       }
     );
   }
+
   AddListTicket() {
     const dataForm = this.form.getRawValue();
     let DocTypeName = this.docServices.FindItemById(this.ListDocType, dataForm.DocType);
@@ -592,7 +589,7 @@ export class DocumentGoComponent implements OnInit {
       },
       () => {
         console.log("Add item of approval user to list ListProcessRequestGo successfully!");
-       // this.saveItemAttachment(0, this.DocumentID);
+        this.addItemSendMail();
         this.services.AddItemToList('ListProcessRequestGo', data1).subscribe(
           item => {},
           error => {
@@ -607,6 +604,7 @@ export class DocumentGoComponent implements OnInit {
           });
       });
   }
+
   DeleteItem(id){
     if(id > 0) {
       this.OpenDocumentGoPanel();
@@ -806,6 +804,113 @@ export class DocumentGoComponent implements OnInit {
     }
   }
 
+  addItemSendMail() {
+    try {
+      // send mail user created
+      const dataSendUser = {
+        __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+        Title: this.listTitle,
+        IndexItem: this.DocumentID,
+        Step: 1,
+        KeyList: this.listTitle +  '_' + this.DocumentID,
+        SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailSubject),
+        BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailBody),
+        SendMailTo: this.currentUserEmail,
+      }
+      this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+        itemRoomRQ => {
+          console.log(itemRoomRQ['d']);
+        },
+        error => {
+          console.log(error);
+          this.CloseDocumentGoPanel();
+        },
+        () => {
+          console.log('Save item success');
+
+          // send mail user approver
+          //this.EmailConfig.AssignEmailSubject = 'New request {Title}';
+          const dataSendApprover = {
+            __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+            Title: this.listTitle,
+            IndexItem: this.DocumentID,
+            Step: 1,
+            KeyList: this.listTitle +  '_' + this.DocumentID,
+            SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailBody),
+            SendMailTo: this.userApproverEmail
+          }
+          this.services.AddItemToList('ListRequestSendMail', dataSendApprover).subscribe(
+            itemCarRQ => {
+              console.log(itemCarRQ['d']);
+            },
+            error => {
+              console.log(error);
+              this.CloseDocumentGoPanel();
+            },
+            () => {
+              console.log('Add email success');
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.log('addItemSendMail error: ' + error.message);
+    }
+  }
+
+  Replace_Field_Mail(FieldMail, ContentMail) {
+    try {
+      if (this.isNotNull(FieldMail) && this.isNotNull(ContentMail)) {
+        let strContent = FieldMail.split(",");
+        console.log("ContentMail before: " + ContentMail);
+        for (let i = 0; i < strContent.length; i++) {
+          switch (strContent[i]) {
+            case 'DocumentType':
+              let itemDocType = this.docServices.FindItemById(this.ListDocType, this.form.get('DocType').value);
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", itemDocType == undefined ? '' : itemDocType.Title);
+              break;
+            case 'Compendium':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docServices.checkNull(this.form.controls['Compendium'].value));
+              break;
+            case 'Content':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docServices.checkNull(this.form.controls['Note'].value));
+              break;
+            case 'UserRequest':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'Author':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'userStep':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
+              break;
+            case 'UserApprover':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
+              break;
+            case 'ItemUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/OutGoingDocs/documentgo-detail/' + this.DocumentID);
+              break;
+            case 'TaskUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/OutGoingDocs/documentgo-detail/' + this.DocumentID + "/1");
+              break;
+            case 'HomeUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/OutGoingDocs/documentgo');
+              break;
+          }
+        }
+        console.log("ContentMail after: " + ContentMail);
+        return ContentMail;
+      }
+      else {
+        console.log("Field or Body email is null or undefined ")
+      }
+    }
+    catch (err) {
+      console.log("Replace_Field_Mail error: " + err.message);
+    }
+  }
+
   getFileBuffer(file) {
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
@@ -813,7 +918,6 @@ export class DocumentGoComponent implements OnInit {
   }
 
   callbackfunc(){
-    // window.location.href = '/workflows/LeaveofAbsence/detail/'+ id;
     this.CloseDocumentGoPanel();
     this.notificationService.success('Thêm văn bản trình thành công');
     this.getListDocumentGo();

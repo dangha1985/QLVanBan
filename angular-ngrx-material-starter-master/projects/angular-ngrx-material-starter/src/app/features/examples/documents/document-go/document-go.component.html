@@ -10,12 +10,6 @@
                       <h3>Thông tin văn bản</h3>
                     </span>
     </div>
-
-    <!-- <ng-container *ngIf="formValueChanges$ | async as updatedForm">
-        {{update(updatedForm)}}
-    </ng-container> 
-     <form [formGroup]="form" (ngSubmit)="submit()">
--->
     <form [formGroup]="form">
         <div class="row justify-content-center">
             <div class="col-md-12">
@@ -157,25 +151,24 @@
                             <mat-checkbox class="example-margin" formControlName="isSendMail" [(ngModel)]="indeterminate">Gửi email</mat-checkbox>
                         </section>
                     </div>
-                    <!-- <mat-card-title>
-                        <div fxLayout="row" fxLayoutAlign="end stretch" fxFlexFill fxLayoutGap="5px">
-                            <div fxLayout="row" fxLayoutAlign="end stretch" fxLayoutGap="5px">
-                                <button mat-stroked-button color="primary" type="button"> <span class="Submit1">Submit</span></button>
-                                <button mat-stroked-button type="button"> <span class="Reset1">Reset</span></button>
+                    <div class="div-checkbox" fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                        <div fxLayout="row" fxLayout.xs="column" fxFlexFil>
+                            <div fxFlex="140px" fxFlex.xs="auto">
+                                <button type="button" mat-raised-button color="primary" (click)="fileInput.click()"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
+                                <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
+                            </div>
+                            <div fxFlex="auto">
+                                <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                    <div *ngFor="let items of ItemAttachments"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+                                </div>
                             </div>
                         </div>
-                    </mat-card-title> -->
-                    <!-- <div class="row  d-flex ">
-                        <button mat-raised-button color="primary"> Lưu</button>
-                        <button type="button" mat-raised-button color="accent" (click)="save()"> Trình ký</button>
-                        <button type="reset" mat-raised-button (click)="reset()">Hủy</button>
-                    </div> -->
-
+                    </div>
                 </mat-card>
             </div>
         </div>
     </form>
-    <div fxLayout="column">
+    <!-- <div fxLayout="column">
         <div class="caption" fxFlexFill>
             <span class="d-flex justify-content-between align-items-baseline  PL10">
                       <h3>Tệp văn bản đính kèm</h3>
@@ -184,7 +177,7 @@
         <div class="div-checkbox" fxLayout="row" fxLayout.xs="column" fxFlexFill>
             <div fxLayout="row" fxLayout.xs="column" fxFlexFil>
                 <div fxFlex="140px" fxFlex.xs="auto">
-                    <button type="button" mat-raised-button color="primary" (click)="fileInput.click()"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Thêm tệp tin</span></button>
+                    <button type="button" mat-raised-button color="primary" (click)="fileInput.click()"> <i class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
                     <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
                 </div>
                 <div fxFlex="auto">
@@ -194,12 +187,7 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="row">
-            <div fxFlex="120px" fxFlex.xs="calc(100%-120px)" class="PL10">
-                <button type="button" mat-raised-button color="primary"> <i class="material-icons ">publish</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
-            </div>
-        </div> -->
-    </div>
+    </div> -->
     <div class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" (click)="addNew = !addNew; showList = !showList"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="submit" class="MR5" (click)="save(-1)"><i class="material-icons">save</i>&nbsp; <span class="Submit1">Lưu</span></button>
@@ -210,7 +198,7 @@
 <div class="row" style="display:inline" *ngIf="showList">
     <div fxFlexFill fxLayoutAlign="end" class="PB10">
         <button mat-stroked-button color="primary" class="btnAdd" style="margin-right: 10px" (click)="addNew = !addNew; showList = !showList" ng-model="addNew">
-            <mat-icon>note_add</mat-icon>&nbsp; Thêm mới văn bản trình ký
+            <mat-icon>note_add</mat-icon>&nbsp; Thêm mới văn bản trình
         </button>
         <input class="docadd-filter" fxFlex="200px" fxLayout matInput (keyup)="applyFilter($event.target.value)" placeholder="Tìm kiếm">
     </div>

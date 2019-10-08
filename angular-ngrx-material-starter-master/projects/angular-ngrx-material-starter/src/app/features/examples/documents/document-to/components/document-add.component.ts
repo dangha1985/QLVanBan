@@ -35,6 +35,7 @@ import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
 } from '../../../../../core/core.module';
+import { element } from 'protractor';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -82,6 +83,7 @@ export class DocumentAddComponent implements OnInit {
   userApproverEmail = '';
   userApproverName = '';
   currentNumberTo = 0;
+  EmailConfig;
   IncomingDocform: FormGroup;
   ListBookType: ItemSeleted[] = [];
   ListDocType: ItemSeleted[] = [];
@@ -122,6 +124,7 @@ export class DocumentAddComponent implements OnInit {
     this.getMethodReceipt();
     this.getSourceAddress();
     this.getUserApprovalList('GĐ');
+    this.getListEmailConfig();
 
     this.IncomingDocform = this.fb.group({
       bookType: ['DT', [Validators.required]],
@@ -378,6 +381,29 @@ export class DocumentAddComponent implements OnInit {
       });
     });
   }
+  
+  getListEmailConfig() {
+    const str = `?$select=*&$filter=Title eq 'DT'&$top=1`;
+    this.EmailConfig = null;
+    this.services.getItem('ListEmailConfig', str).subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      if (item.length > 0) {
+          item.forEach(element => {
+          this.EmailConfig = {
+            FieldMail: element.FieldMail,
+            NewEmailSubject: element.NewRequestSubject,
+            NewEmailBody: element.NewRequestBody,
+            ApprovedEmailSubject: element.ApprovedRequestSubject,
+            ApprovedEmailBody: element.ApprovedRequestBody,
+            AssignEmailSubject: element.AssignRequestSubject,
+            AssignEmailBody: element.AssignRequestBody,
+            FinishEmailSubject: element.FinishRequestSubject,
+            FinishEmailBody: element.FinishRequestBody,
+          }
+      })
+      }
+    });
+  }
 
   getSourceAddress() {
     this.services.getList('ListSourceAddress').subscribe((itemValue: any[]) => {
@@ -591,6 +617,7 @@ export class DocumentAddComponent implements OnInit {
         console.log(
           'Add item of approval user to list ListProcessRequestTo successfully!'
         );
+        this.addItemSendMail();
         this.services.AddItemToList('ListProcessRequestTo', data).subscribe(
           item => {},
           error => {
@@ -654,8 +681,8 @@ export class DocumentAddComponent implements OnInit {
         IndexItem: this.DocumentID,
         Step: 1,
         KeyList: this.listTitle +  '_' + this.DocumentID,
-        SubjectMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.NewEmailSubject),
-        BodyMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.NewEmailBody),
+        SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailSubject),
+        BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailBody),
         SendMailTo: this.currentUserEmail,
       }
       this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
@@ -670,17 +697,16 @@ export class DocumentAddComponent implements OnInit {
           console.log('Save item success');
 
           // send mail user approver
-          this.EmailStepConfig.AssignmentEmailSubject = 'New request {Title}';
+          //this.EmailConfig.AssignEmailSubject = 'New request {Title}';
           const dataSendApprover = {
             __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
             Title: this.listTitle,
             IndexItem: this.DocumentID,
             Step: 1,
             KeyList: this.listTitle +  '_' + this.DocumentID,
-            SubjectMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.AssignmentEmailSubject),
-            BodyMail: this.Replace_Field_Mail(this.EmailStepConfig.FieldMail, this.EmailStepConfig.AssignmentEmailBody),
-            SendMailTo: this.userApproverEmail,
-            TypeEmail: 'Send to approval user'
+            SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailBody),
+            SendMailTo: this.userApproverEmail
           }
           this.services.AddItemToList('ListRequestSendMail', dataSendApprover).subscribe(
             itemCarRQ => {
@@ -691,10 +717,10 @@ export class DocumentAddComponent implements OnInit {
               this.CloseRotiniPanel();
             },
             () => {
-              console.log('Save item success');
-              this.CloseRotiniPanel();
-              alert('Bạn đã tạo yêu cầu thành công');
-              this.routes.navigate(['examples/doc-detail/' + this.DocumentID]);
+              console.log('Add email success');
+              // this.CloseRotiniPanel();
+              // alert('Bạn đã tạo yêu cầu thành công');
+              // this.routes.navigate(['examples/doc-detail/' + this.DocumentID]);
             }
           )
         }
@@ -711,8 +737,17 @@ export class DocumentAddComponent implements OnInit {
         console.log("ContentMail before: " + ContentMail);
         for (let i = 0; i < strContent.length; i++) {
           switch (strContent[i]) {
-            case 'Title':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.Title);
+            case 'NumberTo':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docTo.formatNumberTo(this.IncomingDocform.controls['numberTo'].value));
+              break;
+            case 'Compendium':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docTo.CheckNull(this.IncomingDocform.controls['compendium'].value));
+              break;
+            case 'Content':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docTo.CheckNull(this.IncomingDocform.controls['note'].value));
+              break;
+            case 'UserRequest':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
               break;
             case 'Author':
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
@@ -720,7 +755,7 @@ export class DocumentAddComponent implements OnInit {
             case 'userStep':
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
               break;
-            case 'UserApproval':
+            case 'UserApprover':
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
               break;
             case 'ItemUrl':
