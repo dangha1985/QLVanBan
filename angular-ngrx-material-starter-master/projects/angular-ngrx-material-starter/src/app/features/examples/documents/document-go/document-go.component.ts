@@ -889,13 +889,13 @@ export class DocumentGoComponent implements OnInit {
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
               break;
             case 'ItemUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/OutGoingDocs/documentgo-detail/' + this.DocumentID);
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/Documnets/documentgo-detail/' + this.DocumentID);
               break;
             case 'TaskUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/OutGoingDocs/documentgo-detail/' + this.DocumentID + "/1");
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/documentgo-detail/' + this.DocumentID + "/1");
               break;
             case 'HomeUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/OutGoingDocs/documentgo');
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/documentgo');
               break;
           }
         }

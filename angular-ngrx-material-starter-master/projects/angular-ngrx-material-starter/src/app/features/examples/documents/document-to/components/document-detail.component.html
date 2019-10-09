@@ -458,14 +458,14 @@
                             <ng-container matColumnDef="combine">
                                 <th mat-header-cell *matHeaderCellDef class="input-checkox">Phối hợp xử lý</th>
                                 <td mat-cell *matCellDef="let element" class="input-checkox">
-                                    <mat-checkbox [(ngModel)]="element.IsCombine" (change)="CheckUserNotHandle1(element.Code, element.IsCombine)"></mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="element.IsCombine" (change)="CheckUserNotHandle1(element.Code, element.STT, element.IsCombine)"></mat-checkbox>
                                 </td>
                             </ng-container>
 
                             <ng-container matColumnDef="know">
                                 <th mat-header-cell *matHeaderCellDef class="input-checkox">Nhận để biết</th>
                                 <td mat-cell *matCellDef="let element" class="input-checkox">
-                                    <mat-checkbox [(ngModel)]="element.IsKnow" (change)="CheckUserNotHandle2(element.Code, element.IsKnow)">
+                                    <mat-checkbox [(ngModel)]="element.IsKnow" (change)="CheckUserNotHandle2(element.Code, element.STT, element.IsKnow)">
                                     </mat-checkbox>
                                 </td>
                             </ng-container>

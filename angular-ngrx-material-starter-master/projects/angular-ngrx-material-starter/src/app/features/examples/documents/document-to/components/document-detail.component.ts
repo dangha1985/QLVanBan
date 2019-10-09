@@ -46,6 +46,7 @@ const ELEMENT_DATA: PeriodicElement[] = [
 ];
 
 export class UserOfDepartment {
+  STT: Number;
   IsDepartment: boolean;
   Code: string;
   Name: string;
@@ -58,6 +59,7 @@ export class UserOfDepartment {
 }
 
 export class UserChoice {
+  STT: Number;
   Id: Number;
   Email: string;
   DisplayName: string;
@@ -93,6 +95,7 @@ export class DocumentDetailComponent implements OnInit {
   currentUserId = 0;
   assetFolder = environment.assetFolder;
   currentUserName = '';
+  currentUserEmail = '';
   RoleApprover = [];
   RoleCombine = [];
   RoleKnow = [];
@@ -112,6 +115,7 @@ export class DocumentDetailComponent implements OnInit {
   overlayRef;
   selectedKnower = []; selectedCombiner = []; selectedApprover;
   UserAppoverName = '';
+  EmailConfig;
   ReasonReturn;
   content;deadline;
   displayedColumns: string[] = [
@@ -150,6 +154,7 @@ export class DocumentDetailComponent implements OnInit {
     this.GetTotalStep();
     this.GetAllUser();
     this.getCurrentUser();
+    this.getListEmailConfig();
   }
 
   OpenRotiniPanel() {
@@ -398,15 +403,18 @@ export class DocumentDetailComponent implements OnInit {
         let ListDe = [];
         this.ListUserChoice = [];
         item.forEach(element => {
-          this.ListUserChoice.push({
-            Id: element.User.Id,
-            DisplayName: element.User.Title,
-            Email: element.User.Name.split('|')[2],
-            DeCode: element.DepartmentCode,
-            DeName: element.DepartmentName,
-            RoleCode: element.RoleCode,
-            RoleName: element.RoleName
-          });
+          if(this.ListUserChoice.findIndex(i => i.Id === element.User.Id) < 0) {
+            this.ListUserChoice.push({
+              STT: this.ListUserChoice.length + 1,
+              Id: element.User.Id,
+              DisplayName: element.User.Title,
+              Email: element.User.Name.split('|')[2],
+              DeCode: element.DepartmentCode,
+              DeName: element.DepartmentName,
+              RoleCode: element.RoleCode,
+              RoleName: element.RoleName
+            });
+          }
           if(ListDe.indexOf(element.DepartmentCode) < 0) {
             ListDe.push(element.DepartmentCode);
           }
@@ -419,6 +427,7 @@ export class DocumentDetailComponent implements OnInit {
             DeName = itemDe.Name;
           }
           this.ListUserOfDepartment.push({
+            STT: 0,
             IsDepartment: true,
             Code: element,
             Name: DeName,
@@ -433,6 +442,7 @@ export class DocumentDetailComponent implements OnInit {
             if(user.DeCode === element) {
               this.ListUserOfDepartment.push({
                 IsDepartment: false,
+                STT: user.STT,
                 Code: user.Id + '|' + user.Email + '|' + user.DisplayName,
                 Name: user.DisplayName,
                 Role: user.RoleName,
@@ -467,6 +477,7 @@ export class DocumentDetailComponent implements OnInit {
       itemValue => {
           this.currentUserId = itemValue["Id"];
           this.currentUserName = itemValue["Title"];
+          this.currentUserEmail = itemValue["Email"];
         },
       error => { 
         console.log("error: " + error);
@@ -516,6 +527,29 @@ export class DocumentDetailComponent implements OnInit {
   ViewHistory(template: TemplateRef<any>) {
     this.notificationService.warn("Xem luồng có ở bản verson 2");
     // this.bsModalRef = this.modalService.show(template, {class: 'modal-lg'});
+  }
+
+  getListEmailConfig() {
+    const str = `?$select=*&$filter=Title eq 'DT'&$top=1`;
+    this.EmailConfig = null;
+    this.services.getItem('ListEmailConfig', str).subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      if (item.length > 0) {
+          item.forEach(element => {
+          this.EmailConfig = {
+            FieldMail: element.FieldMail,
+            NewEmailSubject: element.NewRequestSubject,
+            NewEmailBody: element.NewRequestBody,
+            ApprovedEmailSubject: element.ApprovedRequestSubject,
+            ApprovedEmailBody: element.ApprovedRequestBody,
+            AssignEmailSubject: element.AssignRequestSubject,
+            AssignEmailBody: element.AssignRequestBody,
+            FinishEmailSubject: element.FinishRequestSubject,
+            FinishEmailBody: element.FinishRequestBody,
+          }
+      })
+      }
+    });
   }
 
   GetUserApprover() {
@@ -1035,7 +1069,7 @@ export class DocumentDetailComponent implements OnInit {
     }
     else {
       this.CloseRotiniPanel();
-      this.routes.navigate(['examples/doc-detail/' + id]);
+      this.routes.navigate(['Documnets/IncomingDoc/docTo-detail/' + id]);
     }
   }
 
@@ -1068,13 +1102,15 @@ export class DocumentDetailComponent implements OnInit {
     }
   }
 
-  CheckUserNotHandle1(code, isCheck) {
+  CheckUserNotHandle1(code, stt, isCheck) {
     console.log(code);
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
-        if(element.Code === code){
-          if(code.includes('|') && this.selectedCombiner.indexOf(code)) {
+        if(element.Code === code && element.STT === stt){
+          if(code.includes('|') && this.selectedCombiner.indexOf(code) < 0) {
             this.selectedCombiner.push(element.Code);
+          } else if(this.selectedCombiner.indexOf(code) >= 0) {
+            element.IsCombine = false;
           }
           element.IsHandle = false;
           element.IsKnow = false;
@@ -1097,13 +1133,15 @@ export class DocumentDetailComponent implements OnInit {
     }   
   }
 
-  CheckUserNotHandle2(code, isCheck) {
+  CheckUserNotHandle2(code, stt, isCheck) {
     console.log(code);
     if(isCheck){
       this.ListUserOfDepartment.forEach(element => {
-        if(element.Code === code){
-          if(code.includes('|') && this.selectedKnower.indexOf(code)) {
+        if(element.Code === code && element.STT === stt){
+          if(code.includes('|') && this.selectedKnower.indexOf(code) < 0) {
             this.selectedKnower.push(element.Code);
+          } else if(this.selectedCombiner.indexOf(code) >= 0) {
+            element.IsKnow = false;
           }
           element.IsCombine = false;
           element.IsHandle = false;
@@ -1126,514 +1164,575 @@ export class DocumentDetailComponent implements OnInit {
   }
 
 
-addAttachmentFile(sts) {
-  try {
-    if (sts === 0) {
-      const inputNode: any = document.querySelector('#fileAttachment');
-      if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
-        console.log(inputNode.files[0]);
-        if (this.outputFile.length > 0) {
-          if (
-            this.outputFile.findIndex(
-              index => index.name === inputNode.files[0].name
-            ) === -1
-          ) {
+  addAttachmentFile(sts) {
+    try {
+      if (sts === 0) {
+        const inputNode: any = document.querySelector('#fileAttachment');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFile.length > 0) {
+            if (
+              this.outputFile.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFile.push(inputNode.files[0]);
+            }
+          } else {
             this.outputFile.push(inputNode.files[0]);
           }
-        } else {
-          this.outputFile.push(inputNode.files[0]);
         }
-      }
-    } else if (sts === 1) {
-      const inputNode: any = document.querySelector('#fileAttachmentHandle');
-      if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
-        console.log(inputNode.files[0]);
-        if (this.outputFileHandle.length > 0) {
-          if (
-            this.outputFileHandle.findIndex(
-              index => index.name === inputNode.files[0].name
-            ) === -1
-          ) {
+      } else if (sts === 1) {
+        const inputNode: any = document.querySelector('#fileAttachmentHandle');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileHandle.length > 0) {
+            if (
+              this.outputFileHandle.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileHandle.push(inputNode.files[0]);
+            }
+          } else {
             this.outputFileHandle.push(inputNode.files[0]);
           }
-        } else {
-          this.outputFileHandle.push(inputNode.files[0]);
         }
-      }
-    } else if (sts === 2) {
-      const inputNode: any = document.querySelector('#fileAttachmentReturn');
-      if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
-        console.log(inputNode.files[0]);
-        if (this.outputFileReturn.length > 0) {
-          if (
-            this.outputFileReturn.findIndex(
-              index => index.name === inputNode.files[0].name
-            ) === -1
-          ) {
+      } else if (sts === 2) {
+        const inputNode: any = document.querySelector('#fileAttachmentReturn');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileReturn.length > 0) {
+            if (
+              this.outputFileReturn.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileReturn.push(inputNode.files[0]);
+            }
+          } else {
             this.outputFileReturn.push(inputNode.files[0]);
           }
-        } else {
-          this.outputFileReturn.push(inputNode.files[0]);
         }
       }
-    }
-    else if (sts === 3) {//dùng trong ý kiến xử lý
-      const inputNode: any = document.querySelector('#fileAttachmentComment');
-      if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
-        console.log(inputNode.files[0]);
-        if (this.outputFileComment.length > 0) {
-          if (
-            this.outputFileComment.findIndex(
-              index => index.name === inputNode.files[0].name
-            ) === -1
-          ) {
+      else if (sts === 3) {//dùng trong ý kiến xử lý
+        const inputNode: any = document.querySelector('#fileAttachmentComment');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileComment.length > 0) {
+            if (
+              this.outputFileComment.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileComment.push(inputNode.files[0]);
+            }
+          } else {
             this.outputFileComment.push(inputNode.files[0]);
           }
-        } else {
-          this.outputFileComment.push(inputNode.files[0]);
         }
       }
-    }
-    else if (sts === 4) {//dùng trong modal xin ý kiến 
-      const inputNode: any = document.querySelector('#fileAttachmentAddComment');
-      if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
-        console.log(inputNode.files[0]);
-        if (this.outputFileAddComment.length > 0) {
-          if (
-            this.outputFileAddComment.findIndex(
-              index => index.name === inputNode.files[0].name
-            ) === -1
-          ) {
+      else if (sts === 4) {//dùng trong modal xin ý kiến 
+        const inputNode: any = document.querySelector('#fileAttachmentAddComment');
+        if (this.docTo.CheckNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileAddComment.length > 0) {
+            if (
+              this.outputFileAddComment.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) === -1
+            ) {
+              this.outputFileAddComment.push(inputNode.files[0]);
+            }
+          } else {
             this.outputFileAddComment.push(inputNode.files[0]);
           }
-        } else {
-          this.outputFileAddComment.push(inputNode.files[0]);
         }
       }
+    } catch (error) {
+      console.log('addAttachmentFile error: ' + error);
     }
-  } catch (error) {
-    console.log('addAttachmentFile error: ' + error);
   }
-}
 
-removeAttachmentFile(index, sts) {
-  try {
-    if (sts === 0) {
-      console.log(this.outputFile.indexOf(index))
-      this.outputFile.splice(this.outputFile.indexOf(index), 1);
-    } else if (sts === 1) {
-      console.log(this.outputFileHandle.indexOf(index))
-      this.outputFileHandle.splice(this.outputFileHandle.indexOf(index), 1);
-    } else if (sts === 2) {
-      console.log(this.outputFileReturn.indexOf(index))
-      this.outputFileReturn.splice(this.outputFileReturn.indexOf(index), 1);
+  removeAttachmentFile(index, sts) {
+    try {
+      if (sts === 0) {
+        console.log(this.outputFile.indexOf(index))
+        this.outputFile.splice(this.outputFile.indexOf(index), 1);
+      } else if (sts === 1) {
+        console.log(this.outputFileHandle.indexOf(index))
+        this.outputFileHandle.splice(this.outputFileHandle.indexOf(index), 1);
+      } else if (sts === 2) {
+        console.log(this.outputFileReturn.indexOf(index))
+        this.outputFileReturn.splice(this.outputFileReturn.indexOf(index), 1);
+      }
+      else if (sts === 3) {
+        console.log(this.outputFileComment.indexOf(index))
+        this.outputFileComment.splice(this.outputFileComment.indexOf(index), 1);
+      }
+      else if (sts === 3) {
+        console.log(this.outputFileAddComment.indexOf(index))
+        this.outputFileAddComment.splice(this.outputFileAddComment.indexOf(index), 1);
+      }
+    } catch (error) {
+      console.log("removeAttachmentFile error: " + error);
     }
-    else if (sts === 3) {
-      console.log(this.outputFileComment.indexOf(index))
-      this.outputFileComment.splice(this.outputFileComment.indexOf(index), 1);
-    }
-    else if (sts === 3) {
-      console.log(this.outputFileAddComment.indexOf(index))
-      this.outputFileAddComment.splice(this.outputFileAddComment.indexOf(index), 1);
-    }
-  } catch (error) {
-    console.log("removeAttachmentFile error: " + error);
   }
-}
 
-saveItemAttachment(index, idItem, arr, listName,indexUserComment) {
-  try {
-    this.buffer = this.getFileBuffer(arr[index]);
-    this.buffer.onload = (e: any) => {
-      console.log(e.target.result);
-      const dataFile = e.target.result;
-      this.services.inserAttachmentFile(dataFile, arr[index].name, listName, idItem).subscribe(
-        itemAttach => {
-          console.log('inserAttachmentFile success');
-        },
-        error => console.log(error),
-        () => {
-          console.log('inserAttachmentFile successfully');
-          if (Number(index) < (arr.length - 1)) {
-            this.saveItemAttachment((Number(index) + 1), idItem, arr, listName,indexUserComment);
-          }
-          else {
-            // this.outputFile = [];
-            // this.CloseRotiniPanel();
-            if (listName == 'ListComments') {
-              this.CloseRotiniPanel();
-              this.getComment();
-              if(indexUserComment!=null && indexUserComment==this.listUserIdSelect.length-1)
-              {
-                this.outputFileAddComment = [];
-                this.notificationService.success('Bạn gửi xin ý kiến thành công');
-                this.GetItemDetail();
-                this.GetHistory();
-                this.bsModalRef.hide();
-              }
-              else{
-                this.outputFileComment = [];
-                this.notificationService.success('Bạn gửi bình luận thành công');
-              }
+  saveItemAttachment(index, idItem, arr, listName,indexUserComment) {
+    try {
+      this.buffer = this.getFileBuffer(arr[index]);
+      this.buffer.onload = (e: any) => {
+        console.log(e.target.result);
+        const dataFile = e.target.result;
+        this.services.inserAttachmentFile(dataFile, arr[index].name, listName, idItem).subscribe(
+          itemAttach => {
+            console.log('inserAttachmentFile success');
+          },
+          error => console.log(error),
+          () => {
+            console.log('inserAttachmentFile successfully');
+            if (Number(index) < (arr.length - 1)) {
+              this.saveItemAttachment((Number(index) + 1), idItem, arr, listName,indexUserComment);
             }
             else {
-              arr = [];
-              this.CloseRotiniPanel();
-              this.routes.navigate(['examples/doc-detail/' + idItem]);
+              // this.outputFile = [];
+              // this.CloseRotiniPanel();
+              if (listName == 'ListComments') {
+                this.CloseRotiniPanel();
+                this.getComment();
+                if(indexUserComment!=null && indexUserComment==this.listUserIdSelect.length-1)
+                {
+                  this.outputFileAddComment = [];
+                  this.notificationService.success('Bạn gửi xin ý kiến thành công');
+                  this.GetItemDetail();
+                  this.GetHistory();
+                  this.bsModalRef.hide();
+                }
+                else{
+                  this.outputFileComment = [];
+                  this.notificationService.success('Bạn gửi bình luận thành công');
+                }
+              }
+              else {
+                arr = [];
+                this.CloseRotiniPanel();
+                this.routes.navigate(['/Documnets/IncomingDoc/docTo-detail/' + idItem]);
+              }
             }
           }
-        }
-      )
+        )
+      }
+    } catch (error) {
+      console.log("saveItemAttachment error: " + error);
     }
-  } catch (error) {
-    console.log("saveItemAttachment error: " + error);
+  } 
+  getFileBuffer(file) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    return reader;
   }
-}
-getFileBuffer(file) {
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(file);
-  return reader;
-}
 
-GetTypeCode(code) {
-  if (this.docTo.CheckNull(code) === '') {
-    return '';
+  GetTypeCode(code) {
+    if (this.docTo.CheckNull(code) === '') {
+      return '';
+    }
+    else if (code === "CXL") {
+      return 'Chuyển xử lý';
+    }
+    else if (code === "TL") {
+      return 'Trả lại';
+    }
+    else if (code === "XYK") {
+      return 'Xin ý kiến';
+    }
   }
-  else if (code === "CXL") {
-    return 'Chuyển xử lý';
-  }
-  else if (code === "TL") {
-    return 'Trả lại';
-  }
-  else if (code === "XYK") {
-    return 'Xin ý kiến';
-  }
-}
-//comment
-Reply(i, j) {
-  if (j == undefined) {
-    this.listCommentParent[i].DisplayReply = "flex";
-  }
-  else {
 
-    this.listCommentParent[i].children[j].DisplayReply = "flex";
-  }
-}
-isNotNull(str) {
-  return (str !== null && str !== "" && str !== undefined);
-}
-//luu comment (lưu comment xin ý kiến và bình luận ở ý kiến xử lý)
-saveComment(content,isAddComment,index) {
-  try {
-    this.OpenRotiniPanel();
-    if (this.isNotNull(content)) {
-      const dataComment = {
-        __metadata: { type: 'SP.Data.ListCommentsListItem' },
-        Title: "ListDocumentTo_" + this.IncomingDocID,
-        Chat_Comments: content,
-        KeyList: "ListDocumentTo_" + this.IncomingDocID,
-        ProcessID:isAddComment==true? this.idItemProcess:null,
-        UserApproverId:isAddComment==true? this.listUserIdSelect[index]:null,
-      }
-      if (this.isNotNull(this.pictureCurrent)) {
-        Object.assign(dataComment, { userPicture: this.pictureCurrent });
-      }
-      this.services.AddItemToList('ListComments', dataComment).subscribe(
-        itemComment => {
-          this.indexComment = itemComment['d'].Id;
-        },
-        error => {
-          console.log(error);
-          this.notificationService.error('Bạn gửi bình luận thất bại');
-        },
-        () => {
-          if(isAddComment==false){     
-                  this.Comments = null;
-                  if (this.outputFileComment.length > 0) {
-                    this.saveItemAttachment(0, this.indexComment, this.outputFileComment, 'ListComments',null);
-                  }
-                  else {
-                    this.CloseRotiniPanel();
-                    this.notificationService.success('Bạn gửi bình luận thành công');
-                    this.getComment();
-                  }
-          }
-          else  if(isAddComment==true){  //xin ý kiến
-            if (this.outputFileAddComment.length > 0) {
-               this.saveItemAttachment(0, this.indexComment,this.outputFileAddComment, 'ListComments',index);
-             }
-             else {
-               this.CloseRotiniPanel();
-               console.log('Bạn gửi xin ý kiến thành công');
-               //kt nếu lưu đến người cuối cùng rồi thì đóng modal
-               if(index==this.listUserIdSelect.length-1){
-                 this.notificationService.success('Bạn gửi xin ý kiến thành công');
-                 this.bsModalRef.hide();
-                 this.GetHistory();
-                 this.getComment();
-               }
-           }
-          }
-      }
-      )
-    }
-    else {
-      this.CloseRotiniPanel();
-      alert("Bạn chưa nhập nội dung ");
-    }
-  } catch (error) {
-    console.log("SendComment error: " + error);
-  }
-}
-//lưu comment trả lời
-saveCommentReply(i, j) {
-  try {
-    this.OpenRotiniPanel();
-    let content = '';
+  //comment
+  Reply(i, j) {
     if (j == undefined) {
-      content = this.listCommentParent[i].Content;
+      this.listCommentParent[i].DisplayReply = "flex";
     }
     else {
-      content = this.listCommentParent[i].children[j].Content;
+
+      this.listCommentParent[i].children[j].DisplayReply = "flex";
     }
-    if (this.isNotNull(content)) {
-      const dataComment = {
-        __metadata: { type: 'SP.Data.ListCommentsListItem' },
-        Title: "ListDocumentTo_" + this.IncomingDocID,
-        Chat_Comments: content,
-        KeyList: "ListDocumentTo_" + this.IncomingDocID,
-        ParentID: this.listCommentParent[i].ParentID == null ? this.listCommentParent[i].ID : this.listCommentParent[i].ParentID,
+  }
+
+  isNotNull(str) {
+    return (str !== null && str !== "" && str !== undefined);
+  }
+
+  //luu comment (lưu comment xin ý kiến và bình luận ở ý kiến xử lý)
+  saveComment(content,isAddComment,index) {
+    try {
+      this.OpenRotiniPanel();
+      if (this.isNotNull(content)) {
+        const dataComment = {
+          __metadata: { type: 'SP.Data.ListCommentsListItem' },
+          Title: "ListDocumentTo_" + this.IncomingDocID,
+          Chat_Comments: content,
+          KeyList: "ListDocumentTo_" + this.IncomingDocID,
+          ProcessID:isAddComment==true? this.idItemProcess:null,
+          UserApproverId:isAddComment==true? this.listUserIdSelect[index]:null,
+        }
+        if (this.isNotNull(this.pictureCurrent)) {
+          Object.assign(dataComment, { userPicture: this.pictureCurrent });
+        }
+        this.services.AddItemToList('ListComments', dataComment).subscribe(
+          itemComment => {
+            this.indexComment = itemComment['d'].Id;
+          },
+          error => {
+            console.log(error);
+            this.notificationService.error('Bạn gửi bình luận thất bại');
+          },
+          () => {
+            if(isAddComment==false){     
+                    this.Comments = null;
+                    if (this.outputFileComment.length > 0) {
+                      this.saveItemAttachment(0, this.indexComment, this.outputFileComment, 'ListComments',null);
+                    }
+                    else {
+                      this.CloseRotiniPanel();
+                      this.notificationService.success('Bạn gửi bình luận thành công');
+                      this.getComment();
+                    }
+            }
+            else  if(isAddComment==true){  //xin ý kiến
+              if (this.outputFileAddComment.length > 0) {
+                this.saveItemAttachment(0, this.indexComment,this.outputFileAddComment, 'ListComments',index);
+              }
+              else {
+                this.CloseRotiniPanel();
+                console.log('Bạn gửi xin ý kiến thành công');
+                //kt nếu lưu đến người cuối cùng rồi thì đóng modal
+                if(index==this.listUserIdSelect.length-1){
+                  this.notificationService.success('Bạn gửi xin ý kiến thành công');
+                  this.bsModalRef.hide();
+                  this.GetHistory();
+                  this.getComment();
+                }
+            }
+            }
+        }
+        )
       }
-      if (this.isNotNull(this.pictureCurrent)) {
-        Object.assign(dataComment, { userPicture: this.pictureCurrent });
+      else {
+        this.CloseRotiniPanel();
+        alert("Bạn chưa nhập nội dung ");
       }
-      this.services.AddItemToList('ListComments', dataComment).subscribe(
+    } catch (error) {
+      console.log("SendComment error: " + error);
+    }
+  }
+  //lưu comment trả lời
+  saveCommentReply(i, j) {
+    try {
+      this.OpenRotiniPanel();
+      let content = '';
+      if (j == undefined) {
+        content = this.listCommentParent[i].Content;
+      }
+      else {
+        content = this.listCommentParent[i].children[j].Content;
+      }
+      if (this.isNotNull(content)) {
+        const dataComment = {
+          __metadata: { type: 'SP.Data.ListCommentsListItem' },
+          Title: "ListDocumentTo_" + this.IncomingDocID,
+          Chat_Comments: content,
+          KeyList: "ListDocumentTo_" + this.IncomingDocID,
+          ParentID: this.listCommentParent[i].ParentID == null ? this.listCommentParent[i].ID : this.listCommentParent[i].ParentID,
+        }
+        if (this.isNotNull(this.pictureCurrent)) {
+          Object.assign(dataComment, { userPicture: this.pictureCurrent });
+        }
+        this.services.AddItemToList('ListComments', dataComment).subscribe(
+          itemComment => {
+            this.indexComment = itemComment['d'].Id;
+          },
+          error => {
+            console.log(error);
+            this.notificationService.error('Bạn gửi trả lời thất bại');
+          },
+          () => {
+            // if (this.outputFile.length > 0) {
+            //   this.saveItemAttachment(0, this.indexComment);
+            // }
+            // else {
+            this.CloseRotiniPanel();
+            this.notificationService.success('Bạn gửi trả lời thành công');
+            //update lại trạng thái cho phiếu xin ý kiến
+            if (this.isNotNull(this.listCommentParent[i].ProcessID)) {
+              this.updateProcess(this.listCommentParent[i].ProcessID);
+            }
+            this.getComment();
+            // }
+          }
+        )
+      }
+      else {
+        this.CloseRotiniPanel();
+        alert("Bạn chưa nhập nội dung trả lời");
+      }
+    } catch (error) {
+      console.log("saveCommentReply error: " + error);
+    }
+  }
+
+  updateProcess(id) {
+    try {
+      const dataProcess = {
+        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+        StatusID: 1,
+        StatusName: "Đã cho ý kiến",
+      }
+      this.services.updateListById('ListProcessRequestTo', dataProcess, id).subscribe(
         itemComment => {
-          this.indexComment = itemComment['d'].Id;
+          //  this.indexComment = itemComment['d'].Id;
         },
-        error => {
-          console.log(error);
-          this.notificationService.error('Bạn gửi trả lời thất bại');
-        },
+        error => console.log(error),
         () => {
           // if (this.outputFile.length > 0) {
           //   this.saveItemAttachment(0, this.indexComment);
           // }
           // else {
-          this.CloseRotiniPanel();
-          this.notificationService.success('Bạn gửi trả lời thành công');
-          //update lại trạng thái cho phiếu xin ý kiến
-          if (this.isNotNull(this.listCommentParent[i].ProcessID)) {
-            this.updateProcess(this.listCommentParent[i].ProcessID);
-          }
-          this.getComment();
+          // this.closeCommentPanel();
+          // alert('Bạn gửi trả lời thành công');
+          this.GetHistory();
           // }
         }
       )
-    }
-    else {
-      this.CloseRotiniPanel();
-      alert("Bạn chưa nhập nội dung trả lời");
-    }
-  } catch (error) {
-    console.log("saveCommentReply error: " + error);
-  }
-}
-updateProcess(id) {
-  try {
-    const dataProcess = {
-      __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      StatusID: 1,
-      StatusName: "Đã cho ý kiến",
-    }
-    this.services.updateListById('ListProcessRequestTo', dataProcess, id).subscribe(
-      itemComment => {
-        //  this.indexComment = itemComment['d'].Id;
-      },
-      error => console.log(error),
-      () => {
-        // if (this.outputFile.length > 0) {
-        //   this.saveItemAttachment(0, this.indexComment);
-        // }
-        // else {
-        // this.closeCommentPanel();
-        // alert('Bạn gửi trả lời thành công');
-        this.GetHistory();
-        // }
-      }
-    )
 
-  } catch (error) {
-    console.log("saveCommentReply error: " + error);
+    } catch (error) {
+      console.log("saveCommentReply error: " + error);
+    }
   }
-}
-listCommentParent = []; listComment = [];listUserIdSelect=[];
-outputFileComment: AttachmentsObject[] = []; AttachmentsComment: AttachmentsObject[] = [];
-outputFileAddComment:AttachmentsObject[]=[];
-Comments; pictureCurrent; indexComment;selectedUserComment;idItemProcess;contentComment;
-getComment(): void {
-  const strComent = `?$select=ID,Chat_Comments,Created,userPicture,ParentID,ProcessID,Author/Title,UserApprover/Id,UserApprover/Title,AttachmentFiles`
-    + `&$expand=Author/Id,UserApprover,AttachmentFiles&$filter=KeyList eq 'ListDocumentTo_` + this.IncomingDocID + `'&$orderby=Created desc`
-  this.services.getItem("ListComments", strComent).subscribe(itemValue => {
-    this.listComment = [];
-    this.listCommentParent = [];
-    let itemList = itemValue["value"] as Array<any>;
-    itemList.forEach(element => {
-      let picture;
-      if (element.userPicture !== null && element.userPicture !== '' && element.userPicture !== undefined) {
-        picture = element.userPicture;
+
+  listCommentParent = []; listComment = [];listUserIdSelect=[];
+  outputFileComment: AttachmentsObject[] = []; AttachmentsComment: AttachmentsObject[] = [];
+  outputFileAddComment:AttachmentsObject[]=[];
+  Comments; pictureCurrent; indexComment;selectedUserComment;idItemProcess;contentComment;
+  getComment(): void {
+    const strComent = `?$select=ID,Chat_Comments,Created,userPicture,ParentID,ProcessID,Author/Title,UserApprover/Id,UserApprover/Title,AttachmentFiles`
+      + `&$expand=Author/Id,UserApprover,AttachmentFiles&$filter=KeyList eq 'ListDocumentTo_` + this.IncomingDocID + `'&$orderby=Created desc`
+    this.services.getItem("ListComments", strComent).subscribe(itemValue => {
+      this.listComment = [];
+      this.listCommentParent = [];
+      let itemList = itemValue["value"] as Array<any>;
+      itemList.forEach(element => {
+        let picture;
+        if (element.userPicture !== null && element.userPicture !== '' && element.userPicture !== undefined) {
+          picture = element.userPicture;
+        }
+        else {
+          picture = '../../../../' + this.assetFolder + '/img/default-user-image.png';
+        }
+        if (this.isNotNull(element.AttachmentFiles)) {
+          this.AttachmentsComment = [];
+          element.AttachmentFiles.forEach(elementss => {
+            this.AttachmentsComment.push({
+              name: elementss.FileName,
+              urlFile: this.urlAttachment + elementss.ServerRelativeUrl
+            })
+          });
+        }
+        this.listComment.push({
+          ID: element.ID,
+          Author: element.Author.Title,
+          Chat_Comments: element.Chat_Comments,
+          Created: moment(element.Created).format('DD/MM/YYYY HH:mm:ss'),
+          userPicture: picture,
+          UserApprover: element.UserApprover != null ? element.UserApprover.Title : '',
+          XinYKien: ' xin ý kiến ',
+          ParentID: element.ParentID,
+          ProcessID: element.ProcessID,
+          itemAttach: this.AttachmentsComment,
+          Content: '',
+          DisplayReply: "none",
+        })
+      })
+      this.listComment.forEach(item => {
+        if (item.ParentID == null) {
+          let lstChild = this.listComment.filter(element => element.ParentID == item.ID);
+          if (lstChild == undefined) {
+            lstChild = [];
+          }
+          item.children = lstChild;
+          this.listCommentParent.push(item);
+        }
+      });
+      this.ref.detectChanges();
+    })
+  }
+
+  //xin ý kiến
+  saveItem() {
+    try {
+      if (this.isNotNull(this.contentComment)) {
+        this.listUserIdSelect = [];
+        let id = this.selectedUserComment.split('|')[0];
+        this.listUserIdSelect.push(id);
+
+        this.OpenRotiniPanel();
+        //lưu attach file vào văn bản
+        if (this.outputFileAddComment.length > 0) {
+          this.saveItemAttachment(0, this.IncomingDocID,this.outputFileAddComment, 'ListDocumentTo',null);
+        }
+        //lưu phiếu xin ý kiến và lưu comment
+      for(let i=0;i<this.listUserIdSelect.length;i++){
+        this.saveItemListProcess(i);
+      }
       }
       else {
-        picture = '../../../../' + this.assetFolder + '/img/default-user-image.png';
+        alert("Bạn chưa nhập nội dung xin ý kiến");
       }
-      if (this.isNotNull(element.AttachmentFiles)) {
-        this.AttachmentsComment = [];
-        element.AttachmentFiles.forEach(elementss => {
-          this.AttachmentsComment.push({
-            name: elementss.FileName,
-            urlFile: this.urlAttachment + elementss.ServerRelativeUrl
-          })
-        });
+    } catch (error) {
+      console.log('saveItem error: ' + error.message);
+    }
+  }
+
+  saveItemListProcess(index) {
+    try {
+      const dataProcess = {
+        __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
+        Title: this.itemDoc.numberTo,
+        DateCreated: new Date(),
+        NoteBookID: this.itemDoc.ID,
+        UserRequestId: this.currentUserId,
+        UserApproverId: this.listUserIdSelect[index],
+        StatusID: 0,
+        StatusName: "Chờ xin ý kiến",
+        TypeCode: 'XYK',
+        TypeName: 'Xin ý kiến',
+        TaskTypeCode: 'XLC',
+        TaskTypeName: 'Xử lý chính',
+        Content: this.contentComment,
+        Compendium: this.itemDoc.compendium,
       }
-      this.listComment.push({
-        ID: element.ID,
-        Author: element.Author.Title,
-        Chat_Comments: element.Chat_Comments,
-        Created: moment(element.Created).format('DD/MM/YYYY HH:mm:ss'),
-        userPicture: picture,
-        UserApprover: element.UserApprover != null ? element.UserApprover.Title : '',
-        XinYKien: ' xin ý kiến ',
-        ParentID: element.ParentID,
-        ProcessID: element.ProcessID,
-        itemAttach: this.AttachmentsComment,
-        Content: '',
-        DisplayReply: "none",
-      })
-    })
-    this.listComment.forEach(item => {
-      if (item.ParentID == null) {
-        let lstChild = this.listComment.filter(element => element.ParentID == item.ID);
-        if (lstChild == undefined) {
-          lstChild = [];
+      this.services.AddItemToList('ListProcessRequestTo', dataProcess).subscribe(
+        items => {
+          console.log(items);
+          this.idItemProcess = items['d'].Id;
+        },
+        error => {console.log(error);
+          this.CloseRotiniPanel();
+        },
+        () => {
+          this.CloseRotiniPanel();
+          this.saveComment(this.contentComment,true,index)
         }
-        item.children = lstChild;
-        this.listCommentParent.push(item);
-      }
-    });
-    this.ref.detectChanges();
-  })
-}
-//xin ý kiến
-saveItem() {
-  try {
-    if (this.isNotNull(this.contentComment)) {
-      this.listUserIdSelect = [];
-      let id = this.selectedUserComment.split('|')[0];
-      this.listUserIdSelect.push(id);
+      )
+    } catch (error) {
+      console.log('saveItemListProcess error: ' + error.message);
+    }
+  }
 
-      this.OpenRotiniPanel();
-      //lưu attach file vào văn bản
-      if (this.outputFileAddComment.length > 0) {
-        this.saveItemAttachment(0, this.IncomingDocID,this.outputFileAddComment, 'ListDocumentTo',null);
+  addItemSendMail() {
+    try {
+      // send mail user created
+      const dataSendUser = {
+        __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+        Title: this.listName,
+        IndexItem: this.IncomingDocID,
+        Step: 1,
+        KeyList: this.listName +  '_' + this.IncomingDocID,
+        SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailSubject),
+        BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailBody),
+        SendMailTo: this.currentUserEmail,
       }
-      //lưu phiếu xin ý kiến và lưu comment
-     for(let i=0;i<this.listUserIdSelect.length;i++){
-      this.saveItemListProcess(i);
-     }
+      this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+        itemRoomRQ => {
+          console.log(itemRoomRQ['d']);
+        },
+        error => {
+          console.log(error);
+          this.CloseRotiniPanel();
+        },
+        () => {
+          console.log('Save item success');
+
+          const dataSendApprover = {
+            __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+            Title: this.listName,
+            IndexItem: this.IncomingDocID,
+            Step: 1,
+            KeyList: this.listName +  '_' + this.IncomingDocID,
+            SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailBody),
+            SendMailTo: this.selectedApprover.split('|')[1]
+          }
+          this.services.AddItemToList('ListRequestSendMail', dataSendApprover).subscribe(
+            itemCarRQ => {
+              console.log(itemCarRQ['d']);
+            },
+            error => {
+              console.log(error);
+              this.CloseRotiniPanel();
+            },
+            () => {
+              console.log('Add email success');
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.log('addItemSendMail error: ' + error.message);
     }
-    else {
-      alert("Bạn chưa nhập nội dung xin ý kiến");
+  }
+
+
+
+  Replace_Field_Mail(FieldMail, ContentMail) {
+    try {
+      if (this.isNotNull(FieldMail) && this.isNotNull(ContentMail)) {
+        let strContent = FieldMail.split(",");
+        console.log("ContentMail before: " + ContentMail);
+        for (let i = 0; i < strContent.length; i++) {
+          switch (strContent[i]) {
+            case 'NumberTo':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.itemDoc.numberTo);
+              break;
+            case 'Compendium':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docTo.CheckNull(this.itemDoc.compendium));
+              break;
+            case 'Content':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docTo.CheckNull(this.content));
+              break;
+            case 'UserRequest':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'Author':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'userStep':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.UserAppoverName);
+              break;
+            case 'UserApprover':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.UserAppoverName);
+              break;
+            case 'ItemUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/Documnets/IncomingDoc/docTo-detail/' + this.IncomingDocID);
+              break;
+            case 'TaskUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc/docTo-detail/' + this.IncomingDocID + (this.IndexStep + 1));
+              break;
+            case 'HomeUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc');
+              break;
+          }
+        }
+        console.log("ContentMail after: " + ContentMail);
+        return ContentMail;
+      }
+      else {
+        console.log("Field or Body email is null or undefined ")
+      }
     }
-  } catch (error) {
-    console.log('saveItem error: ' + error.message);
+    catch (err) {
+      console.log("Replace_Field_Mail error: " + err.message);
+    }
   }
 }
-
-saveItemListProcess(index) {
-  try {
-    const dataProcess = {
-      __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      Title: this.itemDoc.numberTo,
-      DateCreated: new Date(),
-      NoteBookID: this.itemDoc.ID,
-      UserRequestId: this.currentUserId,
-      UserApproverId: this.listUserIdSelect[index],
-      StatusID: 0,
-      StatusName: "Chờ xin ý kiến",
-      TypeCode: 'XYK',
-      TypeName: 'Xin ý kiến',
-      TaskTypeCode: 'XLC',
-      TaskTypeName: 'Xử lý chính',
-      Content: this.contentComment,
-      Compendium: this.itemDoc.compendium,
-    }
-    this.services.AddItemToList('ListProcessRequestTo', dataProcess).subscribe(
-      items => {
-        console.log(items);
-        this.idItemProcess = items['d'].Id;
-      },
-      error => {console.log(error);
-        this.CloseRotiniPanel();
-      },
-      () => {
-        this.CloseRotiniPanel();
-        this.saveComment(this.contentComment,true,index)
-      }
-    )
-  } catch (error) {
-    console.log('saveItemListProcess error: ' + error.message);
-  }
-}
-}
-
-
-
- // if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
-      //   this.selectedCombiner.forEach(element => {
-      //     data.push({
-      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      //       Title: this.itemDoc.numberTo,
-      //       DateCreated: new Date(),
-      //       NoteBookID: this.IncomingDocID,
-      //       UserRequestId: this.currentUserId,
-      //       UserApproverId: element.split('|')[0],
-      //       Deadline: this.deadline,
-      //       StatusID: 0,
-      //       StatusName: 'Chờ xử lý',
-      //       Source: '',
-      //       Destination: '',
-      //       TaskTypeCode: 'PH',
-      //       TaskTypeName: 'Phối hợp',
-      //       TypeCode: 'CXL',
-      //       TypeName: 'Chuyển xử lý',
-      //       Content: this.content,
-      //       IndexStep: this.IndexStep + 1,
-      //       Compendium: this.itemDoc.compendium
-      //     });
-      //   });
-      // }
-      // if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
-      //   this.selectedKnower.forEach(element => {
-      //     data.push({
-      //       __metadata: { type: 'SP.Data.ListProcessRequestToListItem' },
-      //       Title: this.itemDoc.numberTo,
-      //       DateCreated: new Date(),
-      //       NoteBookID: this.IncomingDocID,
-      //       UserRequestId: this.currentUserId,
-      //       UserApproverId: element.split('|')[0],
-      //       Deadline: this.deadline,
-      //       StatusID: 0,
-      //       StatusName: 'Chờ xử lý',
-      //       Source: '',
-      //       Destination: '',
-      //       TaskTypeCode: 'NĐB',
-      //       TaskTypeName: 'Nhận để biết',
-      //       TypeCode: 'CXL',
-      //       TypeName: 'Chuyển xử lý',
-      //       Content: this.content,
-      //       IndexStep: this.IndexStep + 1,
-      //       Compendium: this.itemDoc.compendium
-      //     });
-      //   });
-      // }
 

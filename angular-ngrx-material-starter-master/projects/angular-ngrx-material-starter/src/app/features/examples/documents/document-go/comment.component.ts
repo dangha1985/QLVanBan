@@ -297,7 +297,7 @@ export class CommentComponent implements OnInit {
     return reader;
   }
   callbackfunc() {
-    this.routes.navigate(['OutGoingDocs/documentgo-detail/' + this.data[0].ID]);
+    this.routes.navigate(['Documnets/documentgo-detail/' + this.data[0].ID]);
   }
   openCommentPanel() {
     let config = new OverlayConfig();

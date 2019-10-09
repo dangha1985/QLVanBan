@@ -130,7 +130,7 @@ export class IncomingDocService {
   }
 
   urlGroupApprover =
-    "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Name,User/Title,User/Id&$expand=User&$filter=RoleCode eq ";
+    "/_api/web/lists/getbytitle('ListMapEmployee')/items?$select=*,User/Name,User/Title,User/Id&$expand=User&$orderby=RoleDefault desc&$filter=RoleCode eq ";
   getUserApprover(role) {
     return this.http.get(
       `${this.restUrl}${this.urlGroupApprover}` + `'` + role + `'`

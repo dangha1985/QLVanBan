@@ -720,7 +720,7 @@ export class DocumentAddComponent implements OnInit {
               console.log('Add email success');
               // this.CloseRotiniPanel();
               // alert('Bạn đã tạo yêu cầu thành công');
-              // this.routes.navigate(['examples/doc-detail/' + this.DocumentID]);
+              // this.routes.navigate(['Documnets/IncomingDoc/docTo-detail/' + this.DocumentID]);
             }
           )
         }
@@ -759,13 +759,13 @@ export class DocumentAddComponent implements OnInit {
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.userApproverName);
               break;
             case 'ItemUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/examples/doc-detail/' + this.DocumentID);
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/Documnets/IncomingDoc/docTo-detail/' + this.DocumentID);
               break;
             case 'TaskUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/examples/doc-detail/' + this.DocumentID + "/1");
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc/docTo-detail/' + this.DocumentID + "/1");
               break;
             case 'HomeUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/examples');
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc');
               break;
           }
         }

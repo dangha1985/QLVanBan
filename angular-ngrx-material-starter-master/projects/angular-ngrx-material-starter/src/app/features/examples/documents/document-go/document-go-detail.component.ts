@@ -890,7 +890,7 @@ export class DocumentGoDetailComponent implements OnInit {
     }
     else {
       this.closeCommentPanel();
-      this.routes.navigate(['/OutGoingDocs/documentgo-detail/' + id]);
+      this.routes.navigate(['/Documnets/documentgo-detail/' + id]);
     }
   }
 
@@ -1011,7 +1011,7 @@ export class DocumentGoDetailComponent implements OnInit {
               arr = [];
               this.closeCommentPanel();
               if(sts === 1) {
-               this.routes.navigate(['examples/doc-detail/' + this.ItemId]);
+               this.routes.navigate(['/Documnets/documentgo/documentgo-detail/' + this.ItemId]);
               } else {
                 this.closeCommentPanel();
                 this.notificationService.success('Bạn gửi bình luận thành công');

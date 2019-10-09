@@ -27,7 +27,6 @@ export class DocumentComponent implements OnInit {
     { link: 'documentgo-waiting-comment/3', label: 'Chờ xin ý kiến' },
     { link: 'documentgo-comment/4', label: 'Đã cho ý kiến' },
   ];
-
   constructor(private store: Store<State>) {}
 
   ngOnInit(): void {

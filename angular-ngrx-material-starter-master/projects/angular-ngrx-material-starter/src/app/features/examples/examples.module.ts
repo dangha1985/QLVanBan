@@ -5,11 +5,11 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import {MatTableModule} from '@angular/material/table';
-import {FlexLayoutModule} from '@angular/flex-layout';
-import {MatTreeModule} from '@angular/material/tree'
-import {MatAutocompleteModule} from '@angular/material';
-import { ModalModule } from 'ngx-bootstrap/modal';
+// import {MatTableModule} from '@angular/material/table';
+// import {FlexLayoutModule} from '@angular/flex-layout';
+// import {MatTreeModule} from '@angular/material/tree'
+// import {MatAutocompleteModule} from '@angular/material';
+// import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../../shared/shared.module';
 import { environment } from '../../../environments/environment';
 
@@ -34,11 +34,11 @@ import { UserComponent } from './simple-state-management/components/user.compone
 import { UserService } from './simple-state-management/user.service';
 import { ElementsComponent } from './elements/elements.component';
 //import {DocumentGoComponent }from './documents/document-go/document-go.component';
-import {DocumentAddComponent, RotiniPanel} from './documents/document-to/components/document-add.component'
-import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
-import { DocumentWaitingComponent, ChecklistDatabase} from './documents/document-to/components/document-waiting.component'
-import { ReportComponent} from './documents/document-to/components/report.component'
-import { ReportAdvanceComponent} from './documents/document-to/components/report-advance.component'
+// import {DocumentAddComponent, RotiniPanel} from './documents/document-to/components/document-add.component'
+// import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
+// import { DocumentWaitingComponent, ChecklistDatabase} from './documents/document-to/components/document-waiting.component'
+// import { ReportComponent} from './documents/document-to/components/report.component'
+// import { ReportAdvanceComponent} from './documents/document-to/components/report-advance.component'
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -70,11 +70,11 @@ export function HttpLoaderFactory(http: HttpClient) {
       BooksEffects,
       FormEffects
     ]),
-     MatTableModule,
-     MatTreeModule,
-     FlexLayoutModule,
-     MatAutocompleteModule,
-     ModalModule.forRoot(),
+    //  MatTableModule,
+    //  MatTreeModule,
+    //  FlexLayoutModule,
+    //  MatAutocompleteModule,
+    //  ModalModule.forRoot(),
   ],
   declarations: [
     ExamplesComponent,
@@ -89,18 +89,18 @@ export function HttpLoaderFactory(http: HttpClient) {
     UserComponent,
     ElementsComponent,
    // DocumentGoComponent,
-    DocumentAddComponent,
-    DocumentDetailComponent,
-    DocumentWaitingComponent,
-    // ChecklistDatabase,
-    RotiniPanel,
-    ReportComponent,
-    ReportAdvanceComponent,
+    // DocumentAddComponent,
+    // DocumentDetailComponent,
+    // DocumentWaitingComponent,
+    // // ChecklistDatabase,
+    // RotiniPanel,
+    // ReportComponent,
+    // ReportAdvanceComponent,
   ],
-  providers: [StockMarketService, UserService, ChecklistDatabase],
-  entryComponents: [
-    RotiniPanel,
-    ],
+  providers: [StockMarketService, UserService],
+  // entryComponents: [
+  //   RotiniPanel,
+  //   ],
 })
 export class ExamplesModule {
   constructor() {}

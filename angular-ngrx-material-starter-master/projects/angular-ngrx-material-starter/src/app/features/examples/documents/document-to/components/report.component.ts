@@ -106,7 +106,7 @@ export class ReportComponent implements OnInit {
             note: this.docTo.CheckNull(element.Note),
             created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
             sts: this.docTo.CheckNullSetZero(element.StatusID) === 0 ? 'Ongoing' : 'Approved',
-            link: '/examples/doc-detail/' + element.ID
+            link: '/Documnets/IncomingDoc/docTo-detail/' + element.ID
           })
         })   
         

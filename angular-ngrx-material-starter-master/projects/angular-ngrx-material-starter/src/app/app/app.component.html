@@ -35,8 +35,8 @@
                     <span class="d-none d-md-inline spacer" style="margin-left: 10px">
             <button mat-flat-button color="primary" class="toplinkbarItem" [matMenuTriggerFor]="examples" type="button">QLVB <mat-icon>keyboard_arrow_down</mat-icon></button>
             <mat-menu #examples="matMenu">
-                <button type="button" mat-menu-item [routerLink]="'/examples'">Văn bản đến</button>
-                <button type="button" mat-menu-item [routerLink]="'/OutGoingDocs'">Văn bản đi</button>
+                <button type="button" mat-menu-item [routerLink]="'/Documnets/IncomingDoc'">Văn bản đến</button>
+                <button type="button" mat-menu-item [routerLink]="'/Documnets'">Văn bản đi</button>
                 <button type="button" mat-menu-item [routerLink]="'/examples/todos'">Todos</button>
                 <button type="button" mat-menu-item [routerLink]="'/examples/stock-market'">Stock</button>
                 <button type="button" mat-menu-item [routerLink]="'/examples/theming'">Theming</button>
@@ -47,14 +47,6 @@
                 <button type="button" mat-menu-item [routerLink]="'/examples/elements'">Elements</button>
                 <button type="button" mat-menu-item [routerLink]="'/examples/authenticated'">Auth</button>
             </mat-menu>
-            <!-- <mat-menu #IncommingDoc="matMenu">
-                <button type="button" mat-menu-item routerLink="/examples/doc-to">Tiếp nhận văn bản</button>
-                <button type="button" mat-menu-item routerLink="/examples/doc-list">Chờ xử lý</button>
-            </mat-menu>
-            <mat-menu #OutComingDoc="matMenu">
-                <button type="button" mat-menu-item routerLink="/OutGoingDocs/documentgo">Văn bản trình ký</button>
-                <button type="button" mat-menu-item routerLink="/OutGoingDocs/documentgo-waiting">Chờ xử lý</button>
-            </mat-menu> -->
           <button mat-button class="nav-button" *ngFor="let item of navigation" [routerLink]="[item.link]"
             routerLinkActive="active">
             {{item.label | translate}}

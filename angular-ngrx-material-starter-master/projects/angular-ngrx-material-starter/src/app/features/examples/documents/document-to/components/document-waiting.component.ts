@@ -247,9 +247,9 @@ export class DocumentWaitingComponent implements OnInit {
   getLinkItemByRole(taskType, id, step) {
     let link = '';
     if(taskType === 'XLC' || taskType === 'TL') {
-      link = '/examples/doc-detail/' + id + '/' + step;
+      link = '/Documnets/IncomingDoc/docTo-detail/' + id + '/' + step;
     } else {
-      link = '/examples/doc-detail/' + id;
+      link = '/Documnets/IncomingDoc/docTo-detail/' + id;
     }
     return link;
   }

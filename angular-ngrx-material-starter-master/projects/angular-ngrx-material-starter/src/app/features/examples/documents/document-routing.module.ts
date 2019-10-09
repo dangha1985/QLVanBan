@@ -4,21 +4,21 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuardService } from '../../../core/core.module';
 
 import { ExamplesComponent } from './../examples/examples.component';
-// import { ParentComponent } from './theming/parent/parent.component';
-// import { AuthenticatedComponent } from './authenticated/authenticated.component';
-// import { TodosContainerComponent } from './todos/components/todos-container.component';
-// import { StockMarketContainerComponent } from './stock-market/components/stock-market-container.component';
-// import { CrudComponent } from './crud/components/crud.component';
-// import { FormComponent } from './form/components/form.component';
 import { NotificationsComponent } from './../notifications/components/notifications.component';
-// import { UserComponent } from './simple-state-management/components/user.component';
 import { ElementsComponent } from './../elements/elements.component';
-// import { FormdemoComponent } from './demo/formdemo.component';
-import { DocumentComponent } from '../../../features/examples/documents/document-go/document.component'
+import { DocumentComponent } from '../../../features/examples/documents/document-go/document.component';
+import { IncomingDocumentComponent } from '../../../features/examples/documents/document-to/components/incoming-document.component';
 import { DocumentGoComponent } from './document-go/document-go.component';
 import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
 import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
 import { CommentComponent }from './document-go/comment.component';
+
+import {DocumentAddComponent} from './document-to/components/document-add.component'
+import {DocumentDetailComponent} from './document-to/components/document-detail.component'
+import { DocumentWaitingComponent } from './document-to/components/document-waiting.component'
+import {ReportComponent} from './document-to/components/report.component'
+import {ReportAdvanceComponent} from './document-to/components/report-advance.component'
+
 import { from } from 'rxjs';
 const routes: Routes = [
   {
@@ -30,7 +30,6 @@ const routes: Routes = [
         redirectTo: 'documentgo',
         pathMatch: 'full'
       },
-
       {
         path: 'documentgo',
         component: DocumentGoComponent,
@@ -66,17 +65,64 @@ const routes: Routes = [
         component: DocumentGoDetailComponent,
         data: { title: 'Xử lý' }
       },
-      // {
-      //   path: 'documentgo-comment',
-      //   component: CommentComponent,
-      //   data: { title: 'Xin ý kiến' }
-      // },
     ]
   },
-  // {
-  //   path: 'documentgo/detail/:id',
-  //   component: DocumentGoDetailComponent,
-  // },
+  {
+    path: 'IncomingDoc',
+    component: IncomingDocumentComponent,
+    children: [
+      {
+        path: '',
+        redirectTo: 'documentto',
+        pathMatch: 'full'
+      },
+      {
+        path: 'documentto',
+        component: DocumentAddComponent,
+        data: { title: 'Tiếp nhận văn bản' }
+      },
+      {
+        path: 'docTo-list/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Chờ xử lý' }
+      },
+      {
+        path: 'docTo-list-approved/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Đã xử lý' }
+      },
+      {
+        path: 'docTo-list-waiting-comment/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Chờ xin ý kiến' }
+      },
+      {
+        path: 'docTo-list-response-comment/:id',
+        component: DocumentWaitingComponent,
+        data: { title: 'Đã cho ý kiến' }
+      },
+      {
+        path: 'reportDocTo',
+        component: ReportComponent,
+        data: { title: 'Báo cáo, thống kê' }
+      },
+      {
+        path: 'reportAdvanceDocTo',
+        component: ReportAdvanceComponent,
+        data: { title: 'Tra cứu văn bản' }
+      },
+      {
+        path: 'docTo-detail/:id',
+        component: DocumentDetailComponent,
+        data: { title: 'Xem chi tiết' }
+      },
+      {
+        path: 'docTo-detail/:id/:step',
+        component: DocumentDetailComponent,
+        data: { title: 'Xử lý' }
+      },
+    ]
+  }
 ];
 
 @NgModule({

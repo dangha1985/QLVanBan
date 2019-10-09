@@ -13,12 +13,6 @@ import { FormComponent } from './form/components/form.component';
 import { NotificationsComponent } from './notifications/components/notifications.component';
 import { UserComponent } from './simple-state-management/components/user.component';
 import { ElementsComponent } from './elements/elements.component';
-import {DocumentGoComponent }from './documents/document-go/document-go.component';
-import {DocumentAddComponent} from './documents/document-to/components/document-add.component'
-import {DocumentDetailComponent} from './documents/document-to/components/document-detail.component'
-import { DocumentWaitingComponent } from './documents/document-to/components/document-waiting.component'
-import {ReportComponent} from './documents/document-to/components/report.component'
-import {ReportAdvanceComponent} from './documents/document-to/components/report-advance.component'
 const routes: Routes = [
   {
     path: '',
@@ -26,53 +20,8 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'doc-to',
+        redirectTo: 'todos',
         pathMatch: 'full'
-      },
-      {
-        path: 'doc-to',
-        component: DocumentAddComponent,
-        data: { title: 'Tiếp nhận văn bản' }
-      },
-      {
-        path: 'doc-list/:id',
-        component: DocumentWaitingComponent,
-        data: { title: 'Chờ xử lý' }
-      },
-      {
-        path: 'doc-list-approved/:id',
-        component: DocumentWaitingComponent,
-        data: { title: 'Đã xử lý' }
-      },
-      {
-        path: 'doc-list-waiting-comment/:id',
-        component: DocumentWaitingComponent,
-        data: { title: 'Chờ xin ý kiến' }
-      },
-      {
-        path: 'doc-list-response-comment/:id',
-        component: DocumentWaitingComponent,
-        data: { title: 'Đã cho ý kiến' }
-      },
-      {
-        path: 'report-list',
-        component: ReportComponent,
-        data: { title: 'Báo cáo, thống kê' }
-      },
-      {
-        path: 'report-advance',
-        component: ReportAdvanceComponent,
-        data: { title: 'Tra cứu văn bản' }
-      },
-      {
-        path: 'doc-detail/:id',
-        component: DocumentDetailComponent,
-        data: { title: 'Xem chi tiết' }
-      },
-      {
-        path: 'doc-detail/:id/:step',
-        component: DocumentDetailComponent,
-        data: { title: 'Xử lý' }
       },
       {
         path: 'todos',
