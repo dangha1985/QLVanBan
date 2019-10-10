@@ -509,9 +509,9 @@ export class DocumentDetailComponent implements OnInit {
   AddNewComment(template: TemplateRef<any>) {
     // this.notificationService.info('Chờ xin ý kiến');
     this.bsModalRef = this.modalService.show(template, { class: 'modal-md' });
-    this.contentComment='';
-    this.outputFileAddComment=[];
-    this.selectedUserComment=null;
+    this.contentComment ='';
+    this.outputFileAddComment = [];
+    this.selectedUserComment = null;
   }
 
   NextApprval(template: TemplateRef<any>) {
@@ -546,6 +546,8 @@ export class DocumentDetailComponent implements OnInit {
             AssignEmailBody: element.AssignRequestBody,
             FinishEmailSubject: element.FinishRequestSubject,
             FinishEmailBody: element.FinishRequestBody,
+            CommentSubject:element.CommentRequestSubject,
+            CommentBody:element.CommentRequestBody
           }
       })
       }
@@ -580,7 +582,6 @@ export class DocumentDetailComponent implements OnInit {
           UserEmail: element.User.Name.split('|')[2]
         })        
       })
-      this.ref.detectChanges();
     });
 
     let strFilterCombine = `&$filter=(`;
@@ -602,7 +603,6 @@ export class DocumentDetailComponent implements OnInit {
           UserEmail: element.User.Name.split('|')[2]
         })        
       })
-      this.ref.detectChanges();
     });
 
     let strFilterKnow = `&$filter=(`;
@@ -624,7 +624,6 @@ export class DocumentDetailComponent implements OnInit {
           UserEmail: element.User.Name.split('|')[2]
         })        
       })
-      this.ref.detectChanges();
     });
   }
 
@@ -637,10 +636,11 @@ export class DocumentDetailComponent implements OnInit {
       this.notificationService.warn("Bạn chưa nhập Nội dung xử lý! Vui lòng kiểm tra lại");
       return false;
     }
-    else if (this.docTo.CheckNull(this.deadline) === '') {
-      this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
-      return false;
-    } else {
+    // else if (this.docTo.CheckNull(this.deadline) === '') {
+    //   this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
+    //   return false;
+    // } 
+    else {
       return true;
     }
   }
@@ -757,7 +757,7 @@ export class DocumentDetailComponent implements OnInit {
           NoteBookID: this.IncomingDocID,
           UserRequestId: this.currentUserId,
           UserApproverId: this.selectedApprover.split('|')[0],
-          Deadline: this.deadline,
+          Deadline: this.docTo.CheckNull(this.deadline) === '' ? null : this.deadline,
           StatusID: 0,
           StatusName: 'Chờ xử lý',
           Source: '',
@@ -843,7 +843,7 @@ export class DocumentDetailComponent implements OnInit {
       NoteBookID: this.IncomingDocID,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
-      Deadline: this.deadline,
+      Deadline: this.docTo.CheckNull(this.deadline) === '' ? null : this.deadline,
       StatusID: 0,
       StatusName: 'Chờ xử lý',
       Source: '',
@@ -896,7 +896,7 @@ export class DocumentDetailComponent implements OnInit {
       NoteBookID: this.IncomingDocID,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
-      Deadline: this.deadline,
+      Deadline: this.docTo.CheckNull(this.deadline) === '' ? null : this.deadline,
       StatusID: 0,
       StatusName: 'Chờ xử lý',
       Source: '',
@@ -981,7 +981,7 @@ export class DocumentDetailComponent implements OnInit {
       NoteBookID: this.itemDoc.ID,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedApprover.split('|')[0],
-      Deadline: this.deadline,
+      Deadline: this.docTo.CheckNull(this.deadline) === '' ? null : this.deadline,
       StatusID: 0,
       StatusName: 'Chờ xử lý',
       Content: this.content,
@@ -1003,6 +1003,10 @@ export class DocumentDetailComponent implements OnInit {
         console.log(
           'Add item of approval user to list ListHistoryRequestTo successfully!'
         );
+        // gui mail
+        this.addItemSendMail();
+
+        // Luu phieu cho nguoi phoi hop va nhan de biet
         if(this.selectedCombiner !== undefined && this.selectedCombiner.length > 0) {
           this.AddUserCombine();
         } else if(this.selectedKnower !== undefined && this.selectedKnower.length > 0) {
@@ -1389,15 +1393,15 @@ export class DocumentDetailComponent implements OnInit {
           },
           () => {
             if(isAddComment==false){     
-                    this.Comments = null;
-                    if (this.outputFileComment.length > 0) {
-                      this.saveItemAttachment(0, this.indexComment, this.outputFileComment, 'ListComments',null);
-                    }
-                    else {
-                      this.CloseRotiniPanel();
-                      this.notificationService.success('Bạn gửi bình luận thành công');
-                      this.getComment();
-                    }
+              this.Comments = null;
+              if (this.outputFileComment.length > 0) {
+                this.saveItemAttachment(0, this.indexComment, this.outputFileComment, 'ListComments',null);
+              }
+              else {
+                this.CloseRotiniPanel();
+                this.notificationService.success('Bạn gửi bình luận thành công');
+                this.getComment();
+              }
             }
             else  if(isAddComment==true){  //xin ý kiến
               if (this.outputFileAddComment.length > 0) {
@@ -1413,9 +1417,9 @@ export class DocumentDetailComponent implements OnInit {
                   this.GetHistory();
                   this.getComment();
                 }
+              }
             }
-            }
-        }
+          }
         )
       }
       else {
@@ -1426,6 +1430,7 @@ export class DocumentDetailComponent implements OnInit {
       console.log("SendComment error: " + error);
     }
   }
+
   //lưu comment trả lời
   saveCommentReply(i, j) {
     try {
@@ -1563,8 +1568,12 @@ export class DocumentDetailComponent implements OnInit {
           this.listCommentParent.push(item);
         }
       });
+    },
+    error => {},
+    () => {
       this.ref.detectChanges();
-    })
+    }
+    )
   }
 
   //xin ý kiến
@@ -1577,13 +1586,13 @@ export class DocumentDetailComponent implements OnInit {
 
         this.OpenRotiniPanel();
         //lưu attach file vào văn bản
-        if (this.outputFileAddComment.length > 0) {
-          this.saveItemAttachment(0, this.IncomingDocID,this.outputFileAddComment, 'ListDocumentTo',null);
-        }
+        // if (this.outputFileAddComment.length > 0) {
+        //   this.saveItemAttachment(0, this.IncomingDocID, this.outputFileAddComment, 'ListDocumentTo', null);
+        // }
         //lưu phiếu xin ý kiến và lưu comment
-      for(let i=0;i<this.listUserIdSelect.length;i++){
-        this.saveItemListProcess(i);
-      }
+        for(let i = 0; i < this.listUserIdSelect.length; i++){
+          this.saveItemListProcess(i);
+        }
       }
       else {
         alert("Bạn chưa nhập nội dung xin ý kiến");
@@ -1621,7 +1630,29 @@ export class DocumentDetailComponent implements OnInit {
         },
         () => {
           this.CloseRotiniPanel();
-          this.saveComment(this.contentComment,true,index)
+          this.saveComment(this.contentComment,true,index);
+          // gui mail
+          const dataSendUser = {
+            __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+            Title: this.listName,
+            IndexItem: this.IncomingDocID,
+            Step: 1,
+            KeyList: this.listName +  '_' + this.IncomingDocID,
+            SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.CommentSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.CommentBody),
+            SendMailTo: this.selectedUserComment.split('|')[1],
+          }
+          this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+            itemRoomRQ => {
+              console.log(itemRoomRQ['d']);
+            },
+            error => {
+              console.log(error);
+              this.CloseRotiniPanel();
+            },
+            () => {
+              console.log('Save item success');
+            });
         }
       )
     } catch (error) {
@@ -1673,6 +1704,12 @@ export class DocumentDetailComponent implements OnInit {
             },
             () => {
               console.log('Add email success');
+              if(this.selectedCombiner.length > 0) {
+                this.SendMailCombiner(0);
+              }
+              if(this.selectedKnower.length > 0) {
+                this.SendMailKnower(0);
+              }
             }
           )
         }
@@ -1682,7 +1719,63 @@ export class DocumentDetailComponent implements OnInit {
     }
   }
 
+  SendMailCombiner(index) {
+    var user = this.selectedCombiner[index];
+    const dataSendUser = {
+      __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+      Title: this.listName,
+      IndexItem: this.IncomingDocID,
+      Step: 1,
+      KeyList: this.listName +  '_' + this.IncomingDocID,
+      SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      SendMailTo: user.split('|')[1],
+    }
+    this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+      itemRoomRQ => {
+        console.log(itemRoomRQ['d']);
+      },
+      error => {
+        console.log(error);
+        this.CloseRotiniPanel();
+      },
+      () => {
+        index ++;
+        if(index < this.selectedCombiner.length) {
+          this.SendMailCombiner(index);
+        }
+      }
+    );
+  }
 
+  SendMailKnower(index) {
+    var user = this.selectedKnower[index];
+    const dataSendUser = {
+      __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+      Title: this.listName,
+      IndexItem: this.IncomingDocID,
+      Step: 1,
+      KeyList: this.listName +  '_' + this.IncomingDocID,
+      SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      SendMailTo: user.split('|')[1],
+    }
+    this.services.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+      itemRoomRQ => {
+        console.log(itemRoomRQ['d']);
+      },
+      error => {
+        console.log(error);
+        this.CloseRotiniPanel();
+      },
+      () => {
+        index ++;
+        if(index < this.selectedKnower.length) {
+          this.SendMailKnower(index);
+        }
+      }
+    );
+  }
 
   Replace_Field_Mail(FieldMail, ContentMail) {
     try {
@@ -1706,6 +1799,12 @@ export class DocumentDetailComponent implements OnInit {
             case 'Author':
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
               break;
+            case 'ContentComment':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.contentComment);
+              break;
+            case 'userComment':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.selectedUserComment.split('|')[2]);
+              break;
             case 'userStep':
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.UserAppoverName);
               break;
@@ -1716,7 +1815,7 @@ export class DocumentDetailComponent implements OnInit {
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/Documnets/IncomingDoc/docTo-detail/' + this.IncomingDocID);
               break;
             case 'TaskUrl':
-              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc/docTo-detail/' + this.IncomingDocID + (this.IndexStep + 1));
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc/docTo-detail/' + this.IncomingDocID + '/' + (this.IndexStep + 1));
               break;
             case 'HomeUrl':
               ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/IncomingDoc');

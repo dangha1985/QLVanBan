@@ -172,7 +172,7 @@ export class DocumentGoComponent implements OnInit {
   }
 
   getListEmailConfig() {
-    const str = `?$select=*&$filter=Title eq 'DG'&$top=1`;
+    const str = `?$select=*&$filter=Title eq 'DT'&$top=1`;
     this.EmailConfig = null;
     this.services.getItem('ListEmailConfig', str).subscribe((itemValue: any[]) => {
       let item = itemValue['value'] as Array<any>;

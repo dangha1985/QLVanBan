@@ -16,7 +16,7 @@ import {
 } from '../../../examples/form/form.actions';
 import { selectFormState } from '../../../examples/form/form.selectors';
 import {SelectionModel} from '@angular/cdk/collections';
-import { ResApiService } from '../../services/res-api.service'
+import { ResApiService } from '../../services/res-api.service';
 import { DocumentGoService } from './document-go.service';
 import { DocumentGoPanel } from './document-go.component';
 import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser, DocumentGoTicket, AttachmentsObject, UserProfilePropertiesObject } from './../models/document-go';
@@ -75,6 +75,7 @@ export class DocumentGoDetailComponent implements OnInit {
   outputFile = [];
   outputFileHandle = [];
   outputFileReturn = [];
+  outputFileAddComment = [];
   displayFile = '';
   buffer;
   content;deadline;
@@ -102,12 +103,15 @@ export class DocumentGoDetailComponent implements OnInit {
   ListUserCombine = [];
   ListUserKnow = [];
   selectedKnower = []; selectedCombiner = []; selectedApprover;
+  EmailConfig;
   numberOfSymbol; numberGo; currentNumberGo = 0;
   UserAppoverName = '';
+  contentComment; selectedUserComment;
+  listUserIdSelect = []; idItemProcess;
   ArrayUserPofile: UserProfilePropertiesObject[] = [];
   dataSource_Ticket = new MatTableDataSource<DocumentGoTicket>();
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  ListDocument: ItemDocumentGo[] = [];
+  ListDocument: ItemDocumentGo;
   displayedColumns2 = ['person', 'role', 'process', 'combine', 'know'];
   dataSource2 = new MatTableDataSource<UserOfDepartment>();
   selection = new SelectionModel<UserOfDepartment>(true, []);
@@ -127,6 +131,7 @@ export class DocumentGoDetailComponent implements OnInit {
     this.getCurrentUser();
     this.GetTotalStep();
     this.GetAllUser();
+    this.getListEmailConfig();
   }
   //Lấy người dùng hiện tại
   getCurrentUser() {
@@ -276,6 +281,31 @@ export class DocumentGoDetailComponent implements OnInit {
       }
       )
     })
+  }
+  
+  getListEmailConfig() {
+    const str = `?$select=*&$filter=Title eq 'DT'&$top=1`;
+    this.EmailConfig = null;
+    this.resService.getItem('ListEmailConfig', str).subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      if (item.length > 0) {
+          item.forEach(element => {
+          this.EmailConfig = {
+            FieldMail: element.FieldMail,
+            NewEmailSubject: element.NewRequestSubject,
+            NewEmailBody: element.NewRequestBody,
+            ApprovedEmailSubject: element.ApprovedRequestSubject,
+            ApprovedEmailBody: element.ApprovedRequestBody,
+            AssignEmailSubject: element.AssignRequestSubject,
+            AssignEmailBody: element.AssignRequestBody,
+            FinishEmailSubject: element.FinishRequestSubject,
+            FinishEmailBody: element.FinishRequestBody,
+            CommentSubject:element.CommentRequestSubject,
+            CommentBody:element.CommentRequestBody
+          }
+      })
+      }
+    });
   }
 
   GetItemDetail() {
@@ -540,10 +570,10 @@ export class DocumentGoDetailComponent implements OnInit {
       this.notificationService.warn("Bạn chưa nhập Nội dung xử lý! Vui lòng kiểm tra lại");
       return false;
     }
-    else if (this.docServices.checkNull(this.deadline) === '') {
-      this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
-      return false;
-    } 
+    // else if (this.docServices.checkNull(this.deadline) === '') {
+    //   this.notificationService.warn("Bạn chưa nhập Hạn xử lý! Vui lòng kiểm tra lại");
+    //   return false;
+    // } 
     else if (this.IndexStep === (this.totalStep -1) && (this.docServices.CheckNullSetZero(this.numberGo) === 0
             || this.docServices.CheckNullSetZero(this.numberGo) <= this.currentNumberGo)) {
       this.notificationService.warn("Số đi không hợp lệ ! Vui lòng kiểm tra lại");
@@ -568,7 +598,7 @@ export class DocumentGoDetailComponent implements OnInit {
           DocumentGoID: this.ItemId,
           UserRequestId: this.currentUserId,
           UserApproverId: this.selectedApprover.split('|')[0],
-          Deadline: this.deadline,
+          Deadline: this.docServices.checkNull(this.deadline) === '' ? null : this.deadline,
           StatusID: 0,
           StatusName: 'Chờ xử lý',
           Source: '',
@@ -670,7 +700,7 @@ export class DocumentGoDetailComponent implements OnInit {
       DocumentGoID: this.ItemId,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
-      Deadline: this.deadline,
+      Deadline: this.docServices.checkNull(this.deadline) === '' ? null : this.deadline,
       StatusID: 0,
       StatusName: 'Chờ xử lý',
       Source: '',
@@ -721,7 +751,7 @@ export class DocumentGoDetailComponent implements OnInit {
       DocumentGoID: this.ItemId,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedCombiner[this.index].split('|')[0],
-      Deadline: this.deadline,
+      Deadline: this.docServices.checkNull(this.deadline) === '' ? null : this.deadline,
       StatusID: 0,
       StatusName: 'Chờ xử lý',
       Source: '',
@@ -804,7 +834,7 @@ export class DocumentGoDetailComponent implements OnInit {
       DocumentGoID: this.itemDoc.ID,
       UserRequestId: this.currentUserId,
       UserApproverId: this.selectedApprover.split('|')[0],
-      Deadline: this.deadline,
+      Deadline: this.docServices.checkNull(this.deadline) === '' ? null : this.deadline,
       StatusID: 0,
       StatusName: 'Chờ xử lý',
       Content: this.itemDoc.Note,
@@ -897,27 +927,29 @@ export class DocumentGoDetailComponent implements OnInit {
   gotoBack() {
     window.history.back()
   }
-  AddNewComment() {
-    this.ListDocument.push(this.itemDoc);
-    console.log(this.itemDoc);
-    const dialogRef = this.dialog.open(CommentComponent, {
-      width: '50%', data: this.ListDocument
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-      //Lấy lại thông tin sau khi đóng diglog
-      this.GetItemDetail();
-      this.GetHistory();
-      this.getComment();
-      // this.callbackfunc();
-    });
+  AddNewComment(template) {
+    // this.ListDocument = this.itemDoc;
+    // console.log(this.itemDoc);
+    // const dialogRef = this.dialog.open(CommentComponent, {
+    //   width: '50%', data: [this.ListDocument, this.ListUserChoice]
+    // });
 
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log(`Dialog result: ${result}`);
+    //   //Lấy lại thông tin sau khi đóng diglog
+    //   this.GetItemDetail();
+    //   this.GetHistory();
+    //   this.getComment();
+    //   // this.callbackfunc();
+    // });
+
+    this.bsModalRef = this.modalService.show(template, { class: 'modal-md' });
+    this.contentComment ='';
+    this.outputFileAddComment = [];
+    this.selectedUserComment = null;
   }
 
-  // AddNewComment() {
-  //   this.notificationService.info('Chờ xin ý kiến');
-  // }
   addAttachmentFile(sts) {
     try {
       if(sts === 0) {
@@ -969,9 +1001,26 @@ export class DocumentGoDetailComponent implements OnInit {
           }
         }
       }
+      else if(sts === 3) {
+        const inputNode: any = document.querySelector('#fileAttachmentAddComment');
+        if (this.docServices.checkNull(inputNode.files[0]) !== '') {
+          console.log(inputNode.files[0]);
+          if (this.outputFileAddComment.length > 0) {
+            if (
+              this.outputFileAddComment.findIndex(
+                index => index.name === inputNode.files[0].name
+              ) < 0
+            ) {
+              this.outputFileAddComment.push(inputNode.files[0]);
+            }
+          } else {
+            this.outputFileAddComment.push(inputNode.files[0]);
+          }
+        }
+      }
     } catch (error) {
       console.log('addAttachmentFile error: ' + error);
-    }
+    }    
   }
 
   removeAttachmentFile(index, sts) {
@@ -985,13 +1034,16 @@ export class DocumentGoDetailComponent implements OnInit {
       } else if(sts === 2) {
         console.log(this.outputFileReturn.indexOf(index))
         this.outputFileReturn.splice(this.outputFileReturn.indexOf(index), 1);
+      } else if(sts === 3) {
+        console.log(this.outputFileAddComment.indexOf(index))
+        this.outputFileAddComment.splice(this.outputFileAddComment.indexOf(index), 1);
       }
     } catch (error) {
       console.log("removeAttachmentFile error: " + error);
     }
   }
 
-  saveItemAttachment(index, listName, idItem, arr, sts) {
+  saveItemAttachment(index, listName, idItem, arr, indexUserComment) {
     try {
       this.buffer = this.getFileBuffer(arr[index]);
       this.buffer.onload = (e: any) => {
@@ -1005,18 +1057,38 @@ export class DocumentGoDetailComponent implements OnInit {
           () => {
             console.log('inserAttachmentFile successfully');
             if (Number(index) < (arr.length - 1)) {
-              this.saveItemAttachment((Number(index) + 1), listName, idItem, arr, sts);
+              this.saveItemAttachment((Number(index) + 1), listName, idItem, arr, indexUserComment);
             }
             else {
               arr = [];
               this.closeCommentPanel();
-              if(sts === 1) {
-               this.routes.navigate(['/Documnets/documentgo/documentgo-detail/' + this.ItemId]);
-              } else {
-                this.closeCommentPanel();
-                this.notificationService.success('Bạn gửi bình luận thành công');
+              if (listName == 'ListComments') {
                 this.getComment();
+                if(indexUserComment!=null && indexUserComment==this.listUserIdSelect.length-1)
+                {
+                  this.outputFileAddComment = [];
+                  this.notificationService.success('Bạn gửi xin ý kiến thành công');
+                  this.GetItemDetail();
+                  this.GetHistory();
+                  this.bsModalRef.hide();
+                }
+                else{
+                  this.outputFile = [];
+                  this.notificationService.success('Bạn gửi bình luận thành công');
+                }
               }
+              else {
+                arr = [];
+                this.routes.navigate(['/Documnets/documentgo-detail/' + this.ItemId]);
+              }
+
+              // if(sts === 1) {
+              //  this.routes.navigate(['/Documnets/documentgo-detail/' + this.ItemId]);
+              // } else {
+              //   this.closeCommentPanel();
+              //   this.notificationService.success('Bạn gửi bình luận thành công');
+              //   this.getComment();
+              // }
             }
           }
         )
@@ -1136,6 +1208,7 @@ export class DocumentGoDetailComponent implements OnInit {
     reader.readAsArrayBuffer(file);
     return reader;
   }
+
   Reply(i, j) {
     if (j == undefined) {
       this.listCommentParent[i].DisplayReply = "flex";
@@ -1145,16 +1218,19 @@ export class DocumentGoDetailComponent implements OnInit {
       this.listCommentParent[i].children[j].DisplayReply = "flex";
     }
   }
+
   //luu comment
-  SendComment() {
+  SendComment(content,isAddComment, index) {
     try {
       this.openCommentPanel();
-      if (this.isNotNull(this.Comments)) {
+      if (this.isNotNull(content)) {
         const dataComment = {
           __metadata: { type: 'SP.Data.ListCommentsListItem' },
           Title: "ListDocumentGo_" + this.ItemId,
-          Chat_Comments: this.Comments,
-          KeyList: "ListDocumentGo_" + this.ItemId
+          Chat_Comments: content,
+          KeyList: "ListDocumentGo_" + this.ItemId,
+          ProcessID:isAddComment==true? this.idItemProcess : null,
+          UserApproverId:isAddComment==true? this.listUserIdSelect[index]:null,
         }
         if (this.isNotNull(this.pictureCurrent)) {
           Object.assign(dataComment, { userPicture: this.pictureCurrent });
@@ -1168,14 +1244,32 @@ export class DocumentGoDetailComponent implements OnInit {
             this.notificationService.error('Bạn gửi bình luận thất bại');
           },
           () => {
-            this.Comments = null;
-            if (this.outputFile.length > 0) {
-              this.saveItemAttachment(0, 'ListComments', this.indexComment, this.outputFile, 0);
+            if(isAddComment == false){     
+              this.Comments = null;
+              if (this.outputFile.length > 0) {
+                this.saveItemAttachment(0, this.indexComment, this.outputFile, 'ListComments', null);
+              }
+              else {
+                this.closeCommentPanel();
+                this.notificationService.success('Bạn gửi bình luận thành công');
+                this.getComment();
+              }
             }
-            else {
-              this.closeCommentPanel();
-              this.notificationService.success('Bạn gửi bình luận thành công');
-              this.getComment();
+            else if(isAddComment == true){  //xin ý kiến
+              if (this.outputFileAddComment.length > 0) {
+                this.saveItemAttachment(0, this.indexComment, this.outputFileAddComment, 'ListComments', index);
+              }
+              else {
+                this.closeCommentPanel();
+                console.log('Bạn gửi xin ý kiến thành công');
+                //kt nếu lưu đến người cuối cùng rồi thì đóng modal
+                if(index == this.listUserIdSelect.length-1){
+                  this.notificationService.success('Bạn gửi xin ý kiến thành công');
+                  this.bsModalRef.hide();
+                  this.GetHistory();
+                  this.getComment();
+                }
+              }
             }
           }
         )
@@ -1188,6 +1282,7 @@ export class DocumentGoDetailComponent implements OnInit {
       console.log("SendComment error: " + error);
     }
   }
+
   //lưu comment trả lời
   saveCommentReply(i, j) {
     try {
@@ -1219,10 +1314,6 @@ export class DocumentGoDetailComponent implements OnInit {
             this.notificationService.error('Bạn gửi trả lời thất bại');
           },
           () => {
-            // if (this.outputFile.length > 0) {
-            //   this.saveItemAttachment(0, this.indexComment);
-            // }
-            // else {
             this.closeCommentPanel();
             this.notificationService.success('Bạn gửi trả lời thành công');
             //update lại trạng thái cho phiếu xin ý kiến
@@ -1242,6 +1333,7 @@ export class DocumentGoDetailComponent implements OnInit {
       console.log("saveCommentReply error: " + error);
     }
   }
+
   updateProcess(id) {
     try {
       const dataProcess = {
@@ -1255,14 +1347,7 @@ export class DocumentGoDetailComponent implements OnInit {
         },
         error => console.log(error),
         () => {
-          // if (this.outputFile.length > 0) {
-          //   this.saveItemAttachment(0, this.indexComment);
-          // }
-          // else {
-          // this.closeCommentPanel();
-          // alert('Bạn gửi trả lời thành công');
           this.GetHistory();
-          // }
         }
       )
 
@@ -1270,6 +1355,7 @@ export class DocumentGoDetailComponent implements OnInit {
       console.log("saveCommentReply error: " + error);
     }
   }
+
   listCommentParent = [];
   listCommentChild = [];
   getComment(): void {
@@ -1322,13 +1408,271 @@ export class DocumentGoDetailComponent implements OnInit {
           this.listCommentParent.push(item);
         }
       });
+    },
+    error => {},
+    () => {
       this.ref.detectChanges();
     })
   }
-  // XinYKien(template: TemplateRef<any>) {
-  //   //  this.notificationService.warn('Chọn người xử lý tiếp theo');
-  //   this.bsModalRef = this.modalService.show(template);
-  // }
+
+  //xin ý kiến
+  saveItem() {
+    try {
+      if (this.isNotNull(this.contentComment)) {
+        this.listUserIdSelect = [];
+        let id = this.selectedUserComment.split('|')[0];
+        this.listUserIdSelect.push(id);
+
+        this.openCommentPanel();
+        //lưu attach file vào văn bản
+        // if (this.outputFileAddComment.length > 0) {
+        //   this.saveItemAttachment(0, this.ItemId, this.outputFileAddComment, 'ListDocumentGo', null);
+        // }
+        //lưu phiếu xin ý kiến và lưu comment
+        for(let i = 0; i < this.listUserIdSelect.length; i++){
+          this.saveItemListProcess(i);
+        }
+      }
+      else {
+        alert("Bạn chưa nhập nội dung xin ý kiến");
+      }
+    } catch (error) {
+      console.log('saveItem error: ' + error.message);
+    }
+  }
+
+  saveItemListProcess(index) {
+    try {
+      const dataProcess = {
+        __metadata: { type: 'SP.Data.ListProcessRequestGoListItem' },
+        Title: this.itemDoc.NumberGo,
+        DateCreated: new Date(),
+        NoteBookID: this.itemDoc.ID,
+        UserRequestId: this.currentUserId,
+        UserApproverId: this.listUserIdSelect[index],
+        StatusID: 0,
+        StatusName: "Chờ xin ý kiến",
+        TypeCode: 'XYK',
+        TypeName: 'Xin ý kiến',
+        TaskTypeCode: 'XLC',
+        TaskTypeName: 'Xử lý chính',
+        Content: this.contentComment,
+        Compendium: this.itemDoc.Compendium,
+      }
+      this.resService.AddItemToList('ListProcessRequestGo', dataProcess).subscribe(
+        items => {
+          console.log(items);
+          this.idItemProcess = items['d'].Id;
+        },
+        error => {console.log(error);
+          this.closeCommentPanel();
+        },
+        () => {
+          this.closeCommentPanel();
+          this.SendComment(this.contentComment, true, index);
+          // gui mail
+          const dataSendUser = {
+            __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+            Title: this.listName,
+            IndexItem: this.ItemId,
+            Step: 1,
+            KeyList: this.listName +  '_' + this.ItemId,
+            SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.CommentSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.CommentBody),
+            SendMailTo: this.selectedUserComment.split('|')[1],
+          }
+          this.resService.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+            itemRoomRQ => {
+              console.log(itemRoomRQ['d']);
+            },
+            error => {
+              console.log(error);
+              this.closeCommentPanel();
+            },
+            () => {
+              console.log('Save item success');
+            });
+        }
+      )
+    } catch (error) {
+      console.log('saveItemListProcess error: ' + error.message);
+    }
+  }
+
+  addItemSendMail() {
+    try {
+      // send mail user created
+      const dataSendUser = {
+        __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+        Title: this.listName,
+        IndexItem: this.ItemId,
+        Step: 1,
+        KeyList: this.listName +  '_' + this.ItemId,
+        SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailSubject),
+        BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.NewEmailBody),
+        SendMailTo: this.currentUserEmail,
+      }
+      this.resService.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+        itemRoomRQ => {
+          console.log(itemRoomRQ['d']);
+        },
+        error => {
+          console.log(error);
+          this.closeCommentPanel();
+        },
+        () => {
+          console.log('Save item success');
+
+          const dataSendApprover = {
+            __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+            Title: this.listName,
+            IndexItem: this.ItemId,
+            Step: 1,
+            KeyList: this.listName +  '_' + this.ItemId,
+            SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+            BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailBody),
+            SendMailTo: this.selectedApprover.split('|')[1]
+          }
+          this.resService.AddItemToList('ListRequestSendMail', dataSendApprover).subscribe(
+            itemCarRQ => {
+              console.log(itemCarRQ['d']);
+            },
+            error => {
+              console.log(error);
+              this.closeCommentPanel();
+            },
+            () => {
+              console.log('Add email success');
+              if(this.selectedCombiner.length > 0) {
+                this.SendMailCombiner(0);
+              }
+              if(this.selectedKnower.length > 0) {
+                this.SendMailKnower(0);
+              }
+            }
+          )
+        }
+      )
+    } catch (error) {
+      console.log('addItemSendMail error: ' + error.message);
+    }
+  }
+
+  SendMailCombiner(index) {
+    var user = this.selectedCombiner[index];
+    const dataSendUser = {
+      __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+      Title: this.listName,
+      IndexItem: this.ItemId,
+      Step: 1,
+      KeyList: this.listName +  '_' + this.ItemId,
+      SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      SendMailTo: user.split('|')[1],
+    }
+    this.resService.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+      itemRoomRQ => {
+        console.log(itemRoomRQ['d']);
+      },
+      error => {
+        console.log(error);
+        this.closeCommentPanel();
+      },
+      () => {
+        index ++;
+        if(index < this.selectedCombiner.length) {
+          this.SendMailCombiner(index);
+        }
+      }
+    );
+  }
+
+  SendMailKnower(index) {
+    var user = this.selectedKnower[index];
+    const dataSendUser = {
+      __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+      Title: this.listName,
+      IndexItem: this.ItemId,
+      Step: 1,
+      KeyList: this.listName +  '_' + this.ItemId,
+      SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.AssignEmailSubject),
+      SendMailTo: user.split('|')[1],
+    }
+    this.resService.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+      itemRoomRQ => {
+        console.log(itemRoomRQ['d']);
+      },
+      error => {
+        console.log(error);
+        this.closeCommentPanel();
+      },
+      () => {
+        index ++;
+        if(index < this.selectedKnower.length) {
+          this.SendMailKnower(index);
+        }
+      }
+    );
+  }
+
+  Replace_Field_Mail(FieldMail, ContentMail) {
+    try {
+      if (this.isNotNull(FieldMail) && this.isNotNull(ContentMail)) {
+        let strContent = FieldMail.split(",");
+        console.log("ContentMail before: " + ContentMail);
+        for (let i = 0; i < strContent.length; i++) {
+          switch (strContent[i]) {
+            case 'NumberTo':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.itemDoc.NumberGo);
+              break;
+            case 'Compendium':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docServices.checkNull(this.itemDoc.Compendium));
+              break;
+            case 'Content':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docServices.checkNull(this.content));
+              break;
+            case 'UserRequest':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'ContentComment':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.contentComment);
+              break;
+            case 'userComment':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.selectedUserComment.split('|')[2]);
+              break;
+            case 'Author':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'userStep':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.UserAppoverName);
+              break;
+            case 'UserApprover':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.UserAppoverName);
+              break;
+            case 'ItemUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/Documnets/documentgo-detail/' + this.ItemId);
+              break;
+            case 'TaskUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/documentgo-detail/' + this.ItemId + '/' + (this.IndexStep + 1));
+              break;
+            case 'HomeUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/documentgo');
+              break;
+          }
+        }
+        console.log("ContentMail after: " + ContentMail);
+        return ContentMail;
+      }
+      else {
+        console.log("Field or Body email is null or undefined ")
+      }
+    }
+    catch (err) {
+      console.log("Replace_Field_Mail error: " + err.message);
+    }
+  }
+ 
   openCommentPanel() {
     let config = new OverlayConfig();
     config.positionStrategy = this.overlay.position()

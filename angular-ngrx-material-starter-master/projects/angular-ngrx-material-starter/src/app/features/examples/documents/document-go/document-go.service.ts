@@ -93,6 +93,20 @@ export class DocumentGoService {
     return this.http.post(`${this.restUrl}/_api/web/lists/GetByTitle('` + listName + `')/items(` + indexItem + `)/AttachmentFiles/add(FileName='` + filename + `')`, data, this.httpOptionsFile);
   }
 
+  urlDocumentgo =
+  "/_api/web/lists/getbytitle('ListDocumentGo')/items?$select=*,UserOfHandle/Title,UserOfHandle/Id,Author/Id,Author/Title,Signer/Id,Signer/Title,AttachmentFiles&$expand=UserOfHandle,Author,Signer,AttachmentFiles&$orderby=ID desc";
+  getAllDocumentTo(strFilter) {
+    return this.http.get(
+      `${this.restUrl}${this.urlDocumentgo}` + strFilter
+    );
+  }
+
+  urlRequestGo =
+  "/_api/web/lists/getbytitle('ListProcessRequestGo')/items?$select=*, UserRequest/Title,UserRequest/Id,UserApprover/Title,UserApprover/Id&$orderby=ID desc&$expand=UserApprover,UserRequest";
+  getListRequestTo(strFilter): Observable<any> {
+    return this.http.get(`${this.restUrl}${this.urlRequestGo}` + strFilter);
+  }
+
   getUserInfo(loginName) {
     // loginName = 'i:0%23.f|membership|tuyen.nguyen@tsg.net.vn';
     return this.http.get(`${this.restUrl}/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v=` + `'` + loginName + `'`);

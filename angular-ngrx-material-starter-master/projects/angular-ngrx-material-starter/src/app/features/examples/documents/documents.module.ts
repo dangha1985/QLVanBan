@@ -21,6 +21,8 @@ import { DocumentComponent } from './document-go/document.component';
 import { IncomingDocumentComponent } from '../../../features/examples/documents/document-to/components/incoming-document.component';
 import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
 import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
+import {ReportDGComponent} from '../documents/document-go/report.component';
+import {ReportAdvanceDGComponent} from '../documents/document-go/report-advance.component';
 import { CommentComponent } from './document-go/comment.component';
 //Loan
 import {DocumentAddComponent, RotiniPanel} from './document-to/components/document-add.component'
@@ -65,6 +67,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     DocumentGoPanel,
     DocumentGoDetailComponent,
     DocumentGoWaitingComponent,
+    ReportDGComponent,
+    ReportAdvanceDGComponent,
     CommentComponent,
     IncomingDocumentComponent,
     DocumentAddComponent,

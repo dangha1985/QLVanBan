@@ -3,20 +3,19 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material';
 import {FormControl, FormBuilder} from '@angular/forms';
 import {SelectionModel} from '@angular/cdk/collections';
-import {FlatTreeControl} from '@angular/cdk/tree';
-import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
-import {BehaviorSubject, Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
+import {BehaviorSubject, Observable} from 'rxjs';
 import * as moment from 'moment';
-import {ItemSeleted, IncomingDocService, IncomingTicket, ApproverObject} from '../incoming-doc.service';
-import {RotiniPanel} from './document-add.component';
-import {ResApiService} from '../../../services/res-api.service';
+import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser, DocumentGoTicket, AttachmentsObject, UserProfilePropertiesObject } from './../models/document-go';
+import {DocumentGoPanel} from './document-go.component';
+import { DocumentGoService } from './document-go.service';
+import {ResApiService} from '../../services/res-api.service';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
-} from '../../../../../core/core.module';
+} from '../../../../core/core.module';
 import { any } from 'bluebird';
 
 @Component({
@@ -25,12 +24,12 @@ import { any } from 'bluebird';
   styleUrls: ['./report-advance.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReportAdvanceComponent implements OnInit {
+export class ReportAdvanceDGComponent implements OnInit {
   listTitle = "ListProcessRequestTo";
   inDocs$ = [];
-  displayedColumns: string[] = ['numberTo', 'numberSymbol' ,'created', 'userRequest', 'deadline','compendium', 'content', 'sts']; //'select', 'userApprover'
-  dataSource = new MatTableDataSource<IncomingTicket>();
-  selection = new SelectionModel<IncomingTicket>(true, []);
+  displayedColumns: string[] = ['numberGo', 'numberSymbol' ,'created', 'userRequest', 'deadline','compendium', 'content', 'sts']; //'select', 'userApprover'
+  dataSource = new MatTableDataSource<DocumentGoTicket>();
+  selection = new SelectionModel<DocumentGoTicket>(true, []);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   searchText = '';
   date = new FormControl(new Date());
@@ -38,18 +37,18 @@ export class ReportAdvanceComponent implements OnInit {
   currentUserId;
   currentUserName;
   strFilter = '';
-  ListUserApprover: ApproverObject[] = [];
+  ListUserApprover: ItemUser[] = [];
   overlayRef;
-  promulgatedFrom = moment().subtract(30,'day').toDate();
-  promulgatedTo = new Date();
+  promulgatedFrom;
+  promulgatedTo;
   dateTo = new Date();
   dateFrom = moment().subtract(30,'day').toDate();
   showList = false;
   ListIdDoc = [];
   isFrist = false;
   ListBookType = [
-    {id: 0, title: 'Chưa vào sổ'},
-    {id: 1, title: 'Văn bản đến'},
+    {id: -1, title: 'Không có sổ'},
+    {id: 1, title: 'Văn bản đi'},
   ];
   ListDocType: ItemSeleted[] = [];
   ListSecret: ItemSeleted[] = [];
@@ -64,9 +63,9 @@ export class ReportAdvanceComponent implements OnInit {
   bookType; numberTo; docType; numberOfSymbol; singer; source; urgentLevel; secretLevel;
   statusDoc; compendium; isAttachment = false;
   userApprover = new FormControl();
-  filteredOptions: Observable<ApproverObject[]>;
+  filteredOptions: Observable<ItemUser[]>;
 
-  constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
+  constructor(private fb: FormBuilder, private docTo: DocumentGoService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
               private readonly notificationService: NotificationService,
               public overlay: Overlay, public viewContainerRef: ViewContainerRef) { }
@@ -87,11 +86,11 @@ export class ReportAdvanceComponent implements OnInit {
     this.getCurrentUser();
   }
 
-  onDisplayValue(user?: ApproverObject): string | undefined {
+  onDisplayValue(user?: ItemUser): string | undefined {
     return user ? user.UserName : undefined;
   }
 
-  private _filterStates(value: string): ApproverObject[] {
+  private _filterStates(value: string): ItemUser[] {
     const filterValue = value.toLowerCase();
     return this.ListUserApprover.filter(item => item.UserName.toLowerCase().includes(filterValue));
   }
@@ -119,109 +118,106 @@ export class ReportAdvanceComponent implements OnInit {
       })
   }
   
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-  
   getAllListRequest() {
     try {
       this.OpenRotiniPanel();
       let listName = '';
       this.strFilter = '';
-      if(this.statusDoc !== 'All' && this.statusDoc !== 'ĐXL' && this.statusDoc !== 'BTH' && !this.isFrist) {
-        this.getTicketByStatus(this.statusDoc);
-        this.CloseRotiniPanel();
-        return;
-      }
-      if(this.bookType === "0") {
-        this.strFilter = `&$filter=StatusID eq '-1'`;
-      } else if(this.docTo.CheckNullSetZero(this.bookType) === 1){
-        this.strFilter = `&$filter=StatusID ne '-1'`;
+      // if(this.statusDoc !== 'All' && this.statusDoc !== 'ĐXL' && this.statusDoc !== 'BTH' && !this.isFrist) {
+      //   this.getTicketByStatus(this.statusDoc);
+      //   this.CloseRotiniPanel();
+      //   return;
+      // }
+      if(this.bookType == 1){
+        this.strFilter = `&$filter=NumberGo ne null`;
+      } else if(this.bookType == -1){
+        this.strFilter = `&$filter=NumberGo eq null`;
       } else {
-        this.strFilter = `&$filter=ID gt '0'`;
+        this.strFilter = `&$filter=ID ne '0'`;
       }
 
-      if(this.docTo.CheckNull(this.numberTo) !== '') {
-        this.strFilter += ` and NumberTo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `'`;
-      }
+      // if(this.docTo.checkNull(this.numberTo) !== '') {
+      //   this.strFilter += ` and NumberTo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `'`;
+      // }
 
-      if(this.docTo.CheckNull(this.numberOfSymbol) !== '') {
-        this.strFilter += ` and substringof('` + this.numberOfSymbol + `',NumberOfSymbol)`;
+      if(this.docTo.checkNull(this.numberOfSymbol) !== '') {
+        this.strFilter += ` and substringof('` + this.numberOfSymbol + `',NumberSymbol)`;
       }
 
       if(this.docTo.CheckNullSetZero(this.docType) > 0) {
         this.strFilter += ` and DocTypeID eq '` + this.docType +`'`;
       }
 
-      if(this.docTo.CheckNull(this.promulgatedFrom) !== '') {
+      if(this.docTo.checkNull(this.promulgatedFrom) !== '') {
         this.promulgatedFrom = moment(this.promulgatedFrom).hours(0).minutes(0).seconds(0).toDate();
-        this.strFilter += ` and (PromulgatedDate ge '` + this.ISODateStringUTC(this.promulgatedFrom) + `' or PromulgatedDate eq null)`;
+        this.strFilter += ` and (DateIssued ge '` + this.ISODateStringUTC(this.promulgatedFrom) + `' or DateIssued eq null)`;
       }
 
-      if(this.docTo.CheckNull(this.promulgatedTo) !== '') {
+      if(this.docTo.checkNull(this.promulgatedTo) !== '') {
         this.promulgatedTo = moment(this.promulgatedTo).hours(23).minutes(59).seconds(59).toDate();
-        this.strFilter += ` and (PromulgatedDate le '` + this.ISODateStringUTC(this.promulgatedTo) + `' or PromulgatedDate eq null)`
+        this.strFilter += ` and (DateIssued le '` + this.ISODateStringUTC(this.promulgatedTo) + `' or DateIssued eq null)`
       }
 
-      if(this.docTo.CheckNull(this.dateFrom) !== '') {
+      if(this.docTo.checkNull(this.dateFrom) !== '') {
         this.dateFrom = moment(this.dateFrom).hours(0).minutes(0).seconds(0).toDate();
-        this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `' or DateTo eq null)`;
+        this.strFilter += ` and DateCreated ge '` + this.ISODateStringUTC(this.dateFrom) + `'`;
       }
 
-      if(this.docTo.CheckNull(this.dateTo) !== '') {
+      if(this.docTo.checkNull(this.dateTo) !== '') {
         this.dateTo = moment(this.dateTo).hours(23).minutes(59).seconds(59).toDate();
-        this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `' or DateTo eq null)`;
+        this.strFilter += ` and DateCreated le '` + this.ISODateStringUTC(this.dateTo) + `'`;
       }
 
-      if(this.docTo.CheckNull(this.singer) !== '') {
+      if(this.docTo.checkNull(this.singer) !== '') {
+        // this.strFilter += ` and substringof('` + this.singer + `',Signer)`;
         this.strFilter += ` and substringof('` + this.singer + `',Signer)`;
       }
 
-      if(this.docTo.CheckNull(this.source) !== '') {
-        this.strFilter += ` and substringof('` + this.source + `',Source)`;
+      if(this.docTo.checkNull(this.source) !== '') {
+        this.strFilter += ` and (substringof('` + this.source + `',RecipientsInName) or substringof('` + this.source + `',RecipientsOutName))`;
       }
 
-      if(this.docTo.CheckNull(this.statusDoc) !== '') {
-        if(this.statusDoc === 'All') {          
-        } 
-        else if(this.statusDoc === 'CVS') {
-          this.strFilter += ` and StatusID eq '-1'`;
-        }
-        else if(this.statusDoc === 'BTH') {
-          this.strFilter += ` and StatusID eq '1' and StatusName eq 'Bị thu hồi'`;
-        }
-        else {
-          this.strFilter += ` and StatusID eq '0'`;
-          if(this.ListIdDoc.length > 0) {
-            this.strFilter += ` and (`;
-            this.ListIdDoc.forEach(item => {
-              this.strFilter += ` ID eq '` + item + `' or`
-            })
-            this.strFilter = this.strFilter.substr(0, this.strFilter.length-3) + `)`;
-          } else if(this.isFrist && this.ListIdDoc.length === 0) {
-            this.strFilter = `&$filter=ID eq '-1'`;
-          }
-        }
-      }
+      // if(this.docTo.checkNull(this.statusDoc) !== '') {
+      //   if(this.statusDoc === 'All') {          
+      //   } 
+      //   else if(this.statusDoc === 'CVS') {
+      //     this.strFilter += ` and StatusID eq '-1'`;
+      //   }
+      //   else if(this.statusDoc === 'BTH') {
+      //     this.strFilter += ` and StatusID eq '1' and StatusName eq 'Bị thu hồi'`;
+      //   }
+      //   else {
+      //     this.strFilter += ` and StatusID eq '0'`;
+      //     if(this.ListIdDoc.length > 0) {
+      //       this.strFilter += ` and (`;
+      //       this.ListIdDoc.forEach(item => {
+      //         this.strFilter += ` ID eq '` + item + `' or`
+      //       })
+      //       this.strFilter = this.strFilter.substr(0, this.strFilter.length-3) + `)`;
+      //     } else if(this.isFrist && this.ListIdDoc.length === 0) {
+      //       this.strFilter = `&$filter=ID eq '-1'`;
+      //     }
+      //   }
+      // }
 
-      if(this.docTo.CheckNullSetZero(this.secretLevel) > 0) {
-        this.strFilter += ` and SecretLevelID eq '` + this.secretLevel +`'`;
-      }
+      // if(this.docTo.CheckNullSetZero(this.secretLevel) > 0) {
+      //   this.strFilter += ` and SecretLevelID eq '` + this.secretLevel +`'`;
+      // }
 
-      if(this.docTo.CheckNullSetZero(this.urgentLevel) > 0) {
-        this.strFilter += ` and UrgentLevelID eq '` + this.urgentLevel +`'`;
-      }
+      // if(this.docTo.CheckNullSetZero(this.urgentLevel) > 0) {
+      //   this.strFilter += ` and UrgentLevelID eq '` + this.urgentLevel +`'`;
+      // }
 
-      if(this.docTo.CheckNull(this.userApprover.value) !== '') {
-        this.strFilter += ` and substringof('` + this.userApprover.value.UserId + `_` + this.userApprover.value.UserName + `',ListUserApprover)`;
-      }
+      // if(this.docTo.checkNull(this.userApprover.value) !== '') {
+      //   this.strFilter += ` and substringof('` + this.userApprover.value.UserId + `_` + this.userApprover.value.UserName + `',ListUserApprover)`;
+      // }
 
       this.docTo.getAllDocumentTo(this.strFilter).subscribe((itemValue: any[]) => {
         let item = itemValue["value"] as Array<any>;     
         this.inDocs$ = []; 
         item.forEach(element => {
-          if(this.docTo.CheckNull(this.compendium) !== '') { 
-            if(!this.docTo.CheckNull(element.Compendium).toLowerCase().includes(this.compendium.toLowerCase())) {
+          if(this.docTo.checkNull(this.compendium) !== '') { 
+            if(!this.docTo.checkNull(element.Compendium).toLowerCase().includes(this.compendium.toLowerCase())) {
               return;
             }
           }
@@ -233,23 +229,22 @@ export class ReportAdvanceComponent implements OnInit {
           this.inDocs$.push({
             STT: this.inDocs$.length + 1,
             ID: element.ID,
-            numberTo: this.docTo.formatNumberTo(element.NumberTo), 
-            numberSub: element.NumberToSub,
-            numberSymbol: element.NumberOfSymbol, 
+            numberTo: this.docTo.checkNull(element.NumberGo) === '' ? '' : this.docTo.formatNumberGo(element.NumberGo), 
+            numberSymbol: element.NumberSymbol, 
             userRequest: element.Author.Title,
             userRequestId: element.Author.Id,
             userApprover: element.UserOfHandle !== undefined ? element.UserOfHandle.Title : '',
-            deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
+            deadline: this.docTo.checkNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
             status: this.docTo.CheckNullSetZero(element.StatusID) === 0 ? 'Đang xử lý' : 'Đã xử lý',
-            compendium: this.docTo.CheckNull(element.Compendium),
-            note: this.docTo.CheckNull(element.Note),
-            created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
+            compendium: this.docTo.checkNull(element.Compendium),
+            note: this.docTo.checkNull(element.Note),
+            created: this.docTo.checkNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
             sts: this.docTo.CheckNullSetZero(element.StatusID) === 0 ? 'Ongoing' : 'Approved',
-            link: '/Documnets/IncomingDoc/docTo-detail/' + element.ID
+            link: '/Documnets/documentgo-detail/' + element.ID
           })
         })   
         
-        this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
+        this.dataSource = new MatTableDataSource<DocumentGoTicket>(this.inDocs$);
         this.ref.detectChanges();
         this.isFrist = false;
         this.CloseRotiniPanel();     
@@ -266,6 +261,10 @@ export class ReportAdvanceComponent implements OnInit {
       console.log("Load all document to error:" + err.message);
       this.CloseRotiniPanel();
     }
+  }
+
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   getTicketByStatus(status) {
@@ -308,8 +307,8 @@ export class ReportAdvanceComponent implements OnInit {
     this.numberOfSymbol = null;
     this.docType = null;
     this.bookType = null;
-    this.promulgatedFrom = moment().subtract(30,'day').toDate();
-    this.promulgatedTo = new Date();
+    this.promulgatedFrom;
+    this.promulgatedTo;
     this.dateTo = new Date();
     this.dateFrom = moment().subtract(30,'day').toDate();
     this.singer = null;
@@ -343,9 +342,8 @@ export class ReportAdvanceComponent implements OnInit {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListDocType.push({
-          id: element.ID,
-          title: element.Title,
-          code: ''
+          ID: element.ID,
+          Title: element.Title,
         });
       });
     });
@@ -370,9 +368,8 @@ export class ReportAdvanceComponent implements OnInit {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListSecret.push({
-          id: element.ID,
-          title: element.Title,
-          code: ''
+          ID: element.ID,
+          Title: element.Title,
         });
       });
     });
@@ -383,9 +380,8 @@ export class ReportAdvanceComponent implements OnInit {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListUrgent.push({
-          id: element.ID,
-          title: element.Title,
-          code: ''
+          ID: element.ID,
+          Title: element.Title,
         });
       });
     });
@@ -397,7 +393,7 @@ export class ReportAdvanceComponent implements OnInit {
       .global().centerVertically().centerHorizontally();
     config.hasBackdrop = true;
     this.overlayRef = this.overlay.create(config);
-    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+    this.overlayRef.attach(new ComponentPortal(DocumentGoPanel, this.viewContainerRef));
   }
 
   CloseRotiniPanel() {

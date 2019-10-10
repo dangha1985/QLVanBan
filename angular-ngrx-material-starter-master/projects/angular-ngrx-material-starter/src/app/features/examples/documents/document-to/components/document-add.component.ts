@@ -696,8 +696,6 @@ export class DocumentAddComponent implements OnInit {
         () => {
           console.log('Save item success');
 
-          // send mail user approver
-          //this.EmailConfig.AssignEmailSubject = 'New request {Title}';
           const dataSendApprover = {
             __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
             Title: this.listTitle,
@@ -718,9 +716,6 @@ export class DocumentAddComponent implements OnInit {
             },
             () => {
               console.log('Add email success');
-              // this.CloseRotiniPanel();
-              // alert('Bạn đã tạo yêu cầu thành công');
-              // this.routes.navigate(['Documnets/IncomingDoc/docTo-detail/' + this.DocumentID]);
             }
           )
         }

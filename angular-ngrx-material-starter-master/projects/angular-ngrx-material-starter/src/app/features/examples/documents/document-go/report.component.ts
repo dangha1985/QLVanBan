@@ -7,15 +7,16 @@ import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {BehaviorSubject} from 'rxjs';
 import * as moment from 'moment';
-import {IncomingDoc, ItemSeleted, IncomingDocService, IncomingTicket} from '../incoming-doc.service';
-import {RotiniPanel} from './document-add.component';
-import {ResApiService} from '../../../services/res-api.service';
+import { ItemDocumentGo, ListDocType, ItemSeleted, ItemSeletedCode, ItemUser, DocumentGoTicket, AttachmentsObject, UserProfilePropertiesObject } from './../models/document-go';
+import {DocumentGoPanel} from './document-go.component';
+import { DocumentGoService } from './document-go.service';
+import {ResApiService} from '../../services/res-api.service';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
-} from '../../../../../core/core.module';
+} from '../../../../core/core.module';
 
 @Component({
   selector: 'anms-report',
@@ -23,12 +24,12 @@ import {
   styleUrls: ['./report.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReportComponent implements OnInit {
+export class ReportDGComponent implements OnInit {
   listTitle = "ListProcessRequestTo";
   inDocs$ = [];
-  displayedColumns: string[] = ['numberTo', 'numberSymbol' ,'created', 'userRequest', 'deadline','compendium', 'content', 'sts']; //'select', 'userApprover'
-  dataSource = new MatTableDataSource<IncomingTicket>();
-  selection = new SelectionModel<IncomingTicket>(true, []);
+  displayedColumns: string[] = ['numberGo', 'numberSymbol' ,'created', 'userRequest', 'deadline','compendium', 'content', 'sts']; //'select', 'userApprover'
+  dataSource = new MatTableDataSource<DocumentGoTicket>();
+  selection = new SelectionModel<DocumentGoTicket>(true, []);
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   searchText = '';
   date = new FormControl(new Date());
@@ -37,14 +38,12 @@ export class ReportComponent implements OnInit {
   currentUserName;
   strFilter = '';
   overlayRef;
-  deadlineFrom = moment().subtract(30,'day').toDate();
-  deadlineTo = new Date();
-  dateTo = new Date();
-  dateFrom = moment().subtract(30,'day').toDate();
+  dateIssuedFrom = moment().subtract(30,'day').toDate();
+  dateIssuedTo = new Date();
   ListDocType: ItemSeleted[] = [];
-  numberTo; docType;
+  docType;
 
-  constructor(private fb: FormBuilder, private docTo: IncomingDocService, 
+  constructor(private fb: FormBuilder, private docTo: DocumentGoService, 
               private services: ResApiService, private ref: ChangeDetectorRef,
               private readonly notificationService: NotificationService,
               public overlay: Overlay, public viewContainerRef: ViewContainerRef) { }
@@ -59,32 +58,19 @@ export class ReportComponent implements OnInit {
     try{
       this.OpenRotiniPanel();
       this.strFilter = `&$filter=StatusID ne '-1'`;
-      if(this.docTo.CheckNull(this.numberTo) !== '') {
-        this.strFilter += ` and(NumberTo eq '` + this.docTo.CheckNullSetZero(this.numberTo) + `' or substringof('` + this.numberTo + `',NumberOfSymbol))`;
-      }
-
+     
       if(this.docTo.CheckNullSetZero(this.docType) > 0) {
         this.strFilter += ` and DocTypeID eq '` + this.docType +`'`;
       }
 
-      if(this.docTo.CheckNull(this.deadlineFrom) !== '') {
-        this.deadlineFrom = moment(this.deadlineFrom).hours(0).minutes(0).seconds(0).toDate();
-        this.strFilter += ` and (Deadline ge '` + this.ISODateStringUTC(this.deadlineFrom) + `' or Deadline eq null)`;
+      if(this.docTo.checkNull(this.dateIssuedFrom) !== '') {
+        this.dateIssuedFrom = moment(this.dateIssuedFrom).hours(0).minutes(0).seconds(0).toDate();
+        this.strFilter += ` and (DateIssued ge '` + this.ISODateStringUTC(this.dateIssuedFrom) + `' or DateIssued eq null)`;
       }
 
-      if(this.docTo.CheckNull(this.deadlineTo) !== '') {
-        this.deadlineTo = moment(this.deadlineTo).hours(23).minutes(59).seconds(59).toDate();
-        this.strFilter += ` and (Deadline le '` + this.ISODateStringUTC(this.deadlineTo) + `' or Deadline eq null)`
-      }
-
-      if(this.docTo.CheckNull(this.dateFrom) !== '') {
-        this.dateFrom = moment(this.dateFrom).hours(0).minutes(0).seconds(0).toDate();
-        this.strFilter += ` and (DateTo ge '` + this.ISODateStringUTC(this.dateFrom) + `' or DateTo eq null)`;
-      }
-
-      if(this.docTo.CheckNull(this.dateTo) !== '') {
-        this.dateTo = moment(this.dateTo).hours(23).minutes(59).seconds(59).toDate();
-        this.strFilter += ` and (DateTo le '` + this.ISODateStringUTC(this.dateTo) + `' or DateTo eq null)`;
+      if(this.docTo.checkNull(this.dateIssuedTo) !== '') {
+        this.dateIssuedTo = moment(this.dateIssuedTo).hours(23).minutes(59).seconds(59).toDate();
+        this.strFilter += ` and (DateIssued le '` + this.ISODateStringUTC(this.dateIssuedTo) + `' or DateIssued eq null)`
       }
 
       this.docTo.getAllDocumentTo(this.strFilter).subscribe((itemValue: any[]) => {
@@ -94,23 +80,22 @@ export class ReportComponent implements OnInit {
           this.inDocs$.push({
             STT: this.inDocs$.length + 1,
             ID: element.ID,
-            numberTo: this.docTo.formatNumberTo(element.NumberTo), 
-            numberSub: element.NumberToSub,
-            numberSymbol: element.NumberOfSymbol, 
+            numberGo: this.docTo.checkNull(element.NumberGo) !== '' ? this.docTo.formatNumberGo(element.NumberGo) : '',
+            numberSymbol: this.docTo.checkNull(element.NumberSymbol) !== '' ? element.NumberSymbol : '', 
             userRequest: element.Author.Title,
             userRequestId: element.Author.Id,
             userApprover: element.UserOfHandle !== undefined ? element.UserOfHandle.Title : '',
-            deadline: this.docTo.CheckNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
+            deadline: this.docTo.checkNull(element.Deadline) === '' ? '' : moment(element.Deadline).format('DD/MM/YYYY'),
             status: this.docTo.CheckNullSetZero(element.StatusID) === 0 ? 'Đang xử lý' : 'Đã xử lý',
-            compendium: this.docTo.CheckNull(element.Compendium),
-            note: this.docTo.CheckNull(element.Note),
-            created: this.docTo.CheckNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
+            compendium: this.docTo.checkNull(element.Compendium),
+            note: this.docTo.checkNull(element.Note),
+            created: this.docTo.checkNull(element.DateCreated) === '' ? '' : moment(element.DateCreated).format('DD/MM/YYYY'),
             sts: this.docTo.CheckNullSetZero(element.StatusID) === 0 ? 'Ongoing' : 'Approved',
-            link: '/Documnets/IncomingDoc/docTo-detail/' + element.ID
+            link: '/Documnets/documentgo-detail/' + element.ID
           })
         })   
         
-        this.dataSource = new MatTableDataSource<IncomingTicket>(this.inDocs$);
+        this.dataSource = new MatTableDataSource<DocumentGoTicket>(this.inDocs$);
         this.ref.detectChanges();
         this.CloseRotiniPanel();     
       },
@@ -129,14 +114,11 @@ export class ReportComponent implements OnInit {
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-  
+
   resetForm() {
-    this.numberTo = null;
     this.docType = null;
-    this.deadlineFrom = moment().subtract(30,'day').toDate();
-    this.deadlineTo = new Date();
-    this.dateTo = new Date();
-    this.dateFrom = moment().subtract(30,'day').toDate();
+    this.dateIssuedFrom = moment().subtract(30,'day').toDate();
+    this.dateIssuedTo = new Date();
   }
 
   getCurrentUser(){
@@ -160,9 +142,8 @@ export class ReportComponent implements OnInit {
       let item = itemValue['value'] as Array<any>;
       item.forEach(element => {
         this.ListDocType.push({
-          id: element.ID,
-          title: element.Title,
-          code: ''
+          ID: element.ID,
+          Title: element.Title,
         });
       });
     });
@@ -174,7 +155,7 @@ export class ReportComponent implements OnInit {
       .global().centerVertically().centerHorizontally();
     config.hasBackdrop = true;
     this.overlayRef = this.overlay.create(config);
-    this.overlayRef.attach(new ComponentPortal(RotiniPanel, this.viewContainerRef));
+    this.overlayRef.attach(new ComponentPortal(DocumentGoPanel, this.viewContainerRef));
   }
 
   CloseRotiniPanel() {

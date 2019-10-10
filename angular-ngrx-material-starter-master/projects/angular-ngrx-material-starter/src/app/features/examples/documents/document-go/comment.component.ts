@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Injectable, ViewContainerRef, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Injectable, ViewContainerRef, Inject, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
@@ -9,11 +9,16 @@ import { DocumentGoPanel } from '../document-go/document-go.component';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
+import { DocumentGoService } from './document-go.service';
 import { Router } from '@angular/router';
+import { ResApiService } from '../../services/res-api.service';
+import { DocumentGoDetailComponent } from './document-go-detail.component';
+
 import {
   ROUTE_ANIMATIONS_ELEMENTS,
   NotificationService
 } from '../../../../core/core.module';
+import { statSync } from 'fs';
 @Component({
   selector: 'anms-comment',
   templateUrl: './comment.component.html',
@@ -36,18 +41,26 @@ export class CommentComponent implements OnInit {
   idItemProcess; listDepCode;
   ArrayUserPofile;
   pictureCurrent;
+  EmailConfig;
   
   constructor(
     public dialogRef: MatDialogRef<CommentComponent>,
     private restService: SharedService,
+    private apiService: ResApiService,
+    private docServices: DocumentGoService,
     private routes: Router,private readonly notificationService: NotificationService,
     public overlay: Overlay, public viewContainerRef: ViewContainerRef,
-    @Inject(MAT_DIALOG_DATA) public data: ItemDocumentGo[]) {
+    private ref: ChangeDetectorRef,
+    @Inject(MAT_DIALOG_DATA) public data:any) {
   }
   ngOnInit() {
     this.getCurrentUser();
-    this.getListUser();
+    //this.getListUser();
+    this.getListEmailConfig();
+    this.listUser = this.data[1];
+    this.ref.detectChanges();
   }
+
   //Lấy người dùng hiện tại
   getCurrentUser() {
     this.restService.getCurrentUser().subscribe(
@@ -66,6 +79,32 @@ export class CommentComponent implements OnInit {
       }
     );
   }
+
+  getListEmailConfig() {
+    const str = `?$select=*&$filter=Title eq 'DT'&$top=1`;
+    this.EmailConfig = null;
+    this.apiService.getItem('ListEmailConfig', str).subscribe((itemValue: any[]) => {
+      let item = itemValue['value'] as Array<any>;
+      if (item.length > 0) {
+          item.forEach(element => {
+          this.EmailConfig = {
+            FieldMail: element.FieldMail,
+            NewEmailSubject: element.NewRequestSubject,
+            NewEmailBody: element.NewRequestBody,
+            ApprovedEmailSubject: element.ApprovedRequestSubject,
+            ApprovedEmailBody: element.ApprovedRequestBody,
+            AssignEmailSubject: element.AssignRequestSubject,
+            AssignEmailBody: element.AssignRequestBody,
+            FinishEmailSubject: element.FinishRequestSubject,
+            FinishEmailBody: element.FinishRequestBody,
+            CommentSubject:element.CommentRequestSubject,
+            CommentBody:element.CommentRequestBody
+          }
+      })
+      }
+    });
+  }
+
   //lấy đường dẫn ảnh trên sharepoint
   getUserPofile(loginName) {
     try {
@@ -91,6 +130,7 @@ export class CommentComponent implements OnInit {
       console.log('getUsr error: ' + error.message);
     }
   }
+
   //lấy ds người dùng trong bảng ListMapEmployee
   getListUser() {
     try {
@@ -116,20 +156,18 @@ export class CommentComponent implements OnInit {
               this.listDepCode.push(element.DepartmentCode);
             }
           });
-//           this.listDepCode.forEach(DepCode=>{
-// let dep=this.listUser.find(a=>a.DepartmentCode==DepCode);
-// if (dep)
-         // })
         },
         error => console.log(error),
         () => {
           console.log('getListUser success');
+          this.ref.detectChanges();
         }
       );
     } catch (error) {
       console.log('getListUser error: ' + error.message);
     }
   }
+
   saveItem() {
     try {
       if (this.isNotNull(this.content)) {
@@ -180,12 +218,41 @@ export class CommentComponent implements OnInit {
         error => console.log(error),
         () => {
             this.saveListComment(index);
-          //  this.closeModal();
+            this.SendMailComment(0);
         }
       )
     } catch (error) {
       console.log('saveItemListProcess error: ' + error.message);
     }
+  }
+
+  SendMailComment(index) {
+    var user = this.listUserIdSelect[index];
+    const dataSendUser = {
+      __metadata: { type: 'SP.Data.ListRequestSendMailListItem' },
+      Title: 'ListDocumentGo',
+      IndexItem: this.data[0].ID,
+      Step: 1,
+      KeyList: 'ListDocumentGo_' + this.data[0].ID,
+      SubjectMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.CommentSubject),
+      BodyMail: this.Replace_Field_Mail(this.EmailConfig.FieldMail, this.EmailConfig.CommentBody),
+      SendMailTo: user.split('|')[1],
+    }
+    this.apiService.AddItemToList('ListRequestSendMail', dataSendUser).subscribe(
+      itemRoomRQ => {
+        console.log(itemRoomRQ['d']);
+      },
+      error => {
+        console.log(error);
+        this.closeCommentPanel();
+      },
+      () => {
+        index ++;
+        if(index < this.listUserIdSelect.length) {
+          this.SendMailComment(index);
+        }
+      }
+    );
   }
 
   saveListComment(index) {
@@ -215,7 +282,7 @@ export class CommentComponent implements OnInit {
             this.closeCommentPanel();
             console.log('Bạn gửi xin ý kiến thành công');
             //kt nếu lưu đến người cuối cùng rồi thì đóng modal
-            if(index==this.listUserIdSelect.length-1){
+            if(index == this.listUserIdSelect.length-1){
               this.notificationService.success('Bạn gửi xin ý kiến thành công');
               this.closeModal();
             }
@@ -227,9 +294,11 @@ export class CommentComponent implements OnInit {
       console.log("saveListComment error: " + error);
     }
   }
+
   isNotNull(str) {
     return (str !== null && str !== "" && str !== undefined);
   }
+
   addAttachmentFile() {
     try {
       const inputNode: any = document.querySelector('#fileAttachment_XYK');
@@ -248,6 +317,7 @@ export class CommentComponent implements OnInit {
       console.log("addAttachmentFile error: " + error);
     }
   }
+
   removeAttachmentFile(index) {
     try {
       console.log(this.outputFile.indexOf(index))
@@ -291,14 +361,17 @@ export class CommentComponent implements OnInit {
       console.log("saveItemAttachment error: " + error);
     }
   }
+
   getFileBuffer(file) {
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
     return reader;
   }
+
   callbackfunc() {
     this.routes.navigate(['Documnets/documentgo-detail/' + this.data[0].ID]);
   }
+
   openCommentPanel() {
     let config = new OverlayConfig();
     config.positionStrategy = this.overlay.position().global().centerVertically().centerHorizontally();
@@ -316,6 +389,62 @@ export class CommentComponent implements OnInit {
   //  this.callbackfunc();
   }
 
+  Replace_Field_Mail(FieldMail, ContentMail) {
+    try {
+      if (this.isNotNull(FieldMail) && this.isNotNull(ContentMail)) {
+        let strContent = FieldMail.split(",");
+        console.log("ContentMail before: " + ContentMail);
+        for (let i = 0; i < strContent.length; i++) {
+          switch (strContent[i]) {
+            case 'NumberTo':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.data[0].NumberGo);
+              break;
+            case 'Compendium':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docServices.checkNull(this.data[0].Compendium));
+              break;
+            case 'Content':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.docServices.checkNull(this.content));
+              break;
+            case 'UserRequest':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'Author':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.currentUserName);
+              break;
+            case 'ContentComment':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.content);
+              break;
+            case 'userComment':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.selectedApprover.split('|')[2]);
+              break;
+            case 'userStep':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.selectedApprover.split('|')[2]);
+              break;
+            case 'UserApprover':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", this.selectedApprover.split('|')[2]);
+              break;
+            case 'ItemUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0]+ '/#/Documnets/documentgo-detail/' + this.data[0].ID);
+              break;
+            case 'TaskUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/documentgo-detail/' + this.data[0].ID + '/1');
+              break;
+            case 'HomeUrl':
+              ContentMail = ContentMail.replace("{" + strContent[i] + "}", window.location.href.split('#/')[0] + '/#/Documnets/documentgo');
+              break;
+          }
+        }
+        console.log("ContentMail after: " + ContentMail);
+        return ContentMail;
+      }
+      else {
+        console.log("Field or Body email is null or undefined ")
+      }
+    }
+    catch (err) {
+      console.log("Replace_Field_Mail error: " + err.message);
+    }
+  }
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();

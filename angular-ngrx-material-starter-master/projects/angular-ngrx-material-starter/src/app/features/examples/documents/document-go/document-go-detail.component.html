@@ -2,7 +2,7 @@
     <div fxFlexFil class="actions">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo1 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="ViewHistory(viewHistory)"><i class="material-icons">share</i>&nbsp; <span class="Submit1">Xem luồng</span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment(modalAddComment)"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="FinishRequest()" *ngIf="isFinish"><i class="material-icons">done</i>&nbsp; <span class="Reset1">Hoàn thành</span></button>
@@ -16,7 +16,7 @@
             </div>
             <div class="UMinHeight">
                 <form class="example-form" *ngIf="itemDoc">
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Đơn vị tạo:</p>
                             <p fxFlex="auto">{{itemDoc.UnitCreateName}}</p>
@@ -26,7 +26,7 @@
                             <p fxFlex="auto">{{itemDoc.UserCreateName}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Sổ văn bản:</p>
                             <p fxFlex="auto">{{itemDoc.BookTypeName}}</p>
@@ -36,7 +36,7 @@
                             <p fxFlex="auto">{{itemDoc.NumberGo}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Số phụ:</p>
                             <p fxFlex="auto"></p>
@@ -46,7 +46,7 @@
                             <p fxFlex="auto">{{itemDoc.NumberSymbol}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <!-- <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Nơi gửi:</p>
                             <p fxFlex="auto">{{itemDoc.source}}</p>
@@ -57,13 +57,13 @@
                         </div>
                     </div>
 
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="100">
                             <p fxFlex="12.5" class="form-label">Trích yếu:</p>
                             <p fxFlex="auto">{{itemDoc.Compendium}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Nơi nhận nội bộ:</p>
                             <p fxFlex="auto">{{itemDoc.RecipientsInName}}</p>
@@ -74,7 +74,7 @@
                         </div>
                     </div>
 
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Người xử lý:</p>
                             <p fxFlex="auto">{{itemDoc.UserHandleName}}</p>
@@ -84,7 +84,7 @@
                             <p fxFlex="auto">{{itemDoc.deadline}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Người Phối hợp:</p>
                             <!-- <p fxFlex="auto">{{itemDoc.UserHandleName}}</p> -->
@@ -96,7 +96,7 @@
                     </div>
 
 
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Độ mật:</p>
                             <p fxFlex="auto">{{itemDoc.SecretLevelName}}</p>
@@ -106,7 +106,7 @@
                             <p fxFlex="auto">{{itemDoc.UrgentLevelName}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Số bản:</p>
                             <p fxFlex="auto">{{itemDoc.NumOfPaper}}</p>
@@ -116,7 +116,7 @@
                             <p fxFlex="auto">{{itemDoc.MethodReceiptName}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
 
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Người ký:</p>
@@ -127,19 +127,19 @@
                             <p fxFlex="auto">{{itemDoc.DateIssued}}</p>
                         </div>
                     </div>
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="100">
                             <p fxFlex="12.5" class="form-label">Nội dung xử lý:</p>
                             <p fxFlex="auto">{{itemDoc.Note}}</p>
                         </div>
                     </div>
-                    <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Là văn bản trả lời:</p>
                             <p fxFlex="auto">{{itemDoc.isResponse}}</p>
                         </div>
                     </div> -->
-                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFill class="item-detail">
                         <div fxLayout="row" fxLayout.xs="column" fxFlex="50">
                             <p fxFlex="25" class="form-label">Tài liệu đính kèm:</p>
                             <div fxFlex="auto">
@@ -240,7 +240,7 @@
                             </div>
                         </div>
                         <div fxLayout="row" fxLayoutAlign="end start" fxLayout.xs="column" fxFlexFill fxLayoutGap="5px">
-                            <button mat-stroked-button color="primary" type="button" (click)="SendComment()"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
+                            <button mat-stroked-button color="primary" type="button" (click)="SendComment(this.Comments,false,null)"> <i class="material-icons">mail</i>&nbsp; <span class="Submit1">Gửi</span></button>
                         </div>
                     </div>
                     <div style="height:800px ;overflow: auto;">
@@ -293,17 +293,6 @@
                                                     <textarea matInput placeholder="Nội dung trả lời" [(ngModel)]="itemChild.Content" minlength="0" maxlength="1000" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="2" cdkAutosizeMaxRows="10"></textarea>
                                                 </mat-form-field>
                                             </div>
-                                            <!-- <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
-                                                    <div fxFlex="120px" fxFlex.xs="auto">
-                                                        <button type="button" mat-stroked-button color="primary" (click)="fileInput.click()"> <i class="material-icons">add</i>&nbsp; <span class="AddfileEdit">Add file</span></button>
-                                                        <input hidden (change)="addAttachmentFile()" #fileInput type="file" id="fileAttachment">
-                                                    </div>
-                                                    <div fxFlex="auto">
-                                                        <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
-                                                            <div *ngFor="let items of outputFile"><a (click)="removeAttachmentFile(items)"><i class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
                                             <div class="actions">
                                                 <button mat-stroked-button color="primary" type="button" class="MR5" (click)="saveCommentReply(i,j)"><i class="material-icons">send</i>&nbsp; <span class="Submit1">Gửi</span></button>
                                             </div>
@@ -321,7 +310,7 @@
     <div fxFlexFil class="actions-bottom PB10">
         <button mat-stroked-button color="primary" type="button" class="MR5" ng-model="showList" #undo2 (click)="gotoBack()"><i class="material-icons">undo</i>&nbsp; <span class="Submit1"></span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="ViewHistory(viewHistory)"><i class="material-icons">share</i>&nbsp; <span class="Submit1">Xem luồng</span></button>
-        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment()"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
+        <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddNewComment(modalAddComment)"><i class="material-icons">chat_bubble_outline</i>&nbsp; <span class="Submit1">Xin ý kiến</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="NextApprval(template)" *ngIf="isExecution"><i class="material-icons">redo</i>&nbsp; <span class="Submit1">Chuyển xử lý</span></button>
         <button mat-stroked-button color="warn" type="button" class="MR5" (click)="ReturnRequest(modalReturn)" *ngIf="isReturn"><i class="material-icons">repeat</i>&nbsp; <span class="Reset1">Trả lại</span></button>
         <button mat-stroked-button color="primary" type="button" class="MR5" (click)="FinishRequest()" *ngIf="isFinish"><i class="material-icons">done</i>&nbsp; <span class="Reset1">Hoàn thành</span></button>
@@ -525,6 +514,49 @@
         </div>
         <div class="modal-footer" fxLayoutAlign="center center">
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="AddListTicket()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
+        </div>
+    </ng-template>
+
+    <ng-template #modalAddComment>
+        <div class="modal-header">
+            <h4 class="modal-title pull-left">Xin ý kiến</h4>
+            <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+        </div>
+        <div class="modal-body" fxLayout="column">
+            <div fxLayout="row" fxLayoutGap="20px">
+                <div fxFlex="auto" fxLayout="column" fxLayoutGap="10px">
+                    <mat-form-field fxFlex="100">
+                        <mat-label>Chọn người xin ý kiến<span class="required-field">*</span></mat-label>
+                        <mat-select [(ngModel)]="selectedUserComment">
+                            <mat-option *ngFor="let item of ListUserChoice" value="{{item.Id}}|{{item.Email}}|{{item.DisplayName}}">{{item.DisplayName}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="100">
+                        <mat-label>Nội dung xin ý kiến <span class="required-field">*</span></mat-label>
+                        <textarea matInput [(ngModel)]="contentComment"></textarea>
+                    </mat-form-field>
+                    <div fxLayout="row" fxLayout.xs="column" fxFlexFil fxLayoutGap="5px">
+                        <div fxFlex="120px" fxFlex.xs="auto">
+                            <button type="button" mat-stroked-button color="primary" (click)="fileInputAddComment.click()"> <i
+                                                    class="material-icons">publish</i>&nbsp; <span class="AddfileEdit">Tải tệp</span></button>
+                            <input hidden (change)="addAttachmentFile(3)" #fileInputAddComment type="file" id="fileAttachmentAddComment">
+                        </div>
+                        <div fxFlex="auto">
+                            <div id="viewAttachment" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="5px">
+                                <div *ngFor="let items of outputFileAddComment"><a (click)="removeAttachmentFile(items,3)"><i
+                                                            class="material-icons">clear</i>&nbsp;</a> {{items.name}}</div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" fxLayoutAlign="center center">
+            <button mat-stroked-button color="primary" type="button" class="MR5" (click)="saveItem()" style="width: 100px"><i class="material-icons">save</i>&nbsp; Lưu</button>
             <button mat-stroked-button color="primary" type="button" class="MR5" (click)="bsModalRef.hide()" style="width: 100px"><i class="material-icons">close</i>&nbsp; Đóng</button>
         </div>
     </ng-template>

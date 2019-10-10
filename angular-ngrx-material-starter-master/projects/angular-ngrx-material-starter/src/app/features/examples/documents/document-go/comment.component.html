@@ -8,7 +8,7 @@
     <mat-form-field fxFlex="100">
         <mat-label>Chọn người xin ý kiến</mat-label>
         <mat-select [(ngModel)]="selectedApprover">
-            <mat-option *ngFor="let item of listUser" value="{{item.UserId}}|{{item.UserEmail}}">{{item.UserName}}</mat-option>
+            <mat-option *ngFor="let item of listUser" value="{{item.UserId}}|{{item.UserEmail}}|{{item.DisplayName}}">{{item.DisplayName}}</mat-option>
         </mat-select>
     </mat-form-field>
     <!-- <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">

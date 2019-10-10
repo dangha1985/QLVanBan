@@ -26,6 +26,8 @@ export class DocumentComponent implements OnInit {
     { link: 'documentgo-process/2', label: 'Đã xử lý' },
     { link: 'documentgo-waiting-comment/3', label: 'Chờ xin ý kiến' },
     { link: 'documentgo-comment/4', label: 'Đã cho ý kiến' },
+    { link: 'reportDocGo', label: 'Báo cáo, thống kê'},
+    { link: 'reportAdvanceDocGo', label: 'Tra cứu văn bản'}
   ];
   constructor(private store: Store<State>) {}
 

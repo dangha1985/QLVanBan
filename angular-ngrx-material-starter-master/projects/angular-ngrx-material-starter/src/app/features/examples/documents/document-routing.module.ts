@@ -11,13 +11,15 @@ import { IncomingDocumentComponent } from '../../../features/examples/documents/
 import { DocumentGoComponent } from './document-go/document-go.component';
 import { DocumentGoDetailComponent } from './document-go/document-go-detail.component';
 import { DocumentGoWaitingComponent } from './document-go/document-go-waiting.component';
+import {ReportDGComponent} from '../documents/document-go/report.component';
+import {ReportAdvanceDGComponent} from '../documents/document-go/report-advance.component';
 import { CommentComponent }from './document-go/comment.component';
 
-import {DocumentAddComponent} from './document-to/components/document-add.component'
-import {DocumentDetailComponent} from './document-to/components/document-detail.component'
-import { DocumentWaitingComponent } from './document-to/components/document-waiting.component'
-import {ReportComponent} from './document-to/components/report.component'
-import {ReportAdvanceComponent} from './document-to/components/report-advance.component'
+import {DocumentAddComponent} from './document-to/components/document-add.component';
+import {DocumentDetailComponent} from './document-to/components/document-detail.component';
+import { DocumentWaitingComponent } from './document-to/components/document-waiting.component';
+import {ReportComponent} from './document-to/components/report.component';
+import {ReportAdvanceComponent} from './document-to/components/report-advance.component';
 
 import { from } from 'rxjs';
 const routes: Routes = [
@@ -64,6 +66,16 @@ const routes: Routes = [
         path: 'documentgo-detail/:id/:step',
         component: DocumentGoDetailComponent,
         data: { title: 'Xử lý' }
+      },
+      {
+        path: 'reportDocGo',
+        component: ReportDGComponent,
+        data: { title: 'Báo cáo, thống kê' }
+      },
+      {
+        path: 'reportAdvanceDocGo',
+        component: ReportAdvanceDGComponent,
+        data: { title: 'Tra cứu văn bản' }
       },
     ]
   },
