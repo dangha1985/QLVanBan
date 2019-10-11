@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Description="SharePoint Add-in Feature" Id="d632d88c-aac0-4828-b5db-ad04b5eaac52" Scope="Web" Title="DOCUMENT_MANAGEMENT Feature1" Version="1.0.0.6">
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Description="SharePoint Add-in Feature" Id="d632d88c-aac0-4828-b5db-ad04b5eaac52" Scope="Web" Title="DOCUMENT_MANAGEMENT Feature1" Version="1.0.0.8">
   <ElementManifests>
     <ElementManifest Location="Pages\Elements.xml" />
     <ElementFile Location="Pages\Default.aspx" />
@@ -507,7 +507,6 @@
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\index.html" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\banner.jpg" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\custom.css" />
-    <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\custom.styl" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\icheck.png" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.eot" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.svg" />
@@ -526,7 +525,6 @@
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\ie\icon-lab.png" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\ie\icon-options.png" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\css\ie\icon-star.png" />
-    <ElementFile Location="Content\assets\global\plugins\icheck\demo\js\custom.js" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\js\custom.min.js" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\js\jquery.js" />
     <ElementFile Location="Content\assets\global\plugins\icheck\demo\js\zepto.js" />

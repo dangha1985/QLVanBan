@@ -492,7 +492,6 @@
     <File Path="Content\assets\global\plugins\icheck\demo\index.html" Url="Content/assets/global/plugins/icheck/demo/index.html" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\banner.jpg" Url="Content/assets/global/plugins/icheck/demo/css/banner.jpg" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\custom.css" Url="Content/assets/global/plugins/icheck/demo/css/custom.css" ReplaceContent="TRUE" />
-    <File Path="Content\assets\global\plugins\icheck\demo\css\custom.styl" Url="Content/assets/global/plugins/icheck/demo/css/custom.styl" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\icheck.png" Url="Content/assets/global/plugins/icheck/demo/css/icheck.png" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.eot" Url="Content/assets/global/plugins/icheck/demo/css/montserrat-bold.eot" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.svg" Url="Content/assets/global/plugins/icheck/demo/css/montserrat-bold.svg" ReplaceContent="TRUE" />
@@ -511,7 +510,6 @@
     <File Path="Content\assets\global\plugins\icheck\demo\css\ie\icon-lab.png" Url="Content/assets/global/plugins/icheck/demo/css/ie/icon-lab.png" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\ie\icon-options.png" Url="Content/assets/global/plugins/icheck/demo/css/ie/icon-options.png" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\css\ie\icon-star.png" Url="Content/assets/global/plugins/icheck/demo/css/ie/icon-star.png" ReplaceContent="TRUE" />
-    <File Path="Content\assets\global\plugins\icheck\demo\js\custom.js" Url="Content/assets/global/plugins/icheck/demo/js/custom.js" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\js\custom.min.js" Url="Content/assets/global/plugins/icheck/demo/js/custom.min.js" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\js\jquery.js" Url="Content/assets/global/plugins/icheck/demo/js/jquery.js" ReplaceContent="TRUE" />
     <File Path="Content\assets\global\plugins\icheck\demo\js\zepto.js" Url="Content/assets/global/plugins/icheck/demo/js/zepto.js" ReplaceContent="TRUE" />

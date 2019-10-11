@@ -2,13 +2,13 @@
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
   <Module Name="App">
     <File Path="App\Sample.txt" Url="App/Sample.txt" ReplaceContent="TRUE" />
-    <File Path="App\main-es2015.c912b5635d6ab2b51b9c.js" Url="App/main-es2015.c912b5635d6ab2b51b9c.js" ReplaceContent="TRUE" />
     <File Path="App\Default.aspx" Url="App/Default.aspx" ReplaceContent="TRUE" />
-    <File Path="App\main-es5.1cc4ffb5bdad696eb05d.js" Url="App/main-es5.1cc4ffb5bdad696eb05d.js" ReplaceContent="TRUE" />
     <File Path="App\polyfills-es2015.c777ec571b57c67e5c1e.js" Url="App/polyfills-es2015.c777ec571b57c67e5c1e.js" ReplaceContent="TRUE" />
     <File Path="App\polyfills-es5.6691e0896a3f6e028498.js" Url="App/polyfills-es5.6691e0896a3f6e028498.js" ReplaceContent="TRUE" />
-    <File Path="App\runtime-es2015.d0ed87ae202bd11a0c95.js" Url="App/runtime-es2015.d0ed87ae202bd11a0c95.js" ReplaceContent="TRUE" />
-    <File Path="App\runtime-es5.c05805d15a7867aff61c.js" Url="App/runtime-es5.c05805d15a7867aff61c.js" ReplaceContent="TRUE" />
-    <File Path="App\styles.b1d920390ca14d69cea7.css" Url="App/styles.b1d920390ca14d69cea7.css" ReplaceContent="TRUE" />
+    <File Path="App\main-es5.52d5cfdf6c2b9521730e.js" Url="App/main-es5.52d5cfdf6c2b9521730e.js" ReplaceContent="TRUE" />
+    <File Path="App\main-es2015.1d00b6acebe171d2c552.js" Url="App/main-es2015.1d00b6acebe171d2c552.js" ReplaceContent="TRUE" />
+    <File Path="App\runtime-es5.db1eef942a23b6d9109b.js" Url="App/runtime-es5.db1eef942a23b6d9109b.js" ReplaceContent="TRUE" />
+    <File Path="App\runtime-es2015.709bd11f81b62017ddc1.js" Url="App/runtime-es2015.709bd11f81b62017ddc1.js" ReplaceContent="TRUE" />
+    <File Path="App\styles.7795f4faced7abf6d992.css" Url="App/styles.7795f4faced7abf6d992.css" ReplaceContent="TRUE" />
   </Module>
 </Elements>

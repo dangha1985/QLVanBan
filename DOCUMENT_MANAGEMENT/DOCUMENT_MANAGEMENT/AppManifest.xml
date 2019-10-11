@@ -3,7 +3,7 @@
 <App xmlns="http://schemas.microsoft.com/sharepoint/2012/app/manifest"
      Name="DOCUMENT_MANAGEMENT"
      ProductID="{630e2e29-48db-4f3d-8114-bd6c17ba96d1}"
-     Version="1.0.0.6"
+     Version="1.0.0.8"
      SharePointMinVersion="16.0.0.0"
 >
   <Properties>

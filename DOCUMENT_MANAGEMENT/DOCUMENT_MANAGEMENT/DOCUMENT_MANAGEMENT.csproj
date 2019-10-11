@@ -43,6 +43,9 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="App\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{b5d6381f-8837-4a09-96dc-64074bada6f5}</SharePointProjectItemId>
+    </None>
     <None Include="Config\AppConfig\AppConfigInstance\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{fc509381-3e04-4003-b3dc-04493a23d396}</SharePointProjectItemId>
     </None>
@@ -97,7 +100,6 @@
     <None Include="Content\assets\global\plugins\icheck\.gitignore" />
     <None Include="Content\assets\global\plugins\icheck\bower.json" />
     <None Include="Content\assets\global\plugins\icheck\CHANGELOG.md" />
-    <None Include="Content\assets\global\plugins\icheck\demo\css\custom.styl" />
     <None Include="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.eot" />
     <None Include="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.ttf" />
     <None Include="Content\assets\global\plugins\icheck\demo\css\montserrat-bold.woff" />
@@ -127,6 +129,16 @@
     <None Include="Pages\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{630e2e29-48db-4f3d-8114-bd6c17ba96d1}</SharePointProjectItemId>
     </None>
+    <Content Include="App\Default.aspx" />
+    <Content Include="App\Elements.xml" />
+    <Content Include="App\main-es2015.1d00b6acebe171d2c552.js" />
+    <Content Include="App\main-es5.52d5cfdf6c2b9521730e.js" />
+    <Content Include="App\polyfills-es2015.c777ec571b57c67e5c1e.js" />
+    <Content Include="App\polyfills-es5.6691e0896a3f6e028498.js" />
+    <Content Include="App\runtime-es2015.709bd11f81b62017ddc1.js" />
+    <Content Include="App\runtime-es5.db1eef942a23b6d9109b.js" />
+    <Content Include="App\Sample.txt" />
+    <Content Include="App\styles.7795f4faced7abf6d992.css" />
     <Content Include="Config\AppConfig\AppConfigInstance\Elements.xml" />
     <Content Include="Config\AppConfig\Elements.xml" />
     <Content Include="Config\AppConfig\Schema.xml" />
@@ -593,7 +605,6 @@
     <Content Include="Content\assets\global\plugins\icheck\demo\css\montserrat-regular.svg" />
     <Content Include="Content\assets\global\plugins\icheck\demo\css\normalize.css" />
     <Content Include="Content\assets\global\plugins\icheck\demo\index.html" />
-    <Content Include="Content\assets\global\plugins\icheck\demo\js\custom.js" />
     <Content Include="Content\assets\global\plugins\icheck\demo\js\custom.min.js" />
     <Content Include="Content\assets\global\plugins\icheck\demo\js\jquery.js" />
     <Content Include="Content\assets\global\plugins\icheck\demo\js\zepto.js" />

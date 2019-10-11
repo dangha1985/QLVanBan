@@ -1,15 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Id="b537fc7e-7976-4706-a28b-5fd91d5d8d05" Scope="Web" Title="DOCUMENT_MANAGEMENT Feature3" Version="1.0.0.6">
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Id="b537fc7e-7976-4706-a28b-5fd91d5d8d05" Scope="Web" Title="DOCUMENT_MANAGEMENT Feature3" Version="1.0.0.8">
   <ElementManifests>
     <ElementManifest Location="ListCreateList\Elements.xml" />
     <ElementFile Location="ListCreateList\Schema.xml" />
     <ElementManifest Location="ListCreateListInstance\Elements.xml" />
+    <ElementManifest Location="App\Elements.xml" />
+    <ElementFile Location="App\Sample.txt" />
+    <ElementFile Location="App\Default.aspx" />
+    <ElementFile Location="App\polyfills-es2015.c777ec571b57c67e5c1e.js" />
+    <ElementFile Location="App\polyfills-es5.6691e0896a3f6e028498.js" />
+    <ElementFile Location="App\main-es5.52d5cfdf6c2b9521730e.js" />
+    <ElementFile Location="App\main-es2015.1d00b6acebe171d2c552.js" />
+    <ElementFile Location="App\runtime-es5.db1eef942a23b6d9109b.js" />
+    <ElementFile Location="App\runtime-es2015.709bd11f81b62017ddc1.js" />
+    <ElementFile Location="App\styles.7795f4faced7abf6d992.css" />
   </ElementManifests>
   <UpgradeActions>
     <VersionRange>
       <ApplyElementManifests>
         <ElementManifest Location="ListCreateList\Elements.xml" />
         <ElementManifest Location="ListCreateListInstance\Elements.xml" />
+        <ElementManifest Location="App\Elements.xml" />
       </ApplyElementManifests>
     </VersionRange>
   </UpgradeActions>

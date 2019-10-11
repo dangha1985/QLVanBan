@@ -493,7 +493,6 @@
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\index.html" Target="Content\assets\global\plugins\icheck\demo\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\banner.jpg" Target="Content\assets\global\plugins\icheck\demo\css\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\custom.css" Target="Content\assets\global\plugins\icheck\demo\css\" Type="ElementFile" />
-    <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\custom.styl" Target="Content\assets\global\plugins\icheck\demo\css\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\icheck.png" Target="Content\assets\global\plugins\icheck\demo\css\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\montserrat-bold.eot" Target="Content\assets\global\plugins\icheck\demo\css\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\montserrat-bold.svg" Target="Content\assets\global\plugins\icheck\demo\css\" Type="ElementFile" />
@@ -512,7 +511,6 @@
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\ie\icon-lab.png" Target="Content\assets\global\plugins\icheck\demo\css\ie\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\ie\icon-options.png" Target="Content\assets\global\plugins\icheck\demo\css\ie\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\css\ie\icon-star.png" Target="Content\assets\global\plugins\icheck\demo\css\ie\" Type="ElementFile" />
-    <ProjectItemFile Source="assets\global\plugins\icheck\demo\js\custom.js" Target="Content\assets\global\plugins\icheck\demo\js\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\js\custom.min.js" Target="Content\assets\global\plugins\icheck\demo\js\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\js\jquery.js" Target="Content\assets\global\plugins\icheck\demo\js\" Type="ElementFile" />
     <ProjectItemFile Source="assets\global\plugins\icheck\demo\js\zepto.js" Target="Content\assets\global\plugins\icheck\demo\js\" Type="ElementFile" />
